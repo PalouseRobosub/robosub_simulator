@@ -1,0 +1,194 @@
+<?xml version='1.0'?>
+<sdf version='1.5'>
+
+  <model name='robosub_cobalt'>
+    <pose>0 0 .5 0 0 0</pose>
+
+    <joint name="hull_frame" type="fixed">
+        <parent>frame</parent>
+        <child>hull</child>
+    </joint>
+
+    <link name='hull'>
+      <pose>0 0 0 1.57079632679 0 0</pose>
+      <inertial>
+        <mass>10</mass>
+        <inertia>
+          <ixx>86.28907821859966</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>86.28907821859966</iyy>
+          <iyz>0</iyz>
+          <izz>5.026548245743671</izz>
+        </inertia>
+      </inertial>
+
+      <visual name='bulkhead_visual'>
+        <geometry>
+              <cylinder>
+                <radius>0.1</radius>
+                <length>.13</length>
+              </cylinder>
+        </geometry>
+        <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Black</name>
+            </script>
+          </material>
+      </visual>
+
+      <visual name='front_ring_visual'>
+      <pose>0 0 .075 0 0 0</pose>
+        <geometry>
+              <cylinder>
+                <radius>0.102</radius>
+                <length>.05</length>
+              </cylinder>
+        </geometry>
+        <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Blue</name>
+            </script>
+          </material>
+      </visual>
+      <visual name='rear_ring_visual'>
+      <pose>0 0 -.075 0 0 0</pose>
+        <geometry>
+              <cylinder>
+                <radius>0.102</radius>
+                <length>.05</length>
+              </cylinder>
+        </geometry>
+        <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Blue</name>
+            </script>
+          </material>
+      </visual>
+            <visual name='front_tube_visual'>
+      <pose>0 0 .235 0 0 0</pose>
+        <geometry>
+              <cylinder>
+                <radius>0.1</radius>
+                <length>.32</length>
+              </cylinder>
+        </geometry>
+        <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/LightGrey</name>
+            </script>
+          </material>
+      </visual>
+
+      <visual name='rear_tube_visual'>
+      <pose>0 0 -.235 0 0 0</pose>
+        <geometry>
+              <cylinder>
+                <radius>0.1</radius>
+                <length>.32</length>
+              </cylinder>
+        </geometry>
+        <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/LightGrey</name>
+            </script>
+          </material>
+      </visual>
+            <collision name='hull_collision'>
+        <geometry>
+              <cylinder>
+                <radius>0.1</radius>
+                <length>.77</length>
+              </cylinder>
+            </geometry>
+      </collision>
+    </link>
+
+
+    <link name='frame'>
+      <pose>0 0 -0.17 0 0 0</pose>
+      <inertial>
+        <mass>47.3</mass>
+        <inertia>
+          <ixx>86.28907821859966</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>86.28907821859966</iyy>
+          <iyz>0</iyz>
+          <izz>5.026548245743671</izz>
+        </inertia>
+      </inertial>
+
+      <visual name='frame_visual'>
+        <geometry>
+              <box>
+                <size>.3 .85 .13</size>
+              </box>
+            </geometry>
+        <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Black</name>
+            </script>
+          </material>
+      </visual>
+
+      <collision name='frame_collision'>
+        <geometry>
+              <box>
+                <size>.3 .85 .13</size>
+              </box>
+            </geometry>
+      </collision>
+    </link>
+
+    <plugin name="frame_drag" filename="libLiftDragPlugin.so">
+         <air_density>1000</air_density>
+         <cla>1.2535816618911175</cla>
+         <cla_stall>-1.4326647564469914</cla_stall>
+         <cda>0</cda>
+         <cda_stall>1.4326647564469914</cda_stall>
+         <alpha_stall>1.396</alpha_stall>
+         <a0>0</a0>
+         <area>0.27637</area>
+         <upward>0 -0.7071067811865476 -0.7071067811865475</upward>
+         <forward>0 -0.7071067811865475 0.7071067811865476</forward>
+         <link_name>frame</link_name>
+         <cp>0.35 0 0</cp>
+    </plugin>
+
+    <plugin name="hull_drag" filename="libLiftDragPlugin.so">
+         <air_density>1000</air_density>
+         <cla>1.2535816618911175</cla>
+         <cla_stall>-1.4326647564469914</cla_stall>
+         <cda>0</cda>
+         <cda_stall>1.4326647564469914</cda_stall>
+         <alpha_stall>1.396</alpha_stall>
+         <a0>0</a0>
+         <area>0.27637</area>
+         <upward>0 -0.7071067811865476 -0.7071067811865475</upward>
+         <forward>0 -0.7071067811865475 0.7071067811865476</forward>
+         <link_name>hull</link_name>
+         <cp>0.35 0 0</cp>
+    </plugin>    <!-- <plugin name="submarine_propeller_1" filename="libLiftDragPlugin.so">
+         <air_density>1000</air_density><cla>1.2535816618911175</cla><cla_stall>-1.4326647564469914</cla_stall><cda>0</cda><cda_stall>1.4326647564469914</cda_stall><alpha_stall>1.396</alpha_stall><a0>0</a0>
+         <area>0.27637</area>
+         <upward>0 -0.7071067811865476 -0.7071067811865475</upward>
+         <forward>0 -0.7071067811865475 0.7071067811865476</forward>
+         <link_name>propeller</link_name>
+         <cp>0.35 0 0</cp>
+       </plugin> -->
+
+    <allow_auto_disable>0</allow_auto_disable>
+
+    <plugin name="buoyancy" filename="libBuoyancyPlugin.so">
+      <fluid_density>1000</fluid_density>
+    </plugin>
+
+  </model>
+</sdf>
