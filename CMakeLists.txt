@@ -1,14 +1,26 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(robosub_simulator)
+project(simulator_gazebo)
+
+#enable C++11 support
+set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED)
+find_package(catkin REQUIRED
+    roscpp
+    rospy
+    gazebo_ros
+    gazebo_plugins
+    gazebo_msgs
+    std_msgs
+    message_generation
+)
+
+find_package(gazebo REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
-
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -97,9 +109,9 @@ find_package(catkin REQUIRED)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES robosub_simulator
+#  LIBRARIES robosub_gazebo
 #  CATKIN_DEPENDS other_catkin_pkg
-#  DEPENDS system_lib
+  DEPENDS gazebo_ros gazebo_plugins roscpp
 )
 
 ###########
@@ -108,27 +120,30 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-# include_directories(include)
+link_directories(${GAZEBO_LIBRARY_DIRS})
+include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS} ${SDFormat_INCLUDE_DIRS})
+#list(APPEND CMAKE_CXX_FLAGS "${GAZEBO_CXX_FLAGS}")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 
 ## Declare a C++ library
-# add_library(robosub_simulator
-#   src/${PROJECT_NAME}/robosub_simulator.cpp
+# add_library(robosub_gazebo
+#   src/${PROJECT_NAME}/robosub_gazebo.cpp
 # )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
-# add_dependencies(robosub_simulator ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(robosub_gazebo ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
-# add_executable(robosub_simulator_node src/robosub_simulator_node.cpp)
+# add_executable(robosub_gazebo_node src/robosub_gazebo_node.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-# add_dependencies(robosub_simulator_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(robosub_gazebo_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(robosub_simulator_node
+# target_link_libraries(robosub_gazebo_node
 #   ${catkin_LIBRARIES}
 # )
 
@@ -147,7 +162,7 @@ catkin_package(
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS robosub_simulator robosub_simulator_node
+# install(TARGETS robosub_gazebo robosub_gazebo_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -172,10 +187,14 @@ catkin_package(
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_robosub_simulator.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_robosub_gazebo.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+# Examples
+add_subdirectory(examples)
+add_subdirectory(src)

@@ -190,5 +190,9 @@
       <fluid_density>1000</fluid_density>
     </plugin>
 
+    <!-- This is what adding model plugins looks like
+    <plugin name="model_example" filename="libmodel_plugin_example.so"/>
+    -->
+
   </model>
 </sdf>
