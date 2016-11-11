@@ -99,5 +99,9 @@
       </link>
     </model>
 
+    <!-- This is what adding world plugins looks like
+    <plugin name="world_example" filename="libworld_plugin_example.so"/>
+    -->
+
   </world>
 </sdf>
