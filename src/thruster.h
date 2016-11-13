@@ -12,8 +12,11 @@
 #include <ros/callback_queue.h>
 #include <ros/advertise_options.h>
 #include <std_msgs/String.h>
+#include "robosub/thruster.h"
 
 #include <iostream>
+#include <vector>
+#include <string>
 
 namespace gazebo
 {
@@ -26,12 +29,18 @@ private:
     ros::NodeHandle *nh;
     ros::Publisher pub;
     int i;
+    int num_thrusters;
+    std::vector<std::string> thruster_names;
+    ros::Subscriber thruster_sub;
+    robosub::thruster last_thruster_msg;
+    bool received_msg;
 
 public:
     Thruster();
     ~Thruster();
     void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf);
     virtual void UpdateChild();
+    void thrusterCallback(const robosub::thruster::ConstPtr& msg);
 };
 
 }
