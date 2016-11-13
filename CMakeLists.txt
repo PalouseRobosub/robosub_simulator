@@ -15,6 +15,7 @@ find_package(catkin REQUIRED
     gazebo_msgs
     std_msgs
     message_generation
+    robosub
 )
 
 find_package(gazebo REQUIRED)
