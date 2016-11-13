@@ -2,17 +2,57 @@
 <sdf version='1.5'>
 
   <model name='robosub_cobalt'>
-    <pose>0 0 .5 0 0 0</pose>
+    <pose>0 0 0.5 0 0 0</pose>
 
     <joint name="hull_frame" type="fixed">
         <parent>frame</parent>
         <child>hull</child>
     </joint>
 
+    <joint name='dive_front_left_frame' type="fixed">
+        <parent>frame</parent>
+        <child>dive_front_left</child>
+    </joint>
+
+    <joint name='dive_front_right_frame' type="fixed">
+        <parent>frame</parent>
+        <child>dive_front_right</child>
+    </joint>
+
+    <joint name='dive_back_left_frame' type="fixed">
+        <parent>frame</parent>
+        <child>dive_back_left</child>
+    </joint>
+
+    <joint name='dive_back_right_frame' type="fixed">
+        <parent>frame</parent>
+        <child>dive_back_right</child>
+    </joint>
+
+    <joint name='strafe_front_frame' type="fixed">
+        <parent>frame</parent>
+        <child>strafe_front</child>
+    </joint>
+
+    <joint name='strafe_back_frame' type="fixed">
+        <parent>frame</parent>
+        <child>strafe_back</child>
+    </joint>
+
+    <joint name='forward_left_frame' type="fixed">
+        <parent>frame</parent>
+        <child>forward_left</child>
+    </joint>
+
+    <joint name='forward_right_frame' type="fixed">
+        <parent>frame</parent>
+        <child>forward_right</child>
+    </joint>
+
     <link name='hull'>
-      <pose>0 0 0 1.57079632679 0 0</pose>
+      <pose>0 0 .082 1.57079632679 0 1.57079632679 </pose>
       <inertial>
-        <mass>10</mass>
+        <mass>4.5</mass>
         <inertia>
           <ixx>86.28907821859966</ixx>
           <ixy>0</ixy>
@@ -68,7 +108,7 @@
             </script>
           </material>
       </visual>
-            <visual name='front_tube_visual'>
+      <visual name='front_tube_visual'>
       <pose>0 0 .235 0 0 0</pose>
         <geometry>
               <cylinder>
@@ -99,7 +139,7 @@
             </script>
           </material>
       </visual>
-            <collision name='hull_collision'>
+      <collision name='hull_collision'>
         <geometry>
               <cylinder>
                 <radius>0.1</radius>
@@ -111,9 +151,9 @@
 
 
     <link name='frame'>
-      <pose>0 0 -0.17 0 0 0</pose>
+      <pose>0 0 -0.088 0 0 1.57079632679</pose>
       <inertial>
-        <mass>47.3</mass>
+        <mass>21.5</mass>
         <inertia>
           <ixx>86.28907821859966</ixx>
           <ixy>0</ixy>
@@ -144,6 +184,174 @@
                 <size>.3 .85 .13</size>
               </box>
             </geometry>
+      </collision>
+    </link>
+
+    <link name='dive_front_left'>
+      <pose>0.235 0.23 -0.1 0 3.1415926 0</pose>
+
+      <visual name='dive_front_left_visual'>
+        <geometry>
+          <cylinder>
+            <radius>0.0485</radius>
+            <length>0.101</length>
+          </cylinder>
+        </geometry>
+      </visual>
+      <collision name='dive_front_left_collision'>
+        <geometry>
+          <cylinder>
+            <radius>0.0485</radius>
+            <length>0.101</length>
+          </cylinder>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name='dive_front_right'>
+      <pose>0.235 -0.23 -0.1 0 3.1415926 0</pose>
+
+      <visual name='dive_front_right_visual'>
+        <geometry>
+          <cylinder>
+            <radius>0.0485</radius>
+            <length>0.101</length>
+          </cylinder>
+        </geometry>
+      </visual>
+      <collision name='dive_front_right_collision'>
+        <geometry>
+          <cylinder>
+            <radius>0.0485</radius>
+            <length>0.101</length>
+          </cylinder>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name='dive_back_left'>
+      <pose>-0.235 0.23 -0.1 0 3.1415926 0</pose>
+
+      <visual name='dive_back_left_visual'>
+        <geometry>
+          <cylinder>
+            <radius>0.0485</radius>
+            <length>0.101</length>
+          </cylinder>
+        </geometry>
+      </visual>
+      <collision name='dive_back_left_collision'>
+        <geometry>
+          <cylinder>
+            <radius>0.0485</radius>
+            <length>0.101</length>
+          </cylinder>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name='dive_back_right'>
+      <pose>-0.235 -0.23 -0.1 0 3.1415926 0</pose>
+
+      <visual name='dive_back_right_visual'>
+        <geometry>
+          <cylinder>
+            <radius>0.0485</radius>
+            <length>0.101</length>
+          </cylinder>
+        </geometry>
+      </visual>
+      <collision name='dive_back_right_collision'>
+        <geometry>
+          <cylinder>
+            <radius>0.0485</radius>
+            <length>0.101</length>
+          </cylinder>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name='strafe_front'>
+      <pose>0.46 0 -0.01 -1.57079632679 0 0</pose>
+
+      <visual name='strafe_front_visual'>
+        <geometry>
+          <cylinder>
+            <radius>0.0485</radius>
+            <length>0.101</length>
+          </cylinder>
+        </geometry>
+      </visual>
+      <collision name='strafe_front_collision'>
+        <geometry>
+          <cylinder>
+            <radius>0.0485</radius>
+            <length>0.101</length>
+          </cylinder>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name='strafe_back'>
+      <pose>-0.46 0 -0.01 -1.57079632679 0 0</pose>
+
+      <visual name='strafe_back_visual'>
+        <geometry>
+          <cylinder>
+            <radius>0.0485</radius>
+            <length>0.101</length>
+          </cylinder>
+        </geometry>
+      </visual>
+      <collision name='strafe_back_collision'>
+        <geometry>
+          <cylinder>
+            <radius>0.0485</radius>
+            <length>0.101</length>
+          </cylinder>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name='forward_left'>
+      <pose>0 0.2075 -0.01 0 1.57079632679 0</pose>
+
+      <visual name='forward_left_visual'>
+        <geometry>
+          <cylinder>
+            <radius>0.0485</radius>
+            <length>0.101</length>
+          </cylinder>
+        </geometry>
+      </visual>
+      <collision name='forward_left_collision'>
+        <geometry>
+          <cylinder>
+            <radius>0.0485</radius>
+            <length>0.101</length>
+          </cylinder>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name='forward_right'>
+      <pose>0 -0.2075 -0.01 0 1.57079632679 0</pose>
+
+      <visual name='forward_right_visual'>
+        <geometry>
+          <cylinder>
+            <radius>0.0485</radius>
+            <length>0.101</length>
+          </cylinder>
+        </geometry>
+      </visual>
+      <collision name='forward_right_collision'>
+        <geometry>
+          <cylinder>
+            <radius>0.0485</radius>
+            <length>0.101</length>
+          </cylinder>
+        </geometry>
       </collision>
     </link>
 
@@ -190,9 +398,7 @@
       <fluid_density>1000</fluid_density>
     </plugin>
 
-    <!-- This is what adding model plugins looks like
-    <plugin name="model_example" filename="libmodel_plugin_example.so"/>
-    -->
+    <plugin name="thruster" filename="libthruster.so"/>
 
   </model>
 </sdf>
