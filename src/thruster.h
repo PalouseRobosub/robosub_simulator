@@ -5,8 +5,10 @@
 
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
+#include <gazebo/rendering/rendering.hh>
 #include <gazebo/transport/transport.hh>
 #include <gazebo/common/common.hh>
+#include <ignition/math.hh>
 
 #include <ros/ros.h>
 #include <ros/callback_queue.h>
@@ -24,22 +26,36 @@ namespace gazebo
 class Thruster : public ModelPlugin
 {
 private:
-    physics::ModelPtr model;
+    // gazebo plugin objects
+    physics::ModelPtr sub;
     event::ConnectionPtr updateConnection;
+
+    // ros comms
     ros::NodeHandle *nh;
     ros::Publisher pub;
-    int i;
+    ros::Subscriber thruster_sub;
+
+    // Thruster stuff
+    // Consider converting to list of thruster class
     int num_thrusters;
     std::vector<std::string> thruster_names;
-    ros::Subscriber thruster_sub;
+    std::vector<physics::LinkPtr> thruster_links;
     robosub::thruster last_thruster_msg;
     bool received_msg;
+    int num_iterations;
+    physics::LinkPtr frame;
+
+    // gazebo messaging objects
+    // This is for visualizing thruster output
+    transport::PublisherPtr visPub;
+    std::vector<msgs::Visual> visualMsg;
+    transport::NodePtr node;
 
 public:
     Thruster();
     ~Thruster();
     void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf);
-    virtual void UpdateChild();
+    virtual void Update();
     void thrusterCallback(const robosub::thruster::ConstPtr& msg);
 };
 
