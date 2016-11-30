@@ -12,9 +12,11 @@ void Thruster::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     this->sub = _parent;
     received_msg = false;
     num_iterations = 0;
+    buoyancy_percentage = 0.02;
 
-    // Grab frame link ptr
+    // Grab frame, hull link ptr
     frame = sub->GetLink("frame");
+    hull = sub->GetLink("hull");
 
     // This sets gazebo msg publisher
     this->node = transport::NodePtr(new transport::Node());
@@ -29,9 +31,19 @@ void Thruster::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 
     if(!ros::isInitialized())
     {
-        ROS_FATAL_STREAM("ROS Not initialized");
+        std::cout << "ROS Not initialized" << std::endl;
         return;
     }
+
+    std::cout << "thruster node started" << std::endl;
+
+    max_thrust = 0.0;
+    if(!ros::param::get("/control/max_thrust", max_thrust))
+    {
+        ROS_FATAL("Failed to load max_thrust");
+        return;
+    }
+    std::cout <<  "max_thrust: " << max_thrust << std::endl;
 
     XmlRpc::XmlRpcValue thruster_settings;
     if(!ros::param::get("thrusters", thruster_settings))
@@ -39,17 +51,25 @@ void Thruster::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
         ROS_FATAL("thruster params failed to load");
         return;
     }
+    ROS_INFO_STREAM("thruster_settings: " << thruster_settings);
 
     // Just getting the names of thrusters right now since were using the
     // actual model links to get position
-    // TODO: Get pos/orientation info so that we can dynamically spawn
-    // thrusters
+    // TODO: Get pos/orientation info from settings so that we can dynamically
+    // spawn thrusters
     num_thrusters = 0;
     for(int i=0; i < thruster_settings.size(); ++i)
     {
         thruster_names.push_back(thruster_settings[i]["name"]);
         num_thrusters++;
     }
+
+    back_thrust_ratio = 1.0;
+    if(!ros::param::get("control/back_thrust_ratio", back_thrust_ratio))
+    {
+        ROS_WARN_STREAM("failed to load control/back_thrust_ratio. defaulting to 1.0");
+    }
+    ROS_INFO_STREAM("back_thrust_ratio: " << back_thrust_ratio);
 
     nh = new ros::NodeHandle();
 	thruster_sub = nh->subscribe("thruster", 1, &Thruster::thrusterCallback, this);
@@ -78,15 +98,17 @@ void Thruster::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
         // a narrow cylinder
         msgs::Geometry *geomMsg = visualMsg[i].mutable_geometry();
         geomMsg->set_type(msgs::Geometry::CYLINDER);
-        geomMsg->mutable_cylinder()->set_radius(.001);
-        geomMsg->mutable_cylinder()->set_length(2);
+        geomMsg->mutable_cylinder()->set_radius(.004);
+        geomMsg->mutable_cylinder()->set_length(1);
 
         // Set color to red
+        // TODO: They aren't really all that red...
         msgs::Material *matMsg = visualMsg[i].mutable_material();
         msgs::Set(matMsg->mutable_diffuse(), common::Color::Red);
+        msgs::Set(matMsg->mutable_specular(), common::Color::Red);
 
         // Set pose of line to 0 initially
-        msgs::Set(visualMsg[i].mutable_pose(), ignition::math::Pose3d(0, 0, 0.0, 0, 0, 0));
+        msgs::Set(visualMsg[i].mutable_pose(), ignition::math::Pose3d(0, 0, 0, 0, 0, 0));
 
         // Publish message
         visPub->Publish(visualMsg[i]);
@@ -98,48 +120,22 @@ void Thruster::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
             boost::bind(&Thruster::Update, this));
 }
 
-void Thruster::Update()
+void Thruster::UpdateBuoyancy()
 {
-    if(last_thruster_msg.data.size() == 8)
-    {
-        double max_thrust = 0.0;
-        if(!nh->getParamCached("/control/max_thrust", max_thrust))
-        {
-            ROS_FATAL_STREAM("Failed to load max_thrust");
-        }
-        for(int i=0; i < num_thrusters; i++)
-        {
-            if(!std::isnan(last_thruster_msg.data[i]))
-            {
-                // Grab thruster ptr
-                physics::LinkPtr t = thruster_links[i];
-
-                // Set force to be in z axis then rotate it as appropriate
-                // for the thruster
-                math::Pose pose = t->GetRelativePose();
-                math::Vector3 force(0, 0, last_thruster_msg.data[i]*max_thrust);
-                force = pose.rot * force;
-
-                // Add the force directly to the frame of the sub (instead of the
-                // thruster itself)
-                frame->AddLinkForce(force, pose.pos);
-
-                if(received_msg)
-                {
-                    ROS_INFO_STREAM(thruster_names[i] << ": (" << force.x << ", " << force.y << ", " << force.z << ")");
-                }
-            }
-        }
-        received_msg = false;
-    }
-    num_iterations++;
+    // Directly adding buoyancy seems to work better than using the buoyancy
+    // plugin.
+    // TODO: Calculate the mass of the sub by getting each link. Use
+    // model->GetLinks() and link->GetInertial(). This would also allow us to
+    // compare it to param /control/mass. If they differ something is probably
+    // not correct.
+    // TODO: Use AddForceAtRelativePosition to add buoyancy to the center of
+    // buoyancy. (Ask Christian for this)
+    double gravity = 32.752*9.8;
+    hull->AddForce(math::Vector3(0,0, gravity + (gravity*buoyancy_percentage)));
 }
 
-void Thruster::thrusterCallback(const robosub::thruster::ConstPtr& msg)
+void Thruster::UpdateVisualizers()
 {
-    received_msg = true;
-    last_thruster_msg.data = msg->data;
-
     for(int i=0; i < num_thrusters; i++)
     {
         if(!std::isnan(last_thruster_msg.data[i]))
@@ -152,7 +148,15 @@ void Thruster::thrusterCallback(const robosub::thruster::ConstPtr& msg)
 
             // Rotate and offset visualizer line as appropriate
             math::Pose p = t->GetWorldPose();
-            math::Vector3 line_offset(0, 0, last_thruster_msg.data[i]/2);
+
+            // Move the cylinder to one side of the thruster to show forward
+            // direction. .101 is the length of the thruster
+            math::Vector3 line_offset;
+            if(last_thruster_msg.data[i] < 0.0)
+                line_offset.z = last_thruster_msg.data[i]/2.0 - .101/2.0;
+            else
+                line_offset.z = last_thruster_msg.data[i]/2.0 + .101/2.0;
+
             line_offset = p.rot * line_offset;
             ignition::math::Pose3d ip(p.pos.x-line_offset.x, p.pos.y-line_offset.y, p.pos.z-line_offset.z, p.rot.w, p.rot.x, p.rot.y, p.rot.z);
             msgs::Set(visualMsg[i].mutable_pose(), ip);
@@ -161,6 +165,76 @@ void Thruster::thrusterCallback(const robosub::thruster::ConstPtr& msg)
             visPub->Publish(visualMsg[i]);
         }
     }
+}
+
+void Thruster::Update()
+{
+    UpdateBuoyancy();
+
+    // Calculate and apply appropriate force to each thruster. For each
+    // thruster, force is first applied in the z axis of a vector3. It is then
+    // rotated to the orientation of the thruster so that the force is along
+    // the z axis of the thruster. The force is then actually added to the
+    // frame at the thrusters position, instead of the thruster link itself
+    // since we may want to load thrusters dynamically in the future.
+    // TODO: (If needed): Optimize this section so that the force is only
+    // calculated once per thruster per message instead of once per frame per
+    // thruster.
+    if(last_thruster_msg.data.size() == 8)
+    {
+        for(int i=0; i < num_thrusters; i++)
+        {
+            if(!std::isnan(last_thruster_msg.data[i]))
+            {
+                // Grab thruster ptr
+                physics::LinkPtr t = thruster_links[i];
+
+                // If the force is in the negative direction, scale the output
+                // by the back thrust ratio
+                math::Vector3 force(0, 0, 0);
+                if(last_thruster_msg.data[i] < 0)
+                    force.z = last_thruster_msg.data[i]*max_thrust*back_thrust_ratio;
+                else
+                    force.z = last_thruster_msg.data[i]*max_thrust;
+
+                // Get pose of thruster relative to frame then rotate force
+                // vector as appropriate to output along thrusters z axis
+                math::Pose thruster_world_pose = t->GetWorldPose();
+                math::Pose thruster_rel_pose = t->GetRelativePose();
+                force = thruster_rel_pose.rot * force;
+                //force = frame_pose.rot * force;
+
+                // Add the force directly to the frame of the sub (instead of the
+                // thruster itself)
+                frame->AddLinkForce(force, thruster_rel_pose.pos);
+
+                if(received_msg)
+                {
+                    ROS_INFO_STREAM(thruster_names[i] << ":");
+                    ROS_INFO_STREAM("Force: (" << force.x << ", " << force.y << ", " << force.z << ")");
+                    ROS_INFO_STREAM("Pos: (" << thruster_rel_pose.pos.x << ", " << thruster_rel_pose.pos.y << ", " << thruster_rel_pose.pos.z << ")");
+                }
+            }
+        }
+
+        if(received_msg)
+        {
+            // Update lines only every time a message is received
+            UpdateVisualizers();
+
+            ROS_INFO_STREAM("Total Force on frame: ");
+            math::Vector3 f = frame->GetRelativeForce();
+            ROS_INFO_STREAM("(" << f.x << ", " << f.y << ", " << f.z << ")\n");
+        }
+        received_msg = false;
+    }
+    num_iterations++;
+}
+
+void Thruster::thrusterCallback(const robosub::thruster::ConstPtr& msg)
+{
+    received_msg = true;
+    last_thruster_msg.data = msg->data;
 }
 
 GZ_REGISTER_MODEL_PLUGIN(Thruster)
