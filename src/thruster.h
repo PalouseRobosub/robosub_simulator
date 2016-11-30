@@ -44,6 +44,10 @@ private:
     bool received_msg;
     int num_iterations;
     physics::LinkPtr frame;
+    physics::LinkPtr hull;
+    double back_thrust_ratio;
+    double buoyancy_percentage;
+    double max_thrust;
 
     // gazebo messaging objects
     // This is for visualizing thruster output
@@ -55,6 +59,8 @@ public:
     Thruster();
     ~Thruster();
     void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf);
+    void UpdateBuoyancy();
+    void UpdateVisualizers();
     virtual void Update();
     void thrusterCallback(const robosub::thruster::ConstPtr& msg);
 };
