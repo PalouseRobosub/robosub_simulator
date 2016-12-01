@@ -19,7 +19,7 @@
 
     <light type="directional" name="sun">
       <cast_shadows>true</cast_shadows>
-      <pose>0 0 100 0 0 0</pose>
+      <pose>100 0 100 0 1.52 0</pose>
       <diffuse>0.8 0.8 0.8 1</diffuse>
       <specular>0.2 0.2 0.2 1</specular>
       <attenuation>
@@ -31,6 +31,7 @@
       <direction>-0.5 0.1 -0.9</direction>
     </light>
 
+    <!--
     <model name="ground_plane">
       <static>true</static>
       <link name="link">
@@ -70,15 +71,17 @@
         </visual>
       </link>
     </model>
+    -->
 
     <model name="ceiling_plane">
       <static>true</static>
-      <pose>0 0 10 0 0 0</pose>
+      <pose>0 0 9.9 0 0 0</pose>
       <link name="link">
         <collision name="collision">
           <geometry>
             <box>
-              <size>50 50 .001</size>
+                <!--<size>50 50 .001</size>-->
+              <size>100 100 .001</size>
             </box>
           </geometry>
         </collision>
@@ -86,7 +89,7 @@
           <cast_shadows>false</cast_shadows>
           <geometry>
             <box>
-              <size>50 50 .001</size>
+              <size>100 60 .001</size>
             </box>
           </geometry>
           <material>
@@ -100,6 +103,7 @@
       </link>
     </model>
 
+    <!--
     <model name="north_plane">
       <static>true</static>
       <pose>25 0 5 3.14 0 3.14</pose>
@@ -211,6 +215,26 @@
         </visual>
       </link>
     </model>
+    -->
+
+    <include>
+      <uri>model://pool</uri>
+    </include>
+
+    <include>
+      <pose>-5 -5 4 0 0 0</pose>
+      <uri>model://gate</uri>
+    </include>
+
+    <include>
+      <pose>0 3 4 0 0 0</pose>
+      <uri>model://buoys</uri>
+    </include>
+
+    <include>
+      <pose>3 -7 3 0 0 0</pose>
+      <uri>model://buoys</uri>
+    </include>
 
     <!-- This is what adding world plugins looks like
     <plugin name="world_example" filename="libworld_plugin_example.so"/>
