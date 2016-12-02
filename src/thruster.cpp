@@ -12,7 +12,7 @@ void Thruster::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     this->sub = _parent;
     received_msg = false;
     num_iterations = 0;
-    buoyancy_percentage = 0.02;
+    buoyancy_percentage = 0.04;
 
     // Grab frame, hull link ptr
     frame = sub->GetLink("frame");
@@ -107,8 +107,8 @@ void Thruster::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
         msgs::Set(matMsg->mutable_diffuse(), common::Color::Red);
         msgs::Set(matMsg->mutable_specular(), common::Color::Red);
 
-        // Set pose of line to 0 initially
-        msgs::Set(visualMsg[i].mutable_pose(), ignition::math::Pose3d(0, 0, 0, 0, 0, 0));
+        // Set pose of line to somewhere in the distance initially
+        msgs::Set(visualMsg[i].mutable_pose(), ignition::math::Pose3d(1000, 1000, 1000, 0, 0, 0));
 
         // Publish message
         visPub->Publish(visualMsg[i]);
