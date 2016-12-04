@@ -213,7 +213,7 @@
     </link>
 
     <link name='dive_front_left'>
-      <pose>0.235 0.23 -0.1 0 0 0</pose>
+      <pose>0.235 0.23 -0.1 0 3.14159 0</pose>
       <inertial>
         <mass>0.344</mass>
       </inertial>
@@ -243,7 +243,7 @@
     </link>
 
     <link name='dive_front_right'>
-      <pose>0.235 -0.23 -0.1 0 0 0</pose>
+      <pose>0.235 -0.23 -0.1 0 3.14159 0</pose>
       <inertial>
         <mass>0.344</mass>
       </inertial>
@@ -273,7 +273,7 @@
     </link>
 
     <link name='dive_back_left'>
-      <pose>-0.235 0.23 -0.1 0 0 0</pose>
+      <pose>-0.235 0.23 -0.1 0 3.14159 0</pose>
       <inertial>
         <mass>0.344</mass>
       </inertial>
@@ -303,7 +303,7 @@
     </link>
 
     <link name='dive_back_right'>
-      <pose>-0.235 -0.23 -0.1 0 0 0</pose>
+      <pose>-0.235 -0.23 -0.1 0 3.14159 0</pose>
       <inertial>
         <mass>0.344</mass>
       </inertial>
