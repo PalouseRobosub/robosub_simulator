@@ -1,5 +1,6 @@
 <launch>
 <rosparam command="load" file="$(find robosub)/param/cobalt.yaml"/>
+<rosparam command="load" file="$(find robosub)/param/obstacles.yaml"/>
 <arg name="world_file"  default="$(find robosub_simulator)/worlds/underwater.world"/>
 <include file="$(find gazebo_ros)/launch/empty_world.launch">
    <arg name="use_sim_time" value="true"/>
