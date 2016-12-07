@@ -75,13 +75,12 @@
 
     <model name="ceiling_plane">
       <static>true</static>
-      <pose>0 0 9.9 0 0 0</pose>
+      <pose>0 0 -0.8 0 0 0</pose>
       <link name="link">
         <collision name="collision">
           <geometry>
             <box>
-                <!--<size>50 50 .001</size>-->
-              <size>100 100 .001</size>
+              <size>90 60 .001</size>
             </box>
           </geometry>
         </collision>
@@ -89,7 +88,7 @@
           <cast_shadows>false</cast_shadows>
           <geometry>
             <box>
-              <size>100 60 .001</size>
+              <size>90 60 .001</size>
             </box>
           </geometry>
           <material>
@@ -221,20 +220,52 @@
       <uri>model://pool</uri>
     </include>
 
+    <!-- Side A -->
+    <model name="dock_sideA">
+      <static>true</static>
+      <pose>4.8 -28.0 -0.67 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>3 2 0.35</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <cast_shadows>true</cast_shadows>
+          <geometry>
+            <box>
+              <size>3 2 0.35</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
     <include>
-      <pose>-5 -5 4 0 0 0</pose>
+      <name>gate_sideA</name>
+      <pose>12.4 -23.6 -0.9 0 0 -0.9</pose>
       <uri>model://gate</uri>
     </include>
 
     <include>
-      <pose>0 3 4 0 0 0</pose>
+      <name>buoys_sideA</name>
+      <pose>19.0 -20.2 -5.0 0 0 -0.6</pose>
       <uri>model://buoys</uri>
     </include>
 
-    <include>
-      <pose>3 -7 3 0 0 0</pose>
-      <uri>model://buoys</uri>
-    </include>
+    <!-- Side B -->
+
+    <!-- Side C -->
+
+    <!-- Side D -->
 
     <!-- This is what adding world plugins looks like
     <plugin name="world_example" filename="libworld_plugin_example.so"/>
