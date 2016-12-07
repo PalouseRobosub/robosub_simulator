@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>simulator_gazebo</name>
+  <name>robosub_simulator</name>
   <version>0.0.0</version>
   <description>The robosub_simulator package</description>
 

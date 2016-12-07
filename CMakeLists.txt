@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(simulator_gazebo)
+project(robosub_simulator)
 
 #enable C++11 support
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
