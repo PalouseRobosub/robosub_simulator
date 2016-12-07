@@ -1,10 +1,13 @@
 <launch>
-<arg name="world_file"  default="$(find simulator_gazebo)/worlds/underwater.world"/>
+<rosparam command="load" file="$(find robosub)/param/cobalt.yaml"/>
+<arg name="world_file"  default="$(find robosub_simulator)/worlds/underwater.world"/>
 <include file="$(find gazebo_ros)/launch/empty_world.launch">
    <arg name="use_sim_time" value="true"/>
    <arg name="debug" value="false"/>
    <arg name="gui" value="true" />
    <arg name="verbose" value="true"/>
    <arg name="world_name" value="$(arg world_file)"/>
- </include>
+</include>
+<node name="spawn_robosub" pkg="robosub_simulator" type="spawn_robosub.sh"/>
+<node name="simulator_bridge" pkg="robosub_simulator" type="simulator_bridge" required="true"/>
 </launch>
