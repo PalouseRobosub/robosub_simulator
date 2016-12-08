@@ -1,14 +1,18 @@
 #include "ros/ros.h"
 #include "robosub/depth_stamped.h"
-#include "geometry_msgs/Quaternion.h"
+#include "robosub/Euler.h"
 #include "geometry_msgs/Vector3.h"
 #include "gazebo_msgs/ModelState.h"
 #include "gazebo_msgs/ModelStates.h"
 #include "robosub/ObstaclePosArray.h"
 #include "robosub/QuaternionStampedAccuracy.h"
+#include "tf/transform_datatypes.h"
+
+static constexpr double _180_OVER_PI = 180.0 / 3.14159;
 
 ros::Publisher position_pub;
 ros::Publisher orientation_pub;
+ros::Publisher euler_pub;
 ros::Publisher depth_pub;
 ros::Publisher obstacle_pos_pub;
 
@@ -28,6 +32,7 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
     geometry_msgs::Vector3 position_msg;
     robosub::QuaternionStampedAccuracy orientation_msg;
     robosub::depth_stamped depth_msg;
+    robosub::Euler euler_msg;
 
     // Find top of water and subs indices in modelstates lists
     int sub_index = -1;
@@ -52,6 +57,16 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
         orientation_msg.quaternion.w = msg.pose[sub_index].orientation.w;
         orientation_msg.header.stamp = ros::Time::now();
         orientation_msg.accuracy = 1;
+
+        // Create an Euler message for human readability
+        tf::Matrix3x3 m(tf::Quaternion(orientation_msg.quaternion.x,
+                    orientation_msg.quaternion.y, orientation_msg.quaternion.z,
+                    orientation_msg.quaternion.w));
+        m.getRPY(euler_msg.roll, euler_msg.pitch, euler_msg.yaw);
+        euler_msg.roll *= _180_OVER_PI;
+        euler_msg.pitch *= _180_OVER_PI;
+        euler_msg.yaw *= _180_OVER_PI;
+        euler_pub.publish(euler_msg);
 
         // Publish sub position and orientation
         position_pub.publish(position_msg);
@@ -109,6 +124,7 @@ int main(int argc, char **argv)
     position_pub = nh.advertise<geometry_msgs::Vector3>("position", 1);
     orientation_pub =
             nh.advertise<robosub::QuaternionStampedAccuracy>("orientation", 1);
+    euler_pub = nh.advertise<robosub::Euler>( "orientation/pretty", 1);
     depth_pub = nh.advertise<robosub::depth_stamped>("depth", 1);
     obstacle_pos_pub = nh.advertise<robosub::ObstaclePosArray>("obstacles/positions", 1);
 
