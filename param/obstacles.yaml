@@ -1,0 +1,13 @@
+obstacles:
+    - "dock_sideA"
+    - "gate_sideA"
+    - "buoys_sideA"
+    - "dock_sideB"
+    - "gate_sideB"
+    - "buoys_sideB"
+    - "dock_sideC"
+    - "gate_sideC"
+    - "buoys_sideC"
+    - "dock_sideD"
+    - "gate_sideD"
+    - "buoys_sideD"
