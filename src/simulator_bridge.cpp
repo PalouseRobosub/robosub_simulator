@@ -1,10 +1,11 @@
 #include "ros/ros.h"
-#include "std_msgs/Float32.h"
+#include "robosub/depth_stamped.h"
 #include "geometry_msgs/Quaternion.h"
 #include "geometry_msgs/Vector3.h"
 #include "gazebo_msgs/ModelState.h"
 #include "gazebo_msgs/ModelStates.h"
 #include "robosub/ObstaclePosArray.h"
+#include "robosub/QuaternionStampedAccuracy.h"
 
 ros::Publisher position_pub;
 ros::Publisher orientation_pub;
@@ -25,8 +26,8 @@ std::vector<std::string> object_names;
 void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
 {
     geometry_msgs::Vector3 position_msg;
-    geometry_msgs::Quaternion orientation_msg;
-    std_msgs::Float32 depth_msg;
+    robosub::QuaternionStampedAccuracy orientation_msg;
+    robosub::depth_stamped depth_msg;
 
     // Find top of water and subs indices in modelstates lists
     int sub_index = -1;
@@ -45,10 +46,12 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
         position_msg.z = msg.pose[sub_index].position.z;
 
         // Copy sub orientation to orientation msg
-        orientation_msg.x = msg.pose[sub_index].orientation.x;
-        orientation_msg.y = msg.pose[sub_index].orientation.y;
-        orientation_msg.z = msg.pose[sub_index].orientation.z;
-        orientation_msg.w = msg.pose[sub_index].orientation.w;
+        orientation_msg.quaternion.x = msg.pose[sub_index].orientation.x;
+        orientation_msg.quaternion.y = msg.pose[sub_index].orientation.y;
+        orientation_msg.quaternion.z = msg.pose[sub_index].orientation.z;
+        orientation_msg.quaternion.w = msg.pose[sub_index].orientation.w;
+        orientation_msg.header.stamp = ros::Time::now();
+        orientation_msg.accuracy = 1;
 
         // Publish sub position and orientation
         position_pub.publish(position_msg);
@@ -58,8 +61,9 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
         // the z positions of the water top and the sub
         if(ceiling_index >= 0)
         {
-            depth_msg.data = -(msg.pose[ceiling_index].position.z -
+            depth_msg.depth = -(msg.pose[ceiling_index].position.z -
                              msg.pose[sub_index].position.z);
+            depth_msg.header.stamp = ros::Time::now();
             depth_pub.publish(depth_msg);
         }
     }
@@ -103,8 +107,9 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
 
     position_pub = nh.advertise<geometry_msgs::Vector3>("position", 1);
-    orientation_pub = nh.advertise<geometry_msgs::Quaternion>("orientation", 1);
-    depth_pub = nh.advertise<std_msgs::Float32>("depth", 1);
+    orientation_pub =
+            nh.advertise<robosub::QuaternionStampedAccuracy>("orientation", 1);
+    depth_pub = nh.advertise<robosub::depth_stamped>("depth", 1);
     obstacle_pos_pub = nh.advertise<robosub::ObstaclePosArray>("obstacles/positions", 1);
 
     ros::Subscriber orient_sub = nh.subscribe("gazebo/model_states", 1, modelStatesCallback);
