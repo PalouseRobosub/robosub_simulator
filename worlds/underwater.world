@@ -2,9 +2,9 @@
 <sdf version="1.5">
   <world name="default">
     <gui>
-      <!-- <camera name="user_camera">
-        <pose>1 1 1 0 0 -2.356</pose>
-      </camera> -->
+      <camera name="user_camera">
+        <pose>4.31615 -34.1599 10.3989 0 0.839643 1.0962</pose>
+      </camera>
     </gui>
 
     <!-- <physics type="bullet"/> -->
