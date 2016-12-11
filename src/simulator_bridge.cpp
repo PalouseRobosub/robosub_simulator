@@ -121,7 +121,7 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
              * translate them to be with respect to the global frame by adding
              * in the x, y, and z positions of the submarine.
              */
-            Eigen::Quaterniond q( orientation_msg.quaternion.w,
+            Eigen::Quaterniond q(orientation_msg.quaternion.w,
                     orientation_msg.quaternion.x, orientation_msg.quaternion.y,
                     orientation_msg.quaternion.z);
 
@@ -135,7 +135,9 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
 
             /*
              * Now that hydrophone positions have been calculated, find the
-             * distance of each hydrophone from the pinger.
+             * distance of each hydrophone from the pinger and translate the
+             * distance into signal time-of-flight as the ping travels through
+             * the water.
              */
             vector<double> hydrophone_time_delays;
             Vector3d pinger_position(msg.pose[pinger_index].position.x,
@@ -155,6 +157,7 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
                 double time_delay = distance / 1484.0;
                 hydrophone_time_delays.push_back(time_delay);
             }
+
             /*
              * Subtract the reference time delay from each hyodrophone time
              * delay to calculate the time differences in receiving the
@@ -164,11 +167,6 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
             {
                 hydrophone_time_delays[i] -= hydrophone_time_delays[0];
             }
-
-            ROS_INFO_STREAM("Time delays " << hydrophone_time_delays[0] << " "
-                    << hydrophone_time_delays[1]<< " " <<
-                    hydrophone_time_delays[2] << " " <<
-                    hydrophone_time_delays[3]);
 
             robosub::HydrophoneDeltas deltas;
             deltas.header.stamp = ros::Time::now();
