@@ -60,6 +60,11 @@
         <child>right_camera</child>
     </joint>
 
+    <joint name='hydrophone_frame' type="fixed">
+    <parent>frame</parent>
+    <child>hydrophones</child>
+    </joint>
+
     <link name='hull'>
       <pose>0 0 .082 1.57079632679 0 1.57079632679 </pose>
       <inertial>
@@ -168,6 +173,75 @@
       </velocity_decay>
     </link>
 
+    <link name='hydrophones'>
+      <pose> 0 0 0 0 0 0 </pose>
+      <inertial>
+        <mass> 0.001 </mass>
+      </inertial>
+      <visual name='ref_hydrophone_visual'>
+        <transparency>0.7</transparency>
+        <pose> 0.5 0 0 0 0 0</pose>
+        <geometry>
+          <box>
+              <size> 0.10 0.10 0.10 </size>
+          </box>
+        </geometry>
+        <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Black</name>
+            </script>
+          </material>
+      </visual>
+
+      <visual name='x_hydrophone_visual'>
+        <transparency>0.7</transparency>
+        <pose> 0.8 0 0 0 0 0</pose>
+        <geometry>
+            <box>
+                <size> 0.10 0.10 0.10 </size>
+            </box>
+        </geometry>
+            <material>
+                <script>
+                <uri>file://media/materials/scripts/gazebo.material</uri>
+                <name>Gazebo/Black</name>
+                </script>
+            </material>
+        </visual>
+
+      <visual name='y_hydrophone_visual'>
+        <transparency>0.7</transparency>
+        <pose> 0.5 0.3 0 0 0 0</pose>
+        <geometry>
+          <box>
+              <size> 0.10 0.10 0.10 </size>
+          </box>
+        </geometry>
+        <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Black</name>
+            </script>
+          </material>
+      </visual>
+
+      <visual name='z_hydrophone_visual'>
+        <transparency>0.7</transparency>
+        <pose> 0.5 0 0.3 0 0 0</pose>
+        <geometry>
+          <box>
+              <size> 0.10 0.10 0.10 </size>
+          </box>
+        </geometry>
+        <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Black</name>
+            </script>
+          </material>
+      </visual>
+    </link>
 
     <link name='frame'>
       <pose>0 0 -0.088 0 0 0</pose>

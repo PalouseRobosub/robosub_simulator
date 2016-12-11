@@ -249,6 +249,28 @@
       </link>
     </model>
 
+    <model name="pinger_a">
+      <static>true</static>
+      <pose>35.1 -2.91 -4.9 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <cast_shadows>true</cast_shadows>
+          <geometry>
+            <cylinder>
+                <radius> 0.03 </radius>
+                <length> 0.15 </length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
     <include>
       <name>gate_side_a</name>
       <pose>12.4 -23.6 -0.9 0 0 -0.9</pose>
