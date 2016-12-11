@@ -170,9 +170,9 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
 
             robosub::HydrophoneDeltas deltas;
             deltas.header.stamp = ros::Time::now();
-            deltas.t1 = ros::Duration(hydrophone_time_delays[1]);
-            deltas.t2 = ros::Duration(hydrophone_time_delays[2]);
-            deltas.t3 = ros::Duration(hydrophone_time_delays[3]);
+            deltas.xDelta = ros::Duration(hydrophone_time_delays[1]);
+            deltas.yDelta = ros::Duration(hydrophone_time_delays[2]);
+            deltas.zDelta = ros::Duration(hydrophone_time_delays[3]);
 
             hydrophone_deltas_pub.publish(deltas);
         }
