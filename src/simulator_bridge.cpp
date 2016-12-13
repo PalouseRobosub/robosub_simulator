@@ -4,6 +4,7 @@
 #include "geometry_msgs/Vector3.h"
 #include "gazebo_msgs/ModelState.h"
 #include "gazebo_msgs/ModelStates.h"
+#include "gazebo_msgs/LinkStates.h"
 #include "robosub/ObstaclePosArray.h"
 #include "robosub/QuaternionStampedAccuracy.h"
 #include "robosub/HydrophoneDeltas.h"
@@ -30,6 +31,82 @@ ros::Publisher hydrophone_deltas_pub;
 // loaded from parameters.
 std::vector<std::string> object_names;
 
+Vector3d pinger_position;
+
+void linkStatesCallback(const gazebo_msgs::LinkStates &msg)
+{
+    int hydrophone_indices[4] = {-1, -1, -1, -1};
+    for (int i = 0; i < msg.name.size(); ++i)
+    {
+        if (msg.name[i] == "robosub::hydrophone_h0") hydrophone_indices[0] = i;
+        if (msg.name[i] == "robosub::hydrophone_hx") hydrophone_indices[1] = i;
+        if (msg.name[i] == "robosub::hydrophone_hy") hydrophone_indices[2] = i;
+        if (msg.name[i] == "robosub::hydrophone_hz") hydrophone_indices[3] = i;
+    }
+
+    /*
+     * Save the hydrophone positions into a vector. They are stored in
+     * order:
+     *      reference, x-axis, y-axis, z-axis
+     */
+    vector<Vector3d> hydrophone_positions;
+    for (int i = 0; i < 4; ++i)
+    {
+        if (hydrophone_indices[i] == -1)
+        {
+            ROS_ERROR_STREAM("Failed to find hydrophone " << i <<
+                    " pose.");
+            return;
+        }
+
+        hydrophone_positions.push_back(
+                Vector3d(msg.pose[hydrophone_indices[i]].position.x,
+                msg.pose[hydrophone_indices[i]].position.y,
+                msg.pose[hydrophone_indices[i]].position.z));
+    }
+
+    /*
+     * Now that hydrophone positions are known, find the
+     * distance of each hydrophone from the pinger and translate the
+     * distance into signal time-of-flight as the ping travels through
+     * the water.
+     */
+    vector<double> hydrophone_time_delays;
+
+    for (int i = 0; i < hydrophone_positions.size(); ++i)
+    {
+        Vector3d delta = hydrophone_positions[i] - pinger_position;
+        double distance = sqrt(delta[0]*delta[0] + delta[1] * delta[1]
+                + delta[2] * delta[2]);
+
+        /*
+         * Calculate a ping signal time delay from the distance by
+         * dividing by the speed of sound in water (1484 m/s).
+         */
+        double time_delay = distance / 1484.0;
+        hydrophone_time_delays.push_back(time_delay);
+    }
+
+    /*
+     * Subtract the reference time delay from each hyodrophone time
+     * delay to calculate the time differences in receiving the
+     * hydrophone signal on all of the ordinal hydrophones.
+     */
+    for (unsigned int i = 1; i < hydrophone_time_delays.size(); ++i)
+    {
+        hydrophone_time_delays[i] -= hydrophone_time_delays[0];
+    }
+
+    robosub::HydrophoneDeltas deltas;
+    deltas.header.stamp = ros::Time::now();
+    deltas.xDelta = ros::Duration(hydrophone_time_delays[1]);
+    deltas.yDelta = ros::Duration(hydrophone_time_delays[2]);
+    deltas.zDelta = ros::Duration(hydrophone_time_delays[3]);
+
+    hydrophone_deltas_pub.publish(deltas);
+
+}
+
 // ModelStates msg consists of a name, a pose (position and orientation),
 // and a twist (linear and angular velocity) for each object in
 // the simulator
@@ -43,7 +120,6 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
     robosub::QuaternionStampedAccuracy orientation_msg;
     robosub::depth_stamped depth_msg;
     robosub::Euler euler_msg;
-    vector<Vector3d> hydrophone_positions;
 
     // Find top of water and subs indices in modelstates lists
     int sub_index = -1, pinger_index = -1, ceiling_index = -1;
@@ -54,129 +130,67 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
         if (msg.name[i] == "pinger_a") pinger_index = i;
     }
 
-    if(sub_index >= 0)
+    /*
+     * Validate that all model states were successfully found.
+     */
+    if (sub_index == -1)
     {
-        // Copy sub pos to position msg
-        position_msg.x = msg.pose[sub_index].position.x;
-        position_msg.y = msg.pose[sub_index].position.y;
-        position_msg.z = msg.pose[sub_index].position.z;
-
-        // Copy sub orientation to orientation msg
-        orientation_msg.quaternion.x = msg.pose[sub_index].orientation.x;
-        orientation_msg.quaternion.y = msg.pose[sub_index].orientation.y;
-        orientation_msg.quaternion.z = msg.pose[sub_index].orientation.z;
-        orientation_msg.quaternion.w = msg.pose[sub_index].orientation.w;
-        orientation_msg.header.stamp = ros::Time::now();
-        orientation_msg.accuracy = 1;
-
-        // Create an Euler message for human readability
-        tf::Matrix3x3 m(tf::Quaternion(orientation_msg.quaternion.x,
-                    orientation_msg.quaternion.y, orientation_msg.quaternion.z,
-                    orientation_msg.quaternion.w));
-        m.getRPY(euler_msg.roll, euler_msg.pitch, euler_msg.yaw);
-        euler_msg.roll *= _180_OVER_PI;
-        euler_msg.pitch *= _180_OVER_PI;
-        euler_msg.yaw *= _180_OVER_PI;
-        euler_pub.publish(euler_msg);
-
-        // Publish sub position and orientation
-        position_pub.publish(position_msg);
-        orientation_pub.publish(orientation_msg);
-
-        // If the model for the top of the water is found calculate depth from
-        // the z positions of the water top and the sub
-        if(ceiling_index >= 0)
-        {
-            depth_msg.depth = -(msg.pose[ceiling_index].position.z -
-                             msg.pose[sub_index].position.z);
-            depth_msg.header.stamp = ros::Time::now();
-            depth_pub.publish(depth_msg);
-        }
-
-        /*
-         * If the pinger index isn't found, break out and dont perform
-         * hydrophone calculations.
-         */
-        if (pinger_index > -1)
-        {
-            /*
-             * Once the submarine position and orientation are known, calculate
-             * all of the hydrophone positions. Assume the first hydrophone is
-             * 0.5 meters directly in front of the submarine, and that the 3
-             * other reference hydrophones are 0.3 meters along the primary
-             * axes. Begin by setting the hydrophone positions as relative to
-             * the submarine without any rotations applied. They are stored in
-             * order:
-             *      reference, x-axis, y-axis, z-axis
-             */
-            hydrophone_positions.push_back(Vector3d(0.5, 0, 0));
-            hydrophone_positions.push_back(Vector3d(0.8, 0, 0));
-            hydrophone_positions.push_back(Vector3d(0.5, 0.3, 0));
-            hydrophone_positions.push_back(Vector3d(0.5, 0, 0.3));
-
-            /*
-             * Next, create a yaw, pitch, and roll rotation matrix to calculate
-             * the rotated positions relative to the sub. Eigen can represent a
-             * rotation matrix as a quaternion. Then, once they are rotated,
-             * translate them to be with respect to the global frame by adding
-             * in the x, y, and z positions of the submarine.
-             */
-            Eigen::Quaterniond q(orientation_msg.quaternion.w,
-                    orientation_msg.quaternion.x, orientation_msg.quaternion.y,
-                    orientation_msg.quaternion.z);
-
-            for (int i = 0; i < 4; ++i)
-            {
-                hydrophone_positions[i] = q.toRotationMatrix() *
-                        hydrophone_positions[i];
-                hydrophone_positions[i] += Vector3d(position_msg.x,
-                        position_msg.y, position_msg.z);
-            }
-
-            /*
-             * Now that hydrophone positions have been calculated, find the
-             * distance of each hydrophone from the pinger and translate the
-             * distance into signal time-of-flight as the ping travels through
-             * the water.
-             */
-            vector<double> hydrophone_time_delays;
-            Vector3d pinger_position(msg.pose[pinger_index].position.x,
-                    msg.pose[pinger_index].position.y,
-                    msg.pose[pinger_index].position.z);
-
-            for (int i = 0; i < hydrophone_positions.size(); ++i)
-            {
-                Vector3d delta = hydrophone_positions[i] - pinger_position;
-                double distance = sqrt(delta[0]*delta[0] + delta[1] * delta[1]
-                        + delta[2] * delta[2]);
-
-                /*
-                 * Calculate a ping signal time delay from the distance by
-                 * dividing by the speed of sound in water (1484 m/s).
-                 */
-                double time_delay = distance / 1484.0;
-                hydrophone_time_delays.push_back(time_delay);
-            }
-
-            /*
-             * Subtract the reference time delay from each hyodrophone time
-             * delay to calculate the time differences in receiving the
-             * hydrophone signal on all of the ordinal hydrophones.
-             */
-            for (unsigned int i = 1; i < hydrophone_time_delays.size(); ++i)
-            {
-                hydrophone_time_delays[i] -= hydrophone_time_delays[0];
-            }
-
-            robosub::HydrophoneDeltas deltas;
-            deltas.header.stamp = ros::Time::now();
-            deltas.xDelta = ros::Duration(hydrophone_time_delays[1]);
-            deltas.yDelta = ros::Duration(hydrophone_time_delays[2]);
-            deltas.zDelta = ros::Duration(hydrophone_time_delays[3]);
-
-            hydrophone_deltas_pub.publish(deltas);
-        }
+        ROS_ERROR_STREAM("Failed to locate submarine model state.");
+        return;
     }
+
+    if (pinger_index == -1)
+    {
+        ROS_ERROR_STREAM("Failed to locate pinger model state.");
+        return;
+    }
+
+    if (ceiling_index == -1)
+    {
+        ROS_ERROR_STREAM("Failed to locate ceiling model state.");
+        return;
+    }
+
+    // Copy sub pos to position msg
+    position_msg.x = msg.pose[sub_index].position.x;
+    position_msg.y = msg.pose[sub_index].position.y;
+    position_msg.z = msg.pose[sub_index].position.z;
+
+    // Copy sub orientation to orientation msg
+    orientation_msg.quaternion.x = msg.pose[sub_index].orientation.x;
+    orientation_msg.quaternion.y = msg.pose[sub_index].orientation.y;
+    orientation_msg.quaternion.z = msg.pose[sub_index].orientation.z;
+    orientation_msg.quaternion.w = msg.pose[sub_index].orientation.w;
+    orientation_msg.header.stamp = ros::Time::now();
+    orientation_msg.accuracy = 1;
+
+    // Create an Euler message for human readability
+    tf::Matrix3x3 m(tf::Quaternion(orientation_msg.quaternion.x,
+                orientation_msg.quaternion.y, orientation_msg.quaternion.z,
+                orientation_msg.quaternion.w));
+    m.getRPY(euler_msg.roll, euler_msg.pitch, euler_msg.yaw);
+    euler_msg.roll *= _180_OVER_PI;
+    euler_msg.pitch *= _180_OVER_PI;
+    euler_msg.yaw *= _180_OVER_PI;
+    euler_pub.publish(euler_msg);
+
+    // Publish sub position and orientation
+    position_pub.publish(position_msg);
+    orientation_pub.publish(orientation_msg);
+
+    // If the model for the top of the water is found calculate depth from
+    // the z positions of the water top and the sub
+    depth_msg.depth = -(msg.pose[ceiling_index].position.z -
+                     msg.pose[sub_index].position.z);
+    depth_msg.header.stamp = ros::Time::now();
+    depth_pub.publish(depth_msg);
+
+    /*
+     * Update the global pinger position.
+     */
+    pinger_position = Vector3d(msg.pose[pinger_index].position.x,
+            msg.pose[pinger_index].position.y,
+            msg.pose[pinger_index].position.z);
 
     // Iterate through object_names and for each iteration search through the
     // msg.name array and attempt to find object_names[i]. If it is not found
@@ -228,6 +242,9 @@ int main(int argc, char **argv)
 
     ros::Subscriber orient_sub = nh.subscribe("gazebo/model_states", 1,
             modelStatesCallback);
+
+    ros::Subscriber link_sub = nh.subscribe("gazebo/link_states", 1,
+            linkStatesCallback);
 
     int rate;
     if(!nh.getParam("control/rate", rate))
