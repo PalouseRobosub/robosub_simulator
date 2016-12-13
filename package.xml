@@ -57,6 +57,8 @@
   <build_depend>message_generation</build_depend>
   <run_depend>message_generation</run_depend>
   <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>robosub</build_depend>
+  <run_depend>robosub</run_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
