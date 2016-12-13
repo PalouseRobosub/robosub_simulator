@@ -180,7 +180,8 @@ void Thruster::Update()
     // TODO: (If needed): Optimize this section so that the force is only
     // calculated once per thruster per message instead of once per frame per
     // thruster.
-    if(last_thruster_msg.data.size() == 8)
+    if(last_thruster_msg.data.size() == 8 &&
+            ros::Time::now() - last_msg_receive_time < ros::Duration(0.5))
     {
         for(int i=0; i < num_thrusters; i++)
         {
@@ -234,6 +235,7 @@ void Thruster::Update()
 void Thruster::thrusterCallback(const robosub::thruster::ConstPtr& msg)
 {
     received_msg = true;
+    last_msg_receive_time = ros::Time::now();
     last_thruster_msg.data = msg->data;
 }
 

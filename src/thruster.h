@@ -48,6 +48,7 @@ private:
     double back_thrust_ratio;
     double buoyancy_percentage;
     double max_thrust;
+    ros::Time last_msg_receive_time;
 
     // gazebo messaging objects
     // This is for visualizing thruster output
