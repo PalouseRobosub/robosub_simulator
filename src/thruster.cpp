@@ -53,6 +53,14 @@ void Thruster::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     }
     ROS_INFO_STREAM("thruster_settings: " << thruster_settings);
 
+    double thruster_timeout_d;
+    if(!ros::param::get("thruster_timeout", thruster_timeout_d))
+    {
+        ROS_WARN("no thruster timeout specified. defaulting to 5.0 seconds");
+        thruster_timeout_d = 5.0;
+    }
+    thruster_timeout = ros::Duration(thruster_timeout_d);
+
     // Just getting the names of thrusters right now since were using the
     // actual model links to get position
     // TODO: Get pos/orientation info from settings so that we can dynamically
@@ -181,7 +189,7 @@ void Thruster::Update()
     // calculated once per thruster per message instead of once per frame per
     // thruster.
     if(last_thruster_msg.data.size() == 8 &&
-            ros::Time::now() - last_msg_receive_time < ros::Duration(0.5))
+            ros::Time::now() - last_msg_receive_time < thruster_timeout)
     {
         for(int i=0; i < num_thrusters; i++)
         {
