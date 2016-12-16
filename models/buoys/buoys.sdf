@@ -17,6 +17,7 @@
             <uri>file://media/materials/scripts/gazebo.material</uri>
             <name>Gazebo/Red</name>
           </script>
+          <diffuse>0.6 0 0 1</diffuse>
         </material>
       </visual>
       <collision name='red_collide'>
@@ -36,6 +37,7 @@
             <uri>file://media/materials/scripts/gazebo.material</uri>
             <name>Gazebo/Green</name>
           </script>
+          <diffuse>0 0.6 0 1</diffuse>
         </material>
       </visual>
       <collision name='green_collide'>
@@ -55,6 +57,7 @@
             <uri>file://media/materials/scripts/gazebo.material</uri>
             <name>Gazebo/Yellow</name>
           </script>
+          <diffuse>0.6 0.6 0 1</diffuse>
         </material>
       </visual>
       <collision name='yellow_collide'>
