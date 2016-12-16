@@ -152,10 +152,10 @@
         <material>
             <script>
               <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/LightGrey</name>
+              <name>Gazebo/GreyTransparent</name>
             </script>
+            <diffuse>0.6 0.6 0.6 0.6</diffuse>
           </material>
-          <transparency>0.6</transparency>
       </visual>
 
       <visual name='rear_tube_visual'>
@@ -169,10 +169,10 @@
         <material>
             <script>
               <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/LightGrey</name>
+              <name>Gazebo/GreyTransparent</name>
             </script>
+            <diffuse>0.6 0.6 0.6 0.6</diffuse>
           </material>
-          <transparency>0.6</transparency>
       </visual>
       <collision name='hull_collision'>
         <geometry>
@@ -241,7 +241,7 @@
           <material>
             <script>
               <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Grey</name>
+              <name>Gazebo/FlatBlack</name>
             </script>
           </material>
       </visual>
@@ -654,7 +654,7 @@
          <forward>0 -0.7071067811865475 0.7071067811865476</forward>
          <link_name>hull</link_name>
          <cp>0.35 0 0</cp>
-     </plugin>    
+     </plugin>
     -->
 
 <!-- <plugin name="submarine_propeller_1" filename="libLiftDragPlugin.so">
