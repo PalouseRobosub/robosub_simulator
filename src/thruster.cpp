@@ -79,6 +79,12 @@ void Thruster::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     }
     ROS_DEBUG_STREAM("back_thrust_ratio: " << back_thrust_ratio);
 
+    if(!ros::param::get("visualize_thrusters", visualize_thrusters))
+    {
+        ROS_WARN_STREAM("failed to load thruster visualizer on/off. defaulting to on");
+        visualize_thrusters = true;
+    }
+
     nh = new ros::NodeHandle();
 	thruster_sub = nh->subscribe("thruster", 1, &Thruster::thrusterCallback, this);
 
@@ -144,33 +150,36 @@ void Thruster::UpdateBuoyancy()
 
 void Thruster::UpdateVisualizers()
 {
-    for(int i=0; i < num_thrusters; i++)
+    if(visualize_thrusters)
     {
-        if(!std::isnan(last_thruster_msg.data[i]))
+        for(int i=0; i < num_thrusters; i++)
         {
-            // Modify length of cylinder based on thruster strength
-            msgs::Geometry *geomMsg = visualMsg[i].mutable_geometry();
-            geomMsg->mutable_cylinder()->set_length(std::fabs(last_thruster_msg.data[i]));
+            if(!std::isnan(last_thruster_msg.data[i]))
+            {
+                // Modify length of cylinder based on thruster strength
+                msgs::Geometry *geomMsg = visualMsg[i].mutable_geometry();
+                geomMsg->mutable_cylinder()->set_length(std::fabs(last_thruster_msg.data[i]));
 
-            physics::LinkPtr t = thruster_links[i];
+                physics::LinkPtr t = thruster_links[i];
 
-            // Rotate and offset visualizer line as appropriate
-            math::Pose p = t->GetWorldPose();
+                // Rotate and offset visualizer line as appropriate
+                math::Pose p = t->GetWorldPose();
 
-            // Move the cylinder to one side of the thruster to show forward
-            // direction. .101 is the length of the thruster
-            math::Vector3 line_offset;
-            if(last_thruster_msg.data[i] < 0.0)
-                line_offset.z = last_thruster_msg.data[i]/2.0 - .101/2.0;
-            else
-                line_offset.z = last_thruster_msg.data[i]/2.0 + .101/2.0;
+                // Move the cylinder to one side of the thruster to show forward
+                // direction. .101 is the length of the thruster
+                math::Vector3 line_offset;
+                if(last_thruster_msg.data[i] < 0.0)
+                    line_offset.z = last_thruster_msg.data[i]/2.0 - .101/2.0;
+                else
+                    line_offset.z = last_thruster_msg.data[i]/2.0 + .101/2.0;
 
-            line_offset = p.rot * line_offset;
-            ignition::math::Pose3d ip(p.pos.x-line_offset.x, p.pos.y-line_offset.y, p.pos.z-line_offset.z, p.rot.w, p.rot.x, p.rot.y, p.rot.z);
-            msgs::Set(visualMsg[i].mutable_pose(), ip);
+                line_offset = p.rot * line_offset;
+                ignition::math::Pose3d ip(p.pos.x-line_offset.x, p.pos.y-line_offset.y, p.pos.z-line_offset.z, p.rot.w, p.rot.x, p.rot.y, p.rot.z);
+                msgs::Set(visualMsg[i].mutable_pose(), ip);
 
-            // Update line
-            visPub->Publish(visualMsg[i]);
+                // Update line
+                visPub->Publish(visualMsg[i]);
+            }
         }
     }
 }

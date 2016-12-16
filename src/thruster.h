@@ -50,6 +50,7 @@ private:
     double max_thrust;
     ros::Time last_msg_receive_time;
     ros::Duration thruster_timeout;
+    bool visualize_thrusters;
 
     // gazebo messaging objects
     // This is for visualizing thruster output
