@@ -14,9 +14,9 @@
         </geometry>
       </visual>
       <collision name='main'>
-        <pose>0 0 0 1.5707 0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
-          <box><size>1.2 1.2 0.05</size></box>
+            <mesh><uri>file://torpedo_target/TorpedoTarget.dae</uri></mesh>
         </geometry>
       </collision>
     </link>
