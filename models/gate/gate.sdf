@@ -6,26 +6,88 @@
     <self_collide> 0 </self_collide>
     <static> 1</static>
 
-    <link name='gate'>
-      <pose>0 0 0 0 0 0</pose>
-      <visual name='gate_visual'>
+    <link name='gate_top'>
+      <pose>0.05 0 0 0 1.5707 0</pose>
+      <visual name='gate_top_vis'>
         <geometry>
-            <mesh><uri>file://gate/gate.dae</uri></mesh>
+          <cylinder>
+            <radius>0.05</radius>
+            <length>3</length>
+          </cylinder>
         </geometry>
         <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Gray</name>
-            </script>
-          </material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/FlatBlack</name>
+          </script>
+        </material>
       </visual>
-      <collision name='gate_collision'>
+      <collision name='gate_top_collide'>
+        <pose>0.05 0 0 0 1.5707 0</pose>
         <geometry>
-            <mesh><uri>file://gate/gate.dae</uri></mesh>
+          <cylinder>
+            <radius>0.05</radius>
+            <length>3</length>
+          </cylinder>
         </geometry>
       </collision>
     </link>
 
+    <link name='gate_right'>
+      <pose>1.5 0 -0.75 0 0 0</pose>
+      <visual name='gate_right_vis'>
+        <geometry>
+          <cylinder>
+            <radius>0.05</radius>
+            <length>1.5</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Orange</name>
+          </script>
+          <diffuse>0.6 0.3088 0.0468 1</diffuse>
+        </material>
+      </visual>
+      <collision name='gate_right_collide'>
+        <pose>1.5 0 -0.75 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.05</radius>
+            <length>1.5</length>
+          </cylinder>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name='gate_left'>
+      <pose>-1.4 0 -0.75 0 0 0</pose>
+      <visual name='gate_left_vis'>
+        <geometry>
+          <cylinder>
+            <radius>0.05</radius>
+            <length>1.5</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Orange</name>
+          </script>
+          <diffuse>0.6 0.3088 0.0468 1</diffuse>
+        </material>
+      </visual>
+      <collision name='gate_left_collide'>
+        <pose>-1.4 0 -0.75 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.05</radius>
+            <length>1.5</length>
+          </cylinder>
+        </geometry>
+      </collision>
+    </link>
 
   </model>
 </sdf>
