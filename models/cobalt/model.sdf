@@ -88,7 +88,7 @@
     <link name='hull'>
       <pose>0 0 .082 1.57079632679 0 1.57079632679 </pose>
       <inertial>
-        <mass>10</mass>
+        <mass>9</mass>
       <!--
         <inertia>
           <ixx>86.28907821859966</ixx>
@@ -196,28 +196,28 @@
     <link name='hydrophone_h0'>
       <pose> 0 0 0 0 0 0 </pose>
       <inertial>
-        <mass> 0.001 </mass>
+        <mass> 0.01 </mass>
       </inertial>
     </link>
 
     <link name='hydrophone_hx'>
       <pose> 3 0 0 0 0 0 </pose>
       <inertial>
-        <mass> 0.001 </mass>
+        <mass> 0.01 </mass>
       </inertial>
     </link>
 
     <link name='hydrophone_hy'>
       <pose> 0 3 0 0 0 0 </pose>
       <inertial>
-        <mass> 0.001 </mass>
+        <mass> 0.01 </mass>
       </inertial>
     </link>
 
     <link name='hydrophone_hz'>
       <pose> 0 0 3 0 0 0 </pose>
       <inertial>
-        <mass> 0.001 </mass>
+        <mass> 0.01 </mass>
       </inertial>
     </link>
 
@@ -738,8 +738,8 @@
       <link name="forward_left">
         <volume>0.000334</volume>
       </link>
-
     </plugin>
+
     <plugin name="imu" filename="libgazebo_ros_imu.so">
       <alwaysOn>true</alwaysOn>
       <bodyName>frame</bodyName>

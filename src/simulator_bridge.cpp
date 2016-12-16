@@ -2,6 +2,7 @@
 #include "robosub/Float32Stamped.h"
 #include "robosub/Euler.h"
 #include "geometry_msgs/Vector3Stamped.h"
+#include "geometry_msgs/Pose.h"
 #include "gazebo_msgs/ModelState.h"
 #include "gazebo_msgs/ModelStates.h"
 #include "gazebo_msgs/LinkStates.h"
@@ -15,6 +16,9 @@
 #include <cmath>
 #include <vector>
 #include <string>
+/* Commented out as unsure if necessary after rebase
+#include <random>
+*/
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Geometry>
 
@@ -35,6 +39,12 @@ ThrottledPublisher<robosub::Float32Stamped> depth_pub;
 ThrottledPublisher<robosub::ObstaclePosArray> obstacle_pos_pub;
 ThrottledPublisher<robosub::HydrophoneDeltas> hydrophone_deltas_pub;
 ThrottledPublisher<geometry_msgs::Vector3Stamped> lin_accel_pub;
+ThrottledPublisher<geometry_msgs::Pose> uwsim_pub;
+
+/* Commented out as unsure if necessary after rebase
+std::default_random_engine generator;
+std::normal_distribution<double> distribution(0, .000002);
+*/
 
 // List of names of objects to publish the position and name of. This will be
 // loaded from parameters.
@@ -42,6 +52,8 @@ std::vector<std::string> object_names;
 
 Vector3d pinger_position;
 Vector3d ceiling_plane_position;
+
+float pinger_frequency;
 
 void linkStatesCallback(const gazebo_msgs::LinkStates &msg)
 {
@@ -108,13 +120,31 @@ void linkStatesCallback(const gazebo_msgs::LinkStates &msg)
         hydrophone_time_delays[i] -= hydrophone_time_delays[0];
     }
 
+    /*
+     * Add in noise to the hydrophone time deltas by adding in [-5, 5] random
+     * phase shifts to each signal.
+     */
     robosub::HydrophoneDeltas deltas;
-    deltas.header.stamp = ros::Time::now();
-    deltas.xDelta = ros::Duration(hydrophone_time_delays[1]);
-    deltas.yDelta = ros::Duration(hydrophone_time_delays[2]);
-    deltas.zDelta = ros::Duration(hydrophone_time_delays[3]);
 
     hydrophone_deltas_pub.publish(deltas);
+
+    /* Commented out as unsure if necessary after rebase */
+    /*const int max_wavelength_error = 1;
+    deltas.header.stamp = ros::Time::now();
+    deltas.xDelta = ros::Duration(hydrophone_time_delays[1]) +
+            ros::Duration(((rand()%(2 * max_wavelength_error)) -
+            max_wavelength_error) * 1.0 / pinger_frequency) +
+            ros::Duration(distribution(generator));
+    deltas.yDelta = ros::Duration(hydrophone_time_delays[2]) +
+            ros::Duration(((rand()%(2 * max_wavelength_error)) -
+            max_wavelength_error) * 1.0 / pinger_frequency) +
+            ros::Duration(distribution(generator));
+    deltas.zDelta = ros::Duration(hydrophone_time_delays[3]) +
+            ros::Duration(((rand()%(2 * max_wavelength_error)) -
+            max_wavelength_error) * 1.0 / pinger_frequency) +
+            ros::Duration(distribution(generator));
+
+    hydrophone_deltas_pub->publish(deltas);*/
 }
 
 // ModelStates msg consists of a name, a pose (position and orientation), and a
@@ -258,6 +288,46 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
     }
 
     obstacle_pos_pub.publish(object_array);
+
+    /*
+     * Additionally, publish the submarine's position with respect to the
+     * pinger for validating hydrophone trilateration.
+     */
+    position_msg.x = msg.pose[sub_index].position.x -
+            msg.pose[pinger_index].position.x;
+    position_msg.y = msg.pose[sub_index].position.y -
+            msg.pose[pinger_index].position.y;
+    position_msg.z = msg.pose[sub_index].position.z -
+            msg.pose[pinger_index].position.z;
+
+    hydrophone_position_pub.publish(position_msg);
+
+    /*
+     * Update the current POSE to the UWSim topic. Beware the UWSim treats
+     * positive Z as down. Rotate the whole coordinate system to compensate.
+     */
+    Vector3d position(msg.pose[sub_index].position.x,
+            msg.pose[sub_index].position.y, msg.pose[sub_index].position.z);
+    Quaterniond orientation(msg.pose[sub_index].orientation.w,
+            msg.pose[sub_index].orientation.x,
+            msg.pose[sub_index].orientation.y,
+            msg.pose[sub_index].orientation.z);
+
+    Vector3d euler = orientation.matrix().eulerAngles(0, 1, 2);
+    ROS_INFO_STREAM("RPY: " << euler);
+    orientation = Quaterniond(AngleAxisd(euler[0], Vector3d::UnitX()) *
+            AngleAxisd(euler[1] * -1, Vector3d::UnitY()) *
+            AngleAxisd(euler[2] * -1, Vector3d::UnitZ()));
+
+    geometry_msgs::Pose sub_pose;
+    sub_pose.position.x = position[0];
+    sub_pose.position.y = position[1] * -1;
+    sub_pose.position.z = position[2] * -1;
+    sub_pose.orientation.w = orientation.w();
+    sub_pose.orientation.x = orientation.x();
+    sub_pose.orientation.y = orientation.y();
+    sub_pose.orientation.z = orientation.z();
+    uwsim_pub.publish(sub_pose);
 }
 
 void imuCallback(const sensor_msgs::Imu::ConstPtr& msg)
@@ -323,12 +393,32 @@ int main(int argc, char **argv)
          "simulator/bridge_rates/hydrophone_deltas");
     lin_accel_pub = ThrottledPublisher<geometry_msgs::Vector3Stamped>
         ("real/acceleration/linear", 1, 0, "simulator/bridge_rates/lin_accel");
+    /* Commented out as unsure if necessary after rebase
+    srand(time(NULL));
+    */
+
+    uwsim_pub = nh.advertise<geometry_msgs::Pose>("/gazebo/Cobalt/pose", 1);
 
     ros::Subscriber orient_sub = nh.subscribe("gazebo/model_states", 1,
             modelStatesCallback);
 
     ros::Subscriber link_sub = nh.subscribe("gazebo/link_states", 1,
             linkStatesCallback);
+    float pinger_rate;
+    if (!nh.getParamCached("hydrophones/pinger/rate", pinger_rate))
+    {
+        pinger_rate = 50;
+    }
+    if (!nh.getParamCached("hydrophones/pinger/frequency", pinger_frequency))
+    {
+        ROS_ERROR_STREAM("Failed to load pinger frequency.");
+        return -1;
+    }
+
+    hydrophone_deltas_pub = new
+            rs::ThrottledPublisher<robosub::HydrophoneDeltas> (
+                "hydrophone/30khz/delta", 1, pinger_rate);
+
 
     ros::Subscriber imu_sub = nh.subscribe("gazebo/rs_imu", 1,
             imuCallback);

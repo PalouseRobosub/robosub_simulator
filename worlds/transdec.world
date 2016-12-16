@@ -127,7 +127,7 @@
 
     <model name="ceiling_plane">
       <static>true</static>
-      <pose>0 0 -0.8 0 0 0</pose>
+      <pose>0 0 0 0 0 0</pose>
       <link name="link">
         <!--
         <collision name="collision">
@@ -151,19 +151,20 @@
               <name>Gazebo/BlueTransparent</name>
             </script>
           </material>
-          <transparency>0.6</transparency>
+          <transparency>0.8</transparency>
         </visual>
       </link>
     </model>
 
     <include>
       <uri>model://pool</uri>
+      <pose> 0 0 0.9 0 0 0 </pose>
     </include>
 
     <!-- Side A -->
     <model name="dock_side_a">
       <static>true</static>
-      <pose>4.8 -28.0 -0.67 0 0 0</pose>
+      <pose>4.8 -28.0 .13 0 0 0</pose>
       <link name="link">
         <collision name="collision">
           <geometry>
@@ -213,13 +214,13 @@
 
     <include>
       <name>gate_side_a</name>
-      <pose>12.4 -23.6 -0.9 0 0 -0.9</pose>
+      <pose>12.4 -23.6 -0.1 0 0 -0.9</pose>
       <uri>model://gate</uri>
     </include>
 
     <include>
       <name>buoys_side_a</name>
-      <pose>19.0 -20.2 -5.0 0 0 -0.6</pose>
+      <pose>19.0 -20.2 -4.1 0 0 -0.6</pose>
       <uri>model://buoys</uri>
     </include>
 
