@@ -11,7 +11,7 @@
       <visual name='bottom_vis'>
         <geometry>
           <cylinder>
-            <radius>0.0508</radius>
+            <radius>0.0254</radius>
             <length>2.4</length>
           </cylinder>
         </geometry>
@@ -27,7 +27,7 @@
         <pose>0 0 -1.2 0 1.5707 0</pose>
         <geometry>
           <cylinder>
-            <radius>0.0508</radius>
+            <radius>0.0254</radius>
             <length>2.4</length>
           </cylinder>
         </geometry>
@@ -39,7 +39,7 @@
       <visual name='left_vis'>
         <geometry>
           <cylinder>
-            <radius>0.0508</radius>
+            <radius>0.0254</radius>
             <length>1.2</length>
           </cylinder>
         </geometry>
@@ -55,7 +55,7 @@
         <pose>-1.2 0 0.6 0 0 0</pose>
         <geometry>
           <cylinder>
-            <radius>0.0508</radius>
+            <radius>0.0254</radius>
             <length>1.2</length>
           </cylinder>
         </geometry>
@@ -67,7 +67,7 @@
       <visual name='right_vis'>
         <geometry>
           <cylinder>
-            <radius>0.0508</radius>
+            <radius>0.0254</radius>
             <length>1.2</length>
           </cylinder>
         </geometry>
@@ -83,7 +83,7 @@
         <pose>1.2 0 0.6 0 0 0</pose>
         <geometry>
           <cylinder>
-            <radius>0.0508</radius>
+            <radius>0.0254</radius>
             <length>1.2</length>
           </cylinder>
         </geometry>

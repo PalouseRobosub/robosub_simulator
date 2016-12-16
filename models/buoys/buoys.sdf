@@ -10,7 +10,7 @@
       <pose>-1.2 0 2.5 0 0 0</pose>
       <visual name='red_vis'>
         <geometry>
-          <sphere><radius>0.2</radius></sphere>
+          <sphere><radius>0.1</radius></sphere>
         </geometry>
         <material>
           <script>
@@ -23,15 +23,15 @@
       <collision name='red_collide'>
         <pose>-1.2 0 2.5 0 0 0</pose>
         <geometry>
-          <sphere><radius>0.11</radius></sphere>
+          <sphere><radius>0.1</radius></sphere>
         </geometry>
       </collision>
     </link>
     <link name='green_buoy'>
-      <pose>1.2 0 2.62 0 0 0</pose>
+      <pose>1.2 0 2.6 0 0 0</pose>
       <visual name='green_vis'>
         <geometry>
-          <sphere><radius>0.2</radius></sphere>
+          <sphere><radius>0.1</radius></sphere>
         </geometry>
         <material>
           <script>
@@ -42,17 +42,17 @@
         </material>
       </visual>
       <collision name='green_collide'>
-        <pose> 1.2 0 2.62 0 0 0</pose>
+        <pose> 1.2 0 2.6 0 0 0</pose>
         <geometry>
-          <sphere><radius>0.2</radius></sphere>
+          <sphere><radius>0.1</radius></sphere>
         </geometry>
       </collision>
     </link>
     <link name='yellow_buoy'>
-        <pose>0 0 2.62 0 0 0</pose>
+        <pose>0 0 2.6 0 0 0</pose>
       <visual name='yellow_vis'>
         <geometry>
-          <sphere><radius>0.2</radius></sphere>
+          <sphere><radius>0.1</radius></sphere>
         </geometry>
         <material>
           <script>
@@ -63,9 +63,9 @@
         </material>
       </visual>
       <collision name='yellow_collide'>
-        <pose>0 0 0 0 0 0</pose>
+        <pose>0 0 2.6 0 0 0</pose>
         <geometry>
-          <sphere><radius>0.11</radius></sphere>
+          <sphere><radius>0.1</radius></sphere>
         </geometry>
       </collision>
     </link>
