@@ -11,7 +11,7 @@
       <visual name='gate_top_vis'>
         <geometry>
           <cylinder>
-            <radius>0.0762</radius>
+            <radius>0.0381</radius>
             <length>3.05</length>
           </cylinder>
         </geometry>
@@ -26,7 +26,7 @@
         <pose>0 0 0 0 1.5707 0</pose>
         <geometry>
           <cylinder>
-            <radius>0.0762</radius>
+            <radius>0.0381</radius>
             <length>3.05</length>
           </cylinder>
         </geometry>
@@ -38,7 +38,7 @@
       <visual name='gate_right_vis'>
         <geometry>
           <cylinder>
-            <radius>0.0762</radius>
+            <radius>0.0381</radius>
             <length>1.21</length>
           </cylinder>
         </geometry>
@@ -54,7 +54,7 @@
         <pose>0 0 0.6858 0 0 0</pose>
         <geometry>
           <cylinder>
-            <radius>0.0762</radius>
+            <radius>0.0381</radius>
             <length>0.16</length>
           </cylinder>
         </geometry>
@@ -69,7 +69,7 @@
         <pose>0 0 -0.6858 0 0 0</pose>
         <geometry>
           <cylinder>
-            <radius>0.0762</radius>
+            <radius>0.0381</radius>
             <length>0.16</length>
           </cylinder>
         </geometry>
@@ -84,7 +84,7 @@
         <pose>1.525 0 -0.762 0 0 0</pose>
         <geometry>
           <cylinder>
-            <radius>0.0762</radius>
+            <radius>0.0381</radius>
             <length>1.52</length>
           </cylinder>
         </geometry>
@@ -96,7 +96,7 @@
       <visual name='gate_left_vis'>
         <geometry>
           <cylinder>
-            <radius>0.0762</radius>
+            <radius>0.0381</radius>
             <length>1.21</length>
           </cylinder>
         </geometry>
@@ -112,7 +112,7 @@
         <pose>0 0 0.6858 0 0 0</pose>
         <geometry>
           <cylinder>
-            <radius>0.0762</radius>
+            <radius>0.0381</radius>
             <length>0.16</length>
           </cylinder>
         </geometry>
@@ -127,7 +127,7 @@
         <pose>0 0 -0.6858 0 0 0</pose>
         <geometry>
           <cylinder>
-            <radius>0.0762</radius>
+            <radius>0.0381</radius>
             <length>0.16</length>
           </cylinder>
         </geometry>
@@ -142,7 +142,7 @@
         <pose>-1.525 0 -0.762 0 0 0</pose>
         <geometry>
           <cylinder>
-            <radius>0.0762</radius>
+            <radius>0.0381</radius>
             <length>1.52</length>
           </cylinder>
         </geometry>
