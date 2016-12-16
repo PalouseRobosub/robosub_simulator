@@ -78,8 +78,9 @@
         <material>
           <script>
             <uri>file://media/materials/scripts/gazebo.material</uri>
-            <name>Gazebo/Grey</name>
+            <name>Gazebo/FlatBlack</name>
           </script>
+          <diffuse>0.3 0.3 0.3 1</diffuse>
         </material>
         </visual>
         <collision name='bottom_rod_collide'>
@@ -104,8 +105,9 @@
         <material>
           <script>
             <uri>file://media/materials/scripts/gazebo.material</uri>
-            <name>Gazebo/Grey</name>
+            <name>Gazebo/FlatBlack</name>
           </script>
+          <diffuse>0.3 0.3 0.3 1</diffuse>
         </material>
         </visual>
         <collision name='red_rod_collide'>
@@ -130,8 +132,9 @@
         <material>
           <script>
             <uri>file://media/materials/scripts/gazebo.material</uri>
-            <name>Gazebo/Grey</name>
+            <name>Gazebo/FlatBlack</name>
           </script>
+          <diffuse>0.3 0.3 0.3 1</diffuse>
         </material>
         </visual>
         <collision name='green_rod_collide'>
@@ -156,8 +159,9 @@
         <material>
           <script>
             <uri>file://media/materials/scripts/gazebo.material</uri>
-            <name>Gazebo/Grey</name>
+            <name>Gazebo/FlatBlack</name>
           </script>
+          <diffuse>0.3 0.3 0.3 1</diffuse>
         </material>
         </visual>
         <collision name='yellow_rod_collide'>
@@ -170,20 +174,6 @@
           </geometry>
         </collision>
     </link>
-    <!-- <link name='buoys'> -->
-    <!--   <pose>0 0 0 0 0 0</pose> -->
-    <!--   <visual name='buoys_visual'> -->
-    <!--     <geometry> -->
-    <!--         <mesh><uri>file://buoys/buoys.dae</uri></mesh> -->
-    <!--     </geometry> -->
-    <!--   </visual> -->
-    <!--   <collision name='buoys_collision'> -->
-    <!--     <geometry> -->
-    <!--         <mesh><uri>file://buoys/buoys.dae</uri></mesh> -->
-    <!--     </geometry> -->
-    <!--   </collision> -->
-    <!-- </link> -->
-
 
   </model>
 </sdf>
