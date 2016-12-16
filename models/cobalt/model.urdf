@@ -1,0 +1,9 @@
+<robot name="cobalt">
+    <link name="base_link">
+        <visual>
+            <geometry>
+                <mesh filename="models/cobalt/Cobalt.stl"/>
+            </geometry>
+        </visual>
+    </link>
+</robot>

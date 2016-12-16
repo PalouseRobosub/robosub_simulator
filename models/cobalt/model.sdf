@@ -83,7 +83,7 @@
     <link name='hull'>
       <pose>0 0 .082 1.57079632679 0 1.57079632679 </pose>
       <inertial>
-        <mass>10</mass>
+        <mass>9</mass>
       <!--
         <inertia>
           <ixx>86.28907821859966</ixx>
@@ -191,28 +191,28 @@
     <link name='hydrophone_h0'>
       <pose> 0 0 0 0 0 0 </pose>
       <inertial>
-        <mass> 0.001 </mass>
+        <mass> 0.01 </mass>
       </inertial>
     </link>
 
     <link name='hydrophone_hx'>
       <pose> 3 0 0 0 0 0 </pose>
       <inertial>
-        <mass> 0.001 </mass>
+        <mass> 0.01 </mass>
       </inertial>
     </link>
 
     <link name='hydrophone_hy'>
       <pose> 0 3 0 0 0 0 </pose>
       <inertial>
-        <mass> 0.001 </mass>
+        <mass> 0.01 </mass>
       </inertial>
     </link>
 
     <link name='hydrophone_hz'>
       <pose> 0 0 3 0 0 0 </pose>
       <inertial>
-        <mass> 0.001 </mass>
+        <mass> 0.01 </mass>
       </inertial>
     </link>
 
@@ -502,7 +502,7 @@
     <link name='left_camera'>
       <pose>0.32 0.20 0.04 0 1.57079632679 0</pose>
       <inertial>
-        <mass>0.000001</mass>
+        <mass>0.5</mass>
       </inertial>
       <visual name='left_camera_visual'>
         <geometry>
@@ -565,7 +565,7 @@
     <link name='right_camera'>
       <pose>0.32 -0.20 0.04 0 1.57079632679 0</pose>
       <inertial>
-        <mass>0.000001</mass>
+        <mass>0.5</mass>
       </inertial>
       <visual name='right_camera_visual'>
         <geometry>
@@ -670,27 +670,79 @@
 
     <plugin name="thruster" filename="libthruster.so"/>
 
-    <!--
-    <plugin name="buoyancy" filename="libBuoyancyPlugin.so">
-      <fluid_density>1000</fluid_density>
-      <link name="frame">
-          <center_of_volume>0 0 0</center_of_volume>
-          <volume>.0195</volume>
+    <plugin name="BuoyancyPlugin" filename="libBuoyancyPlugin.so">
+        <fluid_density> 997 </fluid_density>
+
+      <link name='frame'>
+        <volume> 0.0001 </volume>
+        <center_of_volume> 0 0 0 </center_of_volume>
       </link>
-      <link name="hull">
-          <center_of_volume>0 0 0</center_of_volume>
-          <volume>0.0095</volume>
+      <link name='hull'>
+        <volume> 0.001 </volume>
+        <center_of_volume> 0 0 0 </center_of_volume>
       </link>
-      <link name="left_camera">
-          <center_of_volume>0 0 0</center_of_volume>
-          <volume>0.000001</volume>
+
+      <link name='right_camera'>
+        <volume> 0.0001 </volume>
+        <center_of_volume> 0 0 0 </center_of_volume>
       </link>
-      <link name="right_camera">
-          <center_of_volume>0 0 0</center_of_volume>
-          <volume>0.000001</volume>
+      <link name='left_camera'>
+        <volume> 0.0001 </volume>
+        <center_of_volume> 0 0 0 </center_of_volume>
+      </link>
+
+      <link name='dive_front_right'>
+        <volume> 0.0001 </volume>
+        <center_of_volume> 0 0 0 </center_of_volume>
+      </link>
+      <link name='dive_front_left'>
+        <volume> 0.0001 </volume>
+        <center_of_volume> 0 0 0 </center_of_volume>
+      </link>
+      <link name='dive_back_right'>
+        <volume> 0.0001 </volume>
+        <center_of_volume> 0 0 0 </center_of_volume>
+      </link>
+      <link name='dive_back_left'>
+        <volume> 0.0001 </volume>
+        <center_of_volume> 0 0 0 </center_of_volume>
+      </link>
+
+      <link name='strafe_back'>
+        <volume> 0.0001 </volume>
+        <center_of_volume> 0 0 0 </center_of_volume>
+      </link>
+      <link name='strafe_front'>
+        <volume> 0.0001 </volume>
+        <center_of_volume> 0 0 0 </center_of_volume>
+      </link>
+
+      <link name='forward_right'>
+        <volume> 0.0001 </volume>
+        <center_of_volume> 0 0 0 </center_of_volume>
+      </link>
+      <link name='forward_left'>
+        <volume> 0.0001 </volume>
+        <center_of_volume> 0 0 0 </center_of_volume>
+      </link>
+
+      <link name='hydrophone_h0'>
+        <volume> 0.00001 </volume>
+        <center_of_volume> 0 0 0 </center_of_volume>
+      </link>
+      <link name='hydrophone_hx'>
+        <volume> 0.00001 </volume>
+        <center_of_volume> 0 0 0 </center_of_volume>
+      </link>
+      <link name='hydrophone_hy'>
+        <volume> 0.00001 </volume>
+        <center_of_volume> 0 0 0 </center_of_volume>
+      </link>
+      <link name='hydrophone_hz'>
+        <volume> 0.00001 </volume>
+        <center_of_volume> 0 0 0 </center_of_volume>
       </link>
     </plugin>
--->
 
   </model>
 </sdf>
