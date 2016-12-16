@@ -51,7 +51,7 @@ void Thruster::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
         ROS_FATAL("thruster params failed to load");
         return;
     }
-    ROS_INFO_STREAM("thruster_settings: " << thruster_settings);
+    ROS_DEBUG_STREAM("thruster_settings: " << thruster_settings);
 
     double thruster_timeout_d;
     if(!ros::param::get("thruster_timeout", thruster_timeout_d))
@@ -77,20 +77,20 @@ void Thruster::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     {
         ROS_WARN_STREAM("failed to load control/back_thrust_ratio. defaulting to 1.0");
     }
-    ROS_INFO_STREAM("back_thrust_ratio: " << back_thrust_ratio);
+    ROS_DEBUG_STREAM("back_thrust_ratio: " << back_thrust_ratio);
 
     nh = new ros::NodeHandle();
 	thruster_sub = nh->subscribe("thruster", 1, &Thruster::thrusterCallback, this);
 
-    ROS_INFO_STREAM("Thruster plugin initialized");
-    ROS_INFO_STREAM("Thruster_settings: " << thruster_settings);
-    ROS_INFO_STREAM("Thruster names: ");
+    ROS_DEBUG_STREAM("Thruster plugin initialized");
+    ROS_DEBUG_STREAM("Thruster_settings: " << thruster_settings);
+    ROS_DEBUG_STREAM("Thruster names: ");
     for(int i=0; i<num_thrusters; i++)
     {
         // Get a pointer for each thruster link
         physics::LinkPtr t = sub->GetLink(thruster_names[i]);
         thruster_links.push_back(t);
-        ROS_INFO_STREAM("t->GetRelativePose(): " << t->GetRelativePose());
+        ROS_DEBUG_STREAM("t->GetRelativePose(): " << t->GetRelativePose());
 
         // The visual message that will be sent to the gzserver
         // will tell it to create a cylinder showing thruster output
@@ -219,9 +219,9 @@ void Thruster::Update()
 
                 if(received_msg)
                 {
-                    ROS_INFO_STREAM(thruster_names[i] << ":");
-                    ROS_INFO_STREAM("Force: (" << force.x << ", " << force.y << ", " << force.z << ")");
-                    ROS_INFO_STREAM("Pos: (" << thruster_rel_pose.pos.x << ", " << thruster_rel_pose.pos.y << ", " << thruster_rel_pose.pos.z << ")");
+                    ROS_DEBUG_STREAM(thruster_names[i] << ":");
+                    ROS_DEBUG_STREAM("Force: (" << force.x << ", " << force.y << ", " << force.z << ")");
+                    ROS_DEBUG_STREAM("Pos: (" << thruster_rel_pose.pos.x << ", " << thruster_rel_pose.pos.y << ", " << thruster_rel_pose.pos.z << ")");
                 }
             }
         }
@@ -231,9 +231,9 @@ void Thruster::Update()
             // Update lines only every time a message is received
             UpdateVisualizers();
 
-            ROS_INFO_STREAM("Total Force on frame: ");
+            ROS_DEBUG_STREAM("Total Force on frame: ");
             math::Vector3 f = frame->GetRelativeForce();
-            ROS_INFO_STREAM("(" << f.x << ", " << f.y << ", " << f.z << ")\n");
+            ROS_DEBUG_STREAM("(" << f.x << ", " << f.y << ", " << f.z << ")\n");
         }
         received_msg = false;
     }
