@@ -10,8 +10,6 @@ Thruster::~Thruster() { }
 void Thruster::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 {
     this->sub = _parent;
-    received_msg = false;
-    num_iterations = 0;
     buoyancy_percentage = 0.04;
 
     // Grab frame, hull link ptr
@@ -21,7 +19,7 @@ void Thruster::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     // This sets gazebo msg publisher
     this->node = transport::NodePtr(new transport::Node());
     this->node->Init(sub->GetWorld()->GetName());
-    visPub = this->node->Advertise<msgs::Visual>("~/visual", 1000);
+    vis_pub = this->node->Advertise<msgs::Visual>("~/visual", 80);
 
     // Start ros node named thruster
     int argc = 0;
@@ -35,7 +33,7 @@ void Thruster::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
         return;
     }
 
-    std::cout << "thruster node started" << std::endl;
+    ROS_DEBUG_STREAM("thruster node started");
 
     max_thrust = 0.0;
     if(!ros::param::get("/control/max_thrust", max_thrust))
@@ -66,7 +64,7 @@ void Thruster::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     // TODO: Get pos/orientation info from settings so that we can dynamically
     // spawn thrusters
     num_thrusters = 0;
-    for(int i=0; i < thruster_settings.size(); ++i)
+    for(unsigned int i=0; i < thruster_settings.size(); ++i)
     {
         thruster_names.push_back(thruster_settings[i]["name"]);
         num_thrusters++;
@@ -79,59 +77,38 @@ void Thruster::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     }
     ROS_DEBUG_STREAM("back_thrust_ratio: " << back_thrust_ratio);
 
-    if(!ros::param::get("visualize_thrusters", visualize_thrusters))
-    {
-        ROS_WARN_STREAM("failed to load thruster visualizer on/off. defaulting to on");
-        visualize_thrusters = true;
-    }
-
     nh = new ros::NodeHandle();
 	thruster_sub = nh->subscribe("thruster", 1, &Thruster::thrusterCallback, this);
 
     ROS_DEBUG_STREAM("Thruster plugin initialized");
     ROS_DEBUG_STREAM("Thruster_settings: " << thruster_settings);
     ROS_DEBUG_STREAM("Thruster names: ");
-    for(int i=0; i<num_thrusters; i++)
+    for(unsigned int i=0; i<num_thrusters; i++)
     {
         // Get a pointer for each thruster link
         physics::LinkPtr t = sub->GetLink(thruster_names[i]);
         thruster_links.push_back(t);
         ROS_DEBUG_STREAM("t->GetRelativePose(): " << t->GetRelativePose());
-
-        // The visual message that will be sent to the gzserver
-        // will tell it to create a cylinder showing thruster output
-        // This initializes a message for each thruster
-        msgs::Visual v_msg;
-        visualMsg.push_back(v_msg);
-        visualMsg[i].set_name(thruster_names[i] + "_force_vis");
-        visualMsg[i].set_parent_name(thruster_names[i]);
-        visualMsg[i].set_cast_shadows(false);
-
-        // The geomMsg is part of the visual message
-        // It defines an object to visualize, in this case,
-        // a narrow cylinder
-        msgs::Geometry *geomMsg = visualMsg[i].mutable_geometry();
-        geomMsg->set_type(msgs::Geometry::CYLINDER);
-        geomMsg->mutable_cylinder()->set_radius(.004);
-        geomMsg->mutable_cylinder()->set_length(1);
-
-        // Set color to red
-        // TODO: They aren't really all that red...
-        msgs::Material *matMsg = visualMsg[i].mutable_material();
-        msgs::Set(matMsg->mutable_diffuse(), common::Color::Red);
-        msgs::Set(matMsg->mutable_specular(), common::Color::Red);
-
-        // Set pose of line to somewhere in the distance initially
-        msgs::Set(visualMsg[i].mutable_pose(), ignition::math::Pose3d(1000, 1000, 1000, 0, 0, 0));
-
-        // Publish message
-        visPub->Publish(visualMsg[i]);
     }
+
+    ReloadParams();
+
+    InitVisualizers();
+
+    visualize_update_time = ros::Duration(0.2);
 
     // Set up Update to be called every simulation update
     // (which is frequently)
     updateConnection = event::Events::ConnectWorldUpdateBegin(
             boost::bind(&Thruster::Update, this));
+}
+
+void Thruster::ReloadParams()
+{
+    if(!ros::param::getCached("visualize_thrusters", visualize_thrusters))
+    {
+        ROS_WARN_STREAM("failed to load thruster visualizer on/off");
+    }
 }
 
 void Thruster::UpdateBuoyancy()
@@ -144,50 +121,44 @@ void Thruster::UpdateBuoyancy()
     // not correct.
     // TODO: Use AddForceAtRelativePosition to add buoyancy to the center of
     // buoyancy. (Ask Christian for this)
-    double gravity = 32.752*9.8;
+    static const double sub_mass = 32.752;
+    static constexpr double gravity = sub_mass*9.8;
     hull->AddForce(math::Vector3(0,0, gravity + (gravity*buoyancy_percentage)));
 }
 
-void Thruster::UpdateVisualizers()
+void Thruster::InitVisualizers()
 {
-    if(visualize_thrusters)
+    for(unsigned int i=0; i<num_thrusters; i++)
     {
-        for(int i=0; i < num_thrusters; i++)
-        {
-            if(!std::isnan(last_thruster_msg.data[i]))
-            {
-                // Modify length of cylinder based on thruster strength
-                msgs::Geometry *geomMsg = visualMsg[i].mutable_geometry();
-                geomMsg->mutable_cylinder()->set_length(std::fabs(last_thruster_msg.data[i]));
+        // The visual message that will be sent to the gzserver
+        // will tell it to create a cylinder showing thruster output
+        // This initializes a message for each thruster
+        msgs::Visual v_msg;
+        v_msg.set_name(thruster_names[i] + "_force_vis");
+        v_msg.set_parent_name(this->sub->GetScopedName());
+        v_msg.set_cast_shadows(false);
 
-                physics::LinkPtr t = thruster_links[i];
+        // The geomMsg is part of the visual message
+        // It defines an object to visualize, in this case,
+        // a narrow cylinder
+        msgs::Geometry *geomMsg = v_msg.mutable_geometry();
+        geomMsg->set_type(msgs::Geometry::CYLINDER);
+        geomMsg->mutable_cylinder()->set_radius(.004);
+        geomMsg->mutable_cylinder()->set_length(1);
 
-                // Rotate and offset visualizer line as appropriate
-                math::Pose p = t->GetWorldPose();
+        // Set color to red
+        v_msg.mutable_material()->mutable_script()->set_name("Gazebo/RedGlow");
 
-                // Move the cylinder to one side of the thruster to show forward
-                // direction. .101 is the length of the thruster
-                math::Vector3 line_offset;
-                if(last_thruster_msg.data[i] < 0.0)
-                    line_offset.z = last_thruster_msg.data[i]/2.0 - .101/2.0;
-                else
-                    line_offset.z = last_thruster_msg.data[i]/2.0 + .101/2.0;
+        msgs::Set(v_msg.mutable_pose(), ignition::math::Pose3d(1000, 1000, 1000, 0, 0, 0));
 
-                line_offset = p.rot * line_offset;
-                ignition::math::Pose3d ip(p.pos.x-line_offset.x, p.pos.y-line_offset.y, p.pos.z-line_offset.z, p.rot.w, p.rot.x, p.rot.y, p.rot.z);
-                msgs::Set(visualMsg[i].mutable_pose(), ip);
+        visual_msgs.push_back(v_msg);
 
-                // Update line
-                visPub->Publish(visualMsg[i]);
-            }
-        }
+        vis_pub->Publish(visual_msgs[i]);
     }
 }
 
-void Thruster::Update()
+void Thruster::UpdateThrusters()
 {
-    UpdateBuoyancy();
-
     // Calculate and apply appropriate force to each thruster. For each
     // thruster, force is first applied in the z axis of a vector3. It is then
     // rotated to the orientation of the thruster so that the force is along
@@ -197,63 +168,130 @@ void Thruster::Update()
     // TODO: (If needed): Optimize this section so that the force is only
     // calculated once per thruster per message instead of once per frame per
     // thruster.
-    if(last_thruster_msg.data.size() == 8 &&
-            ros::Time::now() - last_msg_receive_time < thruster_timeout)
+    if(last_thruster_msg.data.size() == num_thrusters)
     {
         for(int i=0; i < num_thrusters; i++)
         {
-            if(!std::isnan(last_thruster_msg.data[i]))
-            {
-                // Grab thruster ptr
-                physics::LinkPtr t = thruster_links[i];
+            // Grab thruster ptr
+            physics::LinkPtr t = thruster_links[i];
 
-                // If the force is in the negative direction, scale the output
-                // by the back thrust ratio
-                math::Vector3 force(0, 0, 0);
-                if(last_thruster_msg.data[i] < 0)
-                    force.z = last_thruster_msg.data[i]*max_thrust*back_thrust_ratio;
-                else
-                    force.z = last_thruster_msg.data[i]*max_thrust;
+            // If the force is in the negative direction, scale the output
+            // by the back thrust ratio
+            math::Vector3 force(0, 0, 0);
+            if(last_thruster_msg.data[i] < 0)
+                force.z = last_thruster_msg.data[i]*max_thrust*back_thrust_ratio;
+            else
+                force.z = last_thruster_msg.data[i]*max_thrust;
 
-                // Get pose of thruster relative to frame then rotate force
-                // vector as appropriate to output along thrusters z axis
-                math::Pose thruster_world_pose = t->GetWorldPose();
-                math::Pose thruster_rel_pose = t->GetRelativePose();
-                force = thruster_rel_pose.rot * force;
-                //force = frame_pose.rot * force;
+            // Get pose of thruster relative to frame then rotate force
+            // vector as appropriate to output along thrusters z axis
+            math::Pose thruster_world_pose = t->GetWorldPose();
+            math::Pose thruster_rel_pose = t->GetRelativePose();
+            force = thruster_rel_pose.rot * force;
+            //force = frame_pose.rot * force;
 
-                // Add the force directly to the frame of the sub (instead of the
-                // thruster itself)
-                frame->AddLinkForce(force, thruster_rel_pose.pos);
-
-                if(received_msg)
-                {
-                    ROS_DEBUG_STREAM(thruster_names[i] << ":");
-                    ROS_DEBUG_STREAM("Force: (" << force.x << ", " << force.y << ", " << force.z << ")");
-                    ROS_DEBUG_STREAM("Pos: (" << thruster_rel_pose.pos.x << ", " << thruster_rel_pose.pos.y << ", " << thruster_rel_pose.pos.z << ")");
-                }
-            }
+            // Add the force directly to the frame of the sub (instead of the
+            // thruster itself)
+            frame->AddLinkForce(force, thruster_rel_pose.pos);
         }
-
-        if(received_msg)
-        {
-            // Update lines only every time a message is received
-            UpdateVisualizers();
-
-            ROS_DEBUG_STREAM("Total Force on frame: ");
-            math::Vector3 f = frame->GetRelativeForce();
-            ROS_DEBUG_STREAM("(" << f.x << ", " << f.y << ", " << f.z << ")\n");
-        }
-        received_msg = false;
     }
-    num_iterations++;
+}
+
+void Thruster::UpdateVisualizers()
+{
+    if(last_thruster_msg.data.size() == num_thrusters)
+    {
+        for(unsigned int i=0; i < num_thrusters; i++)
+        {
+            // Modify length of cylinder based on thruster strength
+            msgs::Geometry *geomMsg = visual_msgs[i].mutable_geometry();
+            geomMsg->mutable_cylinder()->set_length(std::fabs(last_thruster_msg.data[i]));
+
+            physics::LinkPtr t = thruster_links[i];
+
+            // Rotate and offset visualizer line as appropriate
+            math::Pose p = t->GetWorldPose();
+
+            // Move the cylinder to one side of the thruster to show forward
+            // direction.
+            double thruster_length = 0.101;
+            math::Vector3 line_offset;
+            if(last_thruster_msg.data[i] < 0.0)
+            {
+                line_offset.z = last_thruster_msg.data[i]/2.0 - thruster_length/2.0;
+            }
+            else
+            {
+                line_offset.z = last_thruster_msg.data[i]/2.0 + thruster_length/2.0;
+            }
+
+            line_offset = p.rot * line_offset;
+            ignition::math::Pose3d ip(p.pos.x-line_offset.x, p.pos.y-line_offset.y, p.pos.z-line_offset.z, p.rot.w, p.rot.x, p.rot.y, p.rot.z);
+            msgs::Set(visual_msgs[i].mutable_pose(), ip);
+
+            if(visualize_thrusters && !thrusters_timed_out)
+            {
+                visual_msgs[i].set_visible(true);
+            }
+            else
+            {
+                visual_msgs[i].set_visible(false);
+            }
+
+            // Update line
+            vis_pub->Publish(visual_msgs[i]);
+        }
+    }
+}
+
+void Thruster::Update()
+{
+    UpdateBuoyancy();
+    ReloadParams();
+
+    ros::Duration time_since_last_message = ros::Time::now() - last_msg_receive_time;
+    if(time_since_last_message > thruster_timeout)
+    {
+        thrusters_timed_out = true;
+    }
+    else
+    {
+        thrusters_timed_out = false;
+    }
+
+    if(!thrusters_timed_out)
+    {
+        UpdateThrusters();
+    }
+
+    // The reason this is being run at a constant rate now is because I ran
+    // into a wierd issue where the visualizers would disappear (despite the
+    // correct message being sent and received by gazebo) if the topic has not
+    // been published on for some time. It's possible this is due to gazebo
+    // auto disabling the visual entity but there is nothing in the visual msg
+    // that would enable you to disable any auto disabling. Although messages
+    // are still being sent even with visualizers off, I don't think this is in
+    // dire need of optimization right now.
+    // This is currently being run at a hardcoded 5hz.
+    if(ros::Time::now() - last_update_time > visualize_update_time)
+    {
+        UpdateVisualizers();
+        last_update_time = ros::Time::now();
+    }
 }
 
 void Thruster::thrusterCallback(const robosub::thruster::ConstPtr& msg)
 {
-    received_msg = true;
     last_msg_receive_time = ros::Time::now();
     last_thruster_msg.data = msg->data;
+
+    for(unsigned int i=0; i<last_thruster_msg.data.size(); i++)
+    {
+        if(std::isnan(last_thruster_msg.data[i]))
+        {
+            last_thruster_msg.data[i] = 0.0;
+        }
+    }
 }
 
 GZ_REGISTER_MODEL_PLUGIN(Thruster)
