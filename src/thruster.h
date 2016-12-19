@@ -35,14 +35,11 @@ private:
     ros::Publisher pub;
     ros::Subscriber thruster_sub;
 
-    // Thruster stuff
-    // Consider converting to list of thruster class
+    // Thruster objects
     int num_thrusters;
     std::vector<std::string> thruster_names;
     std::vector<physics::LinkPtr> thruster_links;
     robosub::thruster last_thruster_msg;
-    bool received_msg;
-    int num_iterations;
     physics::LinkPtr frame;
     physics::LinkPtr hull;
     double back_thrust_ratio;
@@ -50,20 +47,26 @@ private:
     double max_thrust;
     ros::Time last_msg_receive_time;
     ros::Duration thruster_timeout;
-    bool visualize_thrusters;
+    bool thrusters_timed_out;
 
     // gazebo messaging objects
-    // This is for visualizing thruster output
-    transport::PublisherPtr visPub;
-    std::vector<msgs::Visual> visualMsg;
+    transport::PublisherPtr vis_pub;
+    std::vector<msgs::Visual> visual_msgs;
     transport::NodePtr node;
+    ros::Duration visualize_update_time;
+    bool visualize_thrusters;
+    ros::Time last_update_time;
+
+    void ReloadParams();
+    void InitVisualizers();
+    void UpdateVisualizers();
+    void UpdateBuoyancy();
+    void UpdateThrusters();
 
 public:
     Thruster();
     ~Thruster();
     void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf);
-    void UpdateBuoyancy();
-    void UpdateVisualizers();
     virtual void Update();
     void thrusterCallback(const robosub::thruster::ConstPtr& msg);
 };
