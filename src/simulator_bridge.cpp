@@ -238,7 +238,7 @@ int main(int argc, char **argv)
     obstacle_pos_pub =
             nh.advertise<robosub::ObstaclePosArray>("obstacles/positions", 1);
     hydrophone_deltas_pub = nh.advertise<robosub::HydrophoneDeltas>(
-            "hydrophone/30khz/delta", 1);
+            "hydrophones/30khz/delta", 1);
 
     ros::Subscriber orient_sub = nh.subscribe("gazebo/model_states", 1,
             modelStatesCallback);
