@@ -107,7 +107,7 @@ void Thruster::ReloadParams()
         ROS_WARN("failed to load thruster visualizer on/off");
     }
 
-    double visualizer_update_rate = 0.1;
+    double visualizer_update_rate = 10.0;
     if(!ros::param::getCached("visualizer_update_rate",
                 visualizer_update_rate))
     {
