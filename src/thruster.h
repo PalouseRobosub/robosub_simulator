@@ -48,12 +48,12 @@ private:
     ros::Time last_msg_receive_time;
     ros::Duration thruster_timeout;
     bool thrusters_timed_out;
+    ros::Duration visualizer_update_time;
 
     // gazebo messaging objects
     transport::PublisherPtr vis_pub;
     std::vector<msgs::Visual> visual_msgs;
     transport::NodePtr node;
-    ros::Duration visualize_update_time;
     bool visualize_thrusters;
     ros::Time last_update_time;
 

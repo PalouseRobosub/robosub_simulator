@@ -92,10 +92,7 @@ void Thruster::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     }
 
     ReloadParams();
-
     InitVisualizers();
-
-    visualize_update_time = ros::Duration(0.2);
 
     // Set up Update to be called every simulation update
     // (which is frequently)
@@ -107,8 +104,16 @@ void Thruster::ReloadParams()
 {
     if(!ros::param::getCached("visualize_thrusters", visualize_thrusters))
     {
-        ROS_WARN_STREAM("failed to load thruster visualizer on/off");
+        ROS_WARN("failed to load thruster visualizer on/off");
     }
+
+    double visualizer_update_rate = 0.1;
+    if(!ros::param::getCached("visualizer_update_rate",
+                visualizer_update_rate))
+    {
+        ROS_WARN("no visualizer update rate specified");
+    }
+    visualizer_update_time = ros::Duration(1.0/visualizer_update_rate);
 }
 
 void Thruster::UpdateBuoyancy()
@@ -247,7 +252,6 @@ void Thruster::UpdateVisualizers()
 void Thruster::Update()
 {
     UpdateBuoyancy();
-    ReloadParams();
 
     ros::Duration time_since_last_message = ros::Time::now() - last_msg_receive_time;
     if(time_since_last_message > thruster_timeout)
@@ -272,11 +276,11 @@ void Thruster::Update()
     // that would enable you to disable any auto disabling. Although messages
     // are still being sent even with visualizers off, I don't think this is in
     // dire need of optimization right now.
-    // This is currently being run at a hardcoded 5hz.
-    if(ros::Time::now() - last_update_time > visualize_update_time)
+    if(ros::Time::now() - last_update_time > visualizer_update_time)
     {
-        UpdateVisualizers();
         last_update_time = ros::Time::now();
+        UpdateVisualizers();
+        ReloadParams();
     }
 }
 
