@@ -24,7 +24,6 @@
         </material>
         </visual>
         <collision name='rod1_collide'>
-          <pose>1.35 0 0 0 1.5707 0</pose>
           <geometry>
             <cylinder>
               <radius>0.0254</radius>
@@ -52,7 +51,6 @@
         </material>
         </visual>
         <collision name='rod2_collide'>
-          <pose>-1.35 0 0 0 1.5707 0</pose>
           <geometry>
             <cylinder>
               <radius>0.0254</radius>
@@ -80,7 +78,6 @@
         </material>
         </visual>
         <collision name='rod3_collide'>
-          <pose>0 1.35 0 0 1.5707 1.5707</pose>
           <geometry>
             <cylinder>
               <radius>0.0254</radius>
@@ -108,7 +105,6 @@
         </material>
         </visual>
         <collision name='rod4_collide'>
-          <pose>0 -1.35 0 0 1.5707 1.5707</pose>
           <geometry>
             <cylinder>
               <radius>0.0254</radius>
@@ -136,7 +132,6 @@
         </material>
         </visual>
         <collision name='rod5_collide'>
-          <pose>0.95 0.95 0 0 1.5707 2.356</pose>
           <geometry>
             <cylinder>
               <radius>0.0254</radius>
@@ -164,7 +159,6 @@
         </material>
         </visual>
         <collision name='rod6_collide'>
-          <pose>-0.95 0.95 0 0 1.5707 -2.356</pose>
           <geometry>
             <cylinder>
               <radius>0.0254</radius>
@@ -192,7 +186,6 @@
         </material>
         </visual>
         <collision name='rod7_collide'>
-          <pose>-0.95 -0.95 0 0 1.5707 2.356</pose>
           <geometry>
             <cylinder>
               <radius>0.0254</radius>
@@ -220,7 +213,6 @@
         </material>
         </visual>
         <collision name='rod8_collide'>
-          <pose>0.95 -0.95 0 0 1.5707 -2.356</pose>
           <geometry>
             <cylinder>
               <radius>0.0254</radius>

@@ -23,7 +23,6 @@
         </material>
       </visual>
       <collision name='gate_top_collide'>
-        <pose>0 0 0 0 1.5707 0</pose>
         <geometry>
           <cylinder>
             <radius>0.0381</radius>
@@ -81,7 +80,6 @@
         </material>
       </visual>
       <collision name='gate_right_collide'>
-        <pose>1.525 0 -0.762 0 0 0</pose>
         <geometry>
           <cylinder>
             <radius>0.0381</radius>
@@ -139,7 +137,6 @@
         </material>
       </visual>
       <collision name='gate_left_collide'>
-        <pose>-1.525 0 -0.762 0 0 0</pose>
         <geometry>
           <cylinder>
             <radius>0.0381</radius>

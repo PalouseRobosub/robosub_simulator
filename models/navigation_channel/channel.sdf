@@ -24,7 +24,6 @@
         </material>
       </visual>
       <collision name='bottom_collide'>
-        <pose>0 0 -1.2 0 1.5707 0</pose>
         <geometry>
           <cylinder>
             <radius>0.0254</radius>
@@ -52,7 +51,6 @@
         </material>
       </visual>
       <collision name='left_collide'>
-        <pose>-1.2 0 0.6 0 0 0</pose>
         <geometry>
           <cylinder>
             <radius>0.0254</radius>
@@ -80,7 +78,6 @@
         </material>
       </visual>
       <collision name='right_collide'>
-        <pose>1.2 0 0.6 0 0 0</pose>
         <geometry>
           <cylinder>
             <radius>0.0254</radius>
@@ -108,7 +105,6 @@
         </material>
       </visual>
       <collision name='left_tether_collide'>
-        <pose>-1.2 0 -2.0 0 0 0</pose>
         <geometry>
           <cylinder>
             <radius>0.01</radius>
@@ -136,7 +132,6 @@
         </material>
       </visual>
       <collision name='right_tether_collide'>
-        <pose>1.2 0 -2.0 0 0 0</pose>
         <geometry>
           <cylinder>
             <radius>0.01</radius>
@@ -164,7 +159,6 @@
         </material>
       </visual>
       <collision name='floor_collide'>
-        <pose>0 0 -2.75 0 1.5707 0</pose>
         <geometry>
           <cylinder>
             <radius>0.01</radius>
