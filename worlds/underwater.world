@@ -275,6 +275,7 @@
 
     <!-- Side D -->
 
+    <plugin name="pfvisualizer" filename="libparticle_filter_visualizer.so"/>
     <!-- This is what adding world plugins looks like
     <plugin name="world_example" filename="libworld_plugin_example.so"/>
     -->
