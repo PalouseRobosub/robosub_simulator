@@ -1,4 +1,6 @@
 # This file is for general simulator params
-thruster_timeout: 0.5
-visualize_thrusters: true
-visualizer_update_rate: 10
+simulator:
+    thruster_timeout: 0.5
+    visualize_thrusters: true
+    visualizer_update_rate: 10
+    bridge_rate: 33 # Roughly same as bno update rate
