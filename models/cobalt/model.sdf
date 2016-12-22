@@ -191,6 +191,35 @@
           <linear>0.002</linear>
           <angular>0.002</angular>
       </velocity_decay>
+      <!--
+      <sensor name="imu" type="imu">
+        <imu>
+          <topic>rs_lin_accel_data</topic>
+          <linear_acceleration>
+            <x>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>0.0</stddev>
+              </noise>
+            </x>
+            <y>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>0.0</stddev>
+              </noise>
+            </y>
+            <z>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>0.0</stddev>
+              </noise>
+            </z>
+          </linear_acceleration>
+        </imu>
+        <always_on>1</always_on>
+        <update_rate>33</update_rate>
+      </sensor>
+        -->
     </link>
 
     <link name='hydrophone_h0'>
@@ -789,6 +818,13 @@
       </link>
 
     </plugin>
-
+    <plugin name="imu" filename="libgazebo_ros_imu.so">
+      <alwaysOn>true</alwaysOn>
+      <bodyName>frame</bodyName>
+      <topicName>gazebo/rs_imu</topicName>
+      <serviceName>gazebo/rs_imu_service</serviceName>
+      <gaussianNoise>0.0</gaussianNoise>
+      <updateRate>33.0</updateRate>
+    </plugin>
   </model>
 </sdf>
