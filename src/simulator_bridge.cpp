@@ -5,6 +5,7 @@
 #include "gazebo_msgs/ModelState.h"
 #include "gazebo_msgs/ModelStates.h"
 #include "gazebo_msgs/LinkStates.h"
+#include "sensor_msgs/Imu.h"
 #include "robosub/ObstaclePosArray.h"
 #include "robosub/QuaternionStampedAccuracy.h"
 #include "robosub/HydrophoneDeltas.h"
@@ -26,6 +27,7 @@ ros::Publisher euler_pub;
 ros::Publisher depth_pub;
 ros::Publisher obstacle_pos_pub;
 ros::Publisher hydrophone_deltas_pub;
+ros::Publisher lin_accel_pub;
 
 // List of names of objects to publish the position and name of. This will be
 // loaded from parameters.
@@ -224,6 +226,17 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
     obstacle_pos_pub.publish(object_array);
 }
 
+void imuCallback(const sensor_msgs::Imu::ConstPtr& msg)
+{
+    geometry_msgs::Vector3 lin_accel;
+
+    lin_accel.x = msg->linear_acceleration.x;
+    lin_accel.y = msg->linear_acceleration.y;
+    lin_accel.z = msg->linear_acceleration.z;
+
+    lin_accel_pub.publish(lin_accel);
+}
+
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "simulator_bridge");
@@ -239,6 +252,7 @@ int main(int argc, char **argv)
             nh.advertise<robosub::ObstaclePosArray>("obstacles/positions", 1);
     hydrophone_deltas_pub = nh.advertise<robosub::HydrophoneDeltas>(
             "hydrophone/30khz/delta", 1);
+    lin_accel_pub = nh.advertise<geometry_msgs::Vector3>("rs_lin_accel_data", 1);
 
     ros::Subscriber orient_sub = nh.subscribe("gazebo/model_states", 1,
             modelStatesCallback);
@@ -246,10 +260,14 @@ int main(int argc, char **argv)
     ros::Subscriber link_sub = nh.subscribe("gazebo/link_states", 1,
             linkStatesCallback);
 
+    ros::Subscriber imu_sub = nh.subscribe("gazebo/rs_imu", 1,
+            imuCallback);
+
     int rate;
-    if(!nh.getParam("control/rate", rate))
+    if(!nh.getParam("simulator/bridge_rate", rate))
     {
         rate = 30;
+        ROS_WARN_STREAM("failed to load simulator bridge rate. defaulting to 30");
     }
     ros::Rate r(rate);
 

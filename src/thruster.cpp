@@ -102,13 +102,13 @@ void Thruster::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 
 void Thruster::ReloadParams()
 {
-    if(!ros::param::getCached("visualize_thrusters", visualize_thrusters))
+    if(!ros::param::getCached("simulator/visualize_thrusters", visualize_thrusters))
     {
         ROS_WARN("failed to load thruster visualizer on/off");
     }
 
     double visualizer_update_rate = 10.0;
-    if(!ros::param::getCached("visualizer_update_rate",
+    if(!ros::param::getCached("simulator/visualizer_update_rate",
                 visualizer_update_rate))
     {
         ROS_WARN("no visualizer update rate specified");
