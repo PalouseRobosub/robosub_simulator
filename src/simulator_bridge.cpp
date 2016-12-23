@@ -157,6 +157,9 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
     position_msg.x = msg.pose[sub_index].position.x;
     position_msg.y = msg.pose[sub_index].position.y;
     position_msg.z = msg.pose[sub_index].position.z;
+    position_msg.x -= pinger_position[0];
+    position_msg.y -= pinger_position[1];
+    position_msg.z -= pinger_position[2];
 
     // Copy sub orientation to orientation msg
     orientation_msg.quaternion.x = msg.pose[sub_index].orientation.x;
