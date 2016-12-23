@@ -1,7 +1,7 @@
 #include "ros/ros.h"
 #include "robosub/depth_stamped.h"
 #include "robosub/Euler.h"
-#include "geometry_msgs/Vector3.h"
+#include "geometry_msgs/Vector3Stamped.h"
 #include "gazebo_msgs/ModelState.h"
 #include "gazebo_msgs/ModelStates.h"
 #include "gazebo_msgs/LinkStates.h"
@@ -228,12 +228,13 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
 
 void imuCallback(const sensor_msgs::Imu::ConstPtr& msg)
 {
-    geometry_msgs::Vector3 lin_accel;
+    geometry_msgs::Vector3Stamped lin_accel;
 
-    lin_accel.x = msg->linear_acceleration.x;
-    lin_accel.y = msg->linear_acceleration.y;
-    lin_accel.z = msg->linear_acceleration.z;
+    lin_accel.vector.x = msg->linear_acceleration.x;
+    lin_accel.vector.y = msg->linear_acceleration.y;
+    lin_accel.vector.z = msg->linear_acceleration.z;
 
+    lin_accel.header.stamp = ros::Time::now();
     lin_accel_pub.publish(lin_accel);
 }
 
@@ -252,7 +253,7 @@ int main(int argc, char **argv)
             nh.advertise<robosub::ObstaclePosArray>("obstacles/positions", 1);
     hydrophone_deltas_pub = nh.advertise<robosub::HydrophoneDeltas>(
             "hydrophone/30khz/delta", 1);
-    lin_accel_pub = nh.advertise<geometry_msgs::Vector3>("rs_lin_accel_data", 1);
+    lin_accel_pub = nh.advertise<geometry_msgs::Vector3Stamped>("rs_lin_accel_data", 1);
 
     ros::Subscriber orient_sub = nh.subscribe("gazebo/model_states", 1,
             modelStatesCallback);
