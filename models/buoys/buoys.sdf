@@ -101,6 +101,14 @@
           <diffuse>0.3 0.3 0.3 1</diffuse>
         </material>
         </visual>
+        <collision name='red_rod_collide'>
+            <geometry>
+                <cylinder>
+                    <radius>0.01</radius>
+                    <length>2.4</length>
+                </cylinder>
+            </geometry>
+        </collision>
     </link>
     <link name='green_rod'>
         <pose>0 0 1.26 0 0 0</pose>
@@ -119,6 +127,14 @@
           <diffuse>0.3 0.3 0.3 1</diffuse>
         </material>
         </visual>
+        <collision name='green_rod_collide'>
+            <geometry>
+                <cylinder>
+                    <radius>0.01</radius>
+                    <length>2.5</length>
+                </cylinder>
+            </geometry>
+        </collision>
     </link>
     <link name='yellow_rod'>
         <pose>1.2 0 1.26 0 0 0</pose>
@@ -137,6 +153,14 @@
           <diffuse>0.3 0.3 0.3 1</diffuse>
         </material>
         </visual>
+        <collision name='yellow_rod_collide'>
+            <geometry>
+                <cylinder>
+                    <radius>0.01</radius>
+                    <length>2.5</length>
+                </cylinder>
+            </geometry>
+        </collision>
     </link>
 
   </model>
