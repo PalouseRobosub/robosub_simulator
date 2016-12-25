@@ -29,7 +29,8 @@ void Thruster::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 
     if(!ros::isInitialized())
     {
-        std::cout << "ROS Not initialized" << std::endl;
+        //this goes to cerr just in case ROS logging mechanisms aren't working
+        std::cerr << "ROS Not initialized" << std::endl;
         return;
     }
 
@@ -41,7 +42,7 @@ void Thruster::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
         ROS_FATAL("Failed to load max_thrust");
         return;
     }
-    std::cout <<  "max_thrust: " << max_thrust << std::endl;
+    ROS_DEBUG_STREAM("max_thrust: " << max_thrust);
 
     XmlRpc::XmlRpcValue thruster_settings;
     if(!ros::param::get("thrusters", thruster_settings))
