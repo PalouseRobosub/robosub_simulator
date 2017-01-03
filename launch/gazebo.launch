@@ -1,5 +1,6 @@
 <launch>
 <rosparam command="load" file="$(find robosub)/param/cobalt.yaml"/>
+<rosparam command="load" file="$(find robosub_simulator)/param/cobalt_sim.yaml"/>
 <rosparam command="load" file="$(find robosub_simulator)/param/obstacles.yaml"/>
 <rosparam command="load" file="$(find robosub_simulator)/param/simulator.yaml"/>
 <arg name="world_file"  default="$(find robosub_simulator)/worlds/underwater.world"/>
