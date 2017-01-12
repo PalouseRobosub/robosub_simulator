@@ -127,7 +127,7 @@ void Thruster::UpdateBuoyancy()
     // not correct.
     // TODO: Use AddForceAtRelativePosition to add buoyancy to the center of
     // buoyancy. (Ask Christian for this)
-    static const double sub_mass = 32.752;
+    static constexpr double sub_mass = 32.752;
     static constexpr double gravity = sub_mass*9.8;
     hull->AddForce(math::Vector3(0,0, gravity + (gravity*buoyancy_percentage)));
 }
