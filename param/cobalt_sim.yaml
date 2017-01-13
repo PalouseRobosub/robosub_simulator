@@ -1,33 +1,34 @@
 # this settings file should be loaded after cobalt.yaml is loaded, is designed
 # for overwritting settings that should be different in the simulator
 control:
+    rate: 50
     proportional:
         x: 1.0
         y: 1.0
         z: 2.0
-        psi: 0.04 #roll
-        phi: 0.04 #pitch
+        psi: 2.0  #roll
+        phi: 2.0  #pitch
         theta: 0.07 #yaw
     integral:
         x: 0.0
         y: 0.0
         z: 0.1
-        psi: 0.0
-        phi: 0.0
+        psi: 1.0
+        phi: 1.0
         theta: 0.1
     derivative:
         x: 0.0
         y: 0.0
         z: 1.0
-        psi: 0.0
-        phi: 0.0
+        psi: 2.0
+        phi: 2.0
         theta: 0.25
     windup:
         x: 5.0
         y: 5.0
         z: 0.1
-        psi: 45.0
-        phi: 45.0
+        psi: 10.0
+        phi: 10.0
         theta: 0.1
     hysteresis:
         x: 0.0
@@ -36,5 +37,8 @@ control:
         psi: 0.0
         phi: 0.0
         theta: 0.0
+    limits:
+        rotation: 0.5
+        translation: 0.5
     buoyancy_offset: -12.8
 
