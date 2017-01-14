@@ -109,13 +109,10 @@ void linkStatesCallback(const gazebo_msgs::LinkStates &msg)
 
 }
 
-// ModelStates msg consists of a name, a pose (position and orientation),
-// and a twist (linear and angular velocity) for each object in
-// the simulator
-// Currently it publishes the position, orientation, and depth
-// of the sub
-// TODO: Eventually this should be generalized to publish a list
-// (defined in params) of objects as well as calulate depth
+// ModelStates msg consists of a name, a pose (position and orientation), and a
+// twist (linear and angular velocity) for each object in the simulator
+// Currently it publishes the position, orientation, and depth of the sub, as
+// well as a list (defined in params) of objects
 void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
 {
     geometry_msgs::Vector3 position_msg;
@@ -153,10 +150,26 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
         return;
     }
 
+    /*
+     * Update the global pinger position. Depth of pinger is relative to water
+     * top position
+     */
+    pinger_position = Vector3d(msg.pose[pinger_index].position.x,
+            msg.pose[pinger_index].position.y,
+            -(msg.pose[ceiling_index].position.z -
+                msg.pose[pinger_index].position.z));
+
+    ROS_INFO_STREAM("pinger_position: " << pinger_position);
+
+    // Calculate depth from the z positions of the water top and the sub
+    depth_msg.depth = -(msg.pose[ceiling_index].position.z -
+                     msg.pose[sub_index].position.z);
+    depth_msg.header.stamp = ros::Time::now();
+
     // Copy sub pos to position msg
     position_msg.x = msg.pose[sub_index].position.x;
     position_msg.y = msg.pose[sub_index].position.y;
-    position_msg.z = msg.pose[sub_index].position.z;
+    position_msg.z = depth_msg.depth;
     position_msg.x -= pinger_position[0];
     position_msg.y -= pinger_position[1];
     position_msg.z -= pinger_position[2];
@@ -177,25 +190,12 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
     euler_msg.roll *= _180_OVER_PI;
     euler_msg.pitch *= _180_OVER_PI;
     euler_msg.yaw *= _180_OVER_PI;
-    euler_pub.publish(euler_msg);
 
     // Publish sub position and orientation
     position_pub.publish(position_msg);
     orientation_pub.publish(orientation_msg);
-
-    // If the model for the top of the water is found calculate depth from
-    // the z positions of the water top and the sub
-    depth_msg.depth = -(msg.pose[ceiling_index].position.z -
-                     msg.pose[sub_index].position.z);
-    depth_msg.header.stamp = ros::Time::now();
     depth_pub.publish(depth_msg);
-
-    /*
-     * Update the global pinger position.
-     */
-    pinger_position = Vector3d(msg.pose[pinger_index].position.x,
-            msg.pose[pinger_index].position.y,
-            msg.pose[pinger_index].position.z);
+    euler_pub.publish(euler_msg);
 
     // Iterate through object_names and for each iteration search through the
     // msg.name array and attempt to find object_names[i]. If it is not found
@@ -247,7 +247,7 @@ int main(int argc, char **argv)
 
     ros::NodeHandle nh;
 
-    position_pub = nh.advertise<geometry_msgs::Vector3>("position", 1);
+    position_pub = nh.advertise<geometry_msgs::Vector3>("position/real", 1);
     orientation_pub =
             nh.advertise<robosub::QuaternionStampedAccuracy>("orientation", 1);
     euler_pub = nh.advertise<robosub::Euler>( "orientation/pretty", 1);
