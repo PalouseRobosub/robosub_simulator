@@ -60,6 +60,11 @@
         <child>right_camera</child>
     </joint>
 
+    <joint name='bottom_camera_frame' type="fixed">
+        <parent>frame</parent>
+        <child>bottom_camera</child>
+    </joint>
+    
     <joint name='hydrophone_h0_frame' type="fixed">
         <parent>frame</parent>
         <child>hydrophone_h0</child>
@@ -527,12 +532,12 @@
         </geometry>
       </collision>
       <sensor name="left" type="wideanglecamera">
-          <pose>0.05 0 0 0 -1.570796 0</pose>
+          <pose>0 0 0.14 0 -1.570796 0</pose>
           <camera>
-              <horizontal_fov>6.283</horizontal_fov>
+              <horizontal_fov>3.1415</horizontal_fov>
               <image>
                   <width>640</width>
-                  <height>480</height>
+                  <height>640</height>
               </image>
               <clip>
                   <near>0.1</near>
@@ -542,12 +547,12 @@
                   <type>custom</type>
                   <custom_function>
                       <c1>1.05</c1>   
-                      <c2>4</c2>     
+                      <c2>6</c2>     
                       <f>1.0</f>    
                       <fun>tan</fun>
                   </custom_function>
                   <scale_to_hfov>true</scale_to_hfov>
-                  <cutoff_angle>3.1415</cutoff_angle>
+                  <cutoff_angle>1.57075</cutoff_angle>
                   <env_texture_size>512</env_texture_size>
               </lens>
           </camera>
@@ -588,12 +593,12 @@
         </geometry>
       </collision>
       <sensor name="right" type="wideanglecamera">
-          <pose>0.05 0 0 0 -1.570796 0</pose>
+          <pose>0 0 0.14 0 -1.570796 0</pose>
           <camera>
-              <horizontal_fov>6.283</horizontal_fov>
+              <horizontal_fov>3.1415</horizontal_fov>
               <image>
                   <width>640</width>
-                  <height>480</height>
+                  <height>640</height>
               </image>
               <clip>
                   <near>0.1</near>
@@ -603,18 +608,79 @@
                   <type>custom</type>
                   <custom_function>
                       <c1>1.05</c1>   
-                      <c2>4</c2>     
+                      <c2>6</c2>     
                       <f>1.0</f>    
                       <fun>tan</fun>
                   </custom_function>
                   <scale_to_hfov>true</scale_to_hfov>
-                  <cutoff_angle>3.1415</cutoff_angle>
+                  <cutoff_angle>1.57075</cutoff_angle>
                   <env_texture_size>512</env_texture_size>
               </lens>
           </camera>
           <plugin name="right_camera_controller" filename="libgazebo_ros_camera.so">
               <cameraName>right</cameraName>
               <imageTopicName>/camera/right</imageTopicName>
+          </plugin>
+          <always_on>1</always_on>
+          <update_rate>5</update_rate>
+      </sensor>
+    </link>
+
+    <link name='bottom_camera'>
+      <pose>0 0 -0.1 0 3.14159265358 0</pose>
+      <inertial>
+        <mass>0.000001</mass>
+      </inertial>
+      <visual name='bottom_camera_visual'>
+        <geometry>
+          <cylinder>
+            <radius>0.0405</radius>
+            <length>0.15</length>
+          </cylinder>
+        </geometry>
+      <material>
+        <script>
+          <uri>file://media/materials/scripts/gazebo.material</uri>
+          <name>Gazebo/Black</name>
+        </script>
+      </material>
+      </visual>
+      <collision name='bottom_camera_collision'>
+        <geometry>
+          <cylinder>
+            <radius>0.0405</radius>
+            <length>0.15</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <sensor name="bottom" type="wideanglecamera">
+          <pose>0 0 0.14 0 -1.570796 0</pose>
+          <camera>
+              <horizontal_fov>3.1415</horizontal_fov>
+              <image>
+                  <width>640</width>
+                  <height>640</height>
+              </image>
+              <clip>
+                  <near>0.1</near>
+                  <far>100</far>
+              </clip>
+              <lens>
+                  <type>custom</type>
+                  <custom_function>
+                      <c1>1.05</c1>   
+                      <c2>6</c2>     
+                      <f>1.0</f>    
+                      <fun>tan</fun>
+                  </custom_function>
+                  <scale_to_hfov>true</scale_to_hfov>
+                  <cutoff_angle>1.57075</cutoff_angle>
+                  <env_texture_size>512</env_texture_size>
+              </lens>
+          </camera>
+          <plugin name="bottom_camera_controller" filename="libgazebo_ros_camera.so">
+              <cameraName>bottom</cameraName>
+              <imageTopicName>/camera/bottom</imageTopicName>
           </plugin>
           <always_on>1</always_on>
           <update_rate>5</update_rate>
