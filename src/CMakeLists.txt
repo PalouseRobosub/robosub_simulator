@@ -2,6 +2,9 @@ add_library(thruster SHARED thruster.cpp)
 add_dependencies(thruster ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(thruster ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
 
+add_library(buoyancy_improved SHARED buoyancy_improved.cpp)
+add_dependencies(buoyancy_improved  ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(buoyancy_improved   ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
 
 #simulator bridge
 add_executable(simulator_bridge simulator_bridge.cpp)

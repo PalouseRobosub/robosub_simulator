@@ -10,7 +10,6 @@ Thruster::~Thruster() { }
 void Thruster::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 {
     this->sub = _parent;
-    buoyancy_percentage = 0.04;
 
     // Grab frame, hull link ptr
     frame = sub->GetLink("frame");
@@ -115,21 +114,6 @@ void Thruster::ReloadParams()
         ROS_WARN("no visualizer update rate specified");
     }
     visualizer_update_time = ros::Duration(1.0/visualizer_update_rate);
-}
-
-void Thruster::UpdateBuoyancy()
-{
-    // Directly adding buoyancy seems to work better than using the buoyancy
-    // plugin.
-    // TODO: Calculate the mass of the sub by getting each link. Use
-    // model->GetLinks() and link->GetInertial(). This would also allow us to
-    // compare it to param /control/mass. If they differ something is probably
-    // not correct.
-    // TODO: Use AddForceAtRelativePosition to add buoyancy to the center of
-    // buoyancy. (Ask Christian for this)
-    static constexpr double sub_mass = 32.752;
-    static constexpr double gravity = sub_mass*9.8;
-    hull->AddForce(math::Vector3(0,0, gravity + (gravity*buoyancy_percentage)));
 }
 
 void Thruster::InitVisualizers()
@@ -252,8 +236,6 @@ void Thruster::UpdateVisualizers()
 
 void Thruster::Update()
 {
-    UpdateBuoyancy();
-
     ros::Duration time_since_last_message = ros::Time::now() - last_msg_receive_time;
     if(time_since_last_message > thruster_timeout)
     {

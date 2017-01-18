@@ -224,7 +224,7 @@
     <link name='frame'>
       <pose>0 0 -0.088 0 0 0</pose>
       <inertial>
-        <mass>20.0</mass>
+        <mass>16.5</mass>
         <!--
         <inertia>
           <ixx>86.28907821859966</ixx>
@@ -507,7 +507,7 @@
     <link name='left_camera'>
       <pose>0.37 0.20 0.04 0 1.57079632679 0</pose>
       <inertial>
-        <mass>0.000001</mass>
+        <mass>0.73</mass>
       </inertial>
       <visual name='left_camera_visual'>
         <geometry>
@@ -568,7 +568,7 @@
     <link name='right_camera'>
       <pose>0.37 -0.20 0.04 0 1.57079632679 0</pose>
       <inertial>
-        <mass>0.000001</mass>
+        <mass>0.73</mass>
       </inertial>
       <visual name='right_camera_visual'>
         <geometry>
@@ -629,7 +629,7 @@
     <link name='bottom_camera'>
       <pose>0 0 -0.1 0 3.14159265358 0</pose>
       <inertial>
-        <mass>0.000001</mass>
+        <mass>0.73</mass>
       </inertial>
       <visual name='bottom_camera_visual'>
         <geometry>
@@ -732,27 +732,39 @@
 
     <plugin name="thruster" filename="libthruster.so"/>
 
-    <!--
-    <plugin name="buoyancy" filename="libBuoyancyPlugin.so">
+    <plugin name="buoyancy_improved" filename="libbuoyancy_improved.so">
       <fluid_density>1000</fluid_density>
       <link name="frame">
-          <center_of_volume>0 0 0</center_of_volume>
-          <volume>.0195</volume>
+        <volume>0.0026</volume>
       </link>
-      <link name="hull">
-          <center_of_volume>0 0 0</center_of_volume>
-          <volume>0.0095</volume>
+
+      <!-- thrusters -->
+      <link name="dive_back_right">
+        <volume>0.000334</volume>
       </link>
-      <link name="left_camera">
-          <center_of_volume>0 0 0</center_of_volume>
-          <volume>0.000001</volume>
+      <link name="dive_back_left">
+        <volume>0.000334</volume>
       </link>
-      <link name="right_camera">
-          <center_of_volume>0 0 0</center_of_volume>
-          <volume>0.000001</volume>
+      <link name="dive_front_right">
+        <volume>0.000334</volume>
       </link>
+      <link name="dive_front_left">
+        <volume>0.000334</volume>
+      </link>
+      <link name="strafe_front">
+        <volume>0.000334</volume>
+      </link>
+      <link name="strafe_back">
+        <volume>0.000334</volume>
+      </link>
+      <link name="forward_right">
+        <volume>0.000334</volume>
+      </link>
+      <link name="forward_left">
+        <volume>0.000334</volume>
+      </link>
+
     </plugin>
--->
 
   </model>
 </sdf>

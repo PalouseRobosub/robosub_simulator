@@ -40,5 +40,5 @@ control:
     limits:
         rotation: 0.5
         translation: 0.5
-    buoyancy_offset: -12.8
+    buoyancy_offset: -2.5
 
