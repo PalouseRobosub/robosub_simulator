@@ -52,7 +52,7 @@ void Thruster::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     ROS_DEBUG_STREAM("thruster_settings: " << thruster_settings);
 
     double thruster_timeout_d;
-    if(!ros::param::get("thruster_timeout", thruster_timeout_d))
+    if(!ros::param::get("simulator/thruster_timeout", thruster_timeout_d))
     {
         ROS_WARN("no thruster timeout specified. defaulting to 5.0 seconds");
         thruster_timeout_d = 5.0;
