@@ -540,21 +540,29 @@
                   <height>640</height>
               </image>
               <clip>
-                  <near>0.1</near>
+                  <near>0.001</near>
                   <far>100</far>
               </clip>
               <lens>
                   <type>custom</type>
                   <custom_function>
-                      <c1>1.05</c1>   
-                      <c2>6</c2>     
-                      <f>1.0</f>    
+                      <c1>691.5</c1>   
+                      <c2>515.5</c2>     
+                      <f>341.43251966606937</f>    
                       <fun>tan</fun>
                   </custom_function>
                   <scale_to_hfov>true</scale_to_hfov>
                   <cutoff_angle>1.57075</cutoff_angle>
                   <env_texture_size>512</env_texture_size>
               </lens>
+              <distortion>
+                <k1>-.16492342967649815</k1>
+                <k2>0.016187172468110342</k2>
+                <k3>-0.00038951913220274415</k3>
+                <p1>0</p1>
+                <p2>0</p2>
+                <center>0 0</center>
+              </distortion>
           </camera>
           <plugin name="left_camera_controller" filename="libgazebo_ros_camera.so">
               <cameraName>left</cameraName>
@@ -607,15 +615,23 @@
               <lens>
                   <type>custom</type>
                   <custom_function>
-                      <c1>1.05</c1>   
-                      <c2>6</c2>     
-                      <f>1.0</f>    
+                      <c1>691.5</c1>   
+                      <c2>515.5</c2>     
+                      <f>341.43251966606937</f>    
                       <fun>tan</fun>
                   </custom_function>
                   <scale_to_hfov>true</scale_to_hfov>
                   <cutoff_angle>1.57075</cutoff_angle>
                   <env_texture_size>512</env_texture_size>
               </lens>
+              <distortion>
+                <k1>-.16492342967649815</k1>
+                <k2>0.016187172468110342</k2>
+                <k3>-0.00038951913220274415</k3>
+                <p1>0</p1>
+                <p2>0</p2>
+                <center>0 0</center>
+              </distortion>
           </camera>
           <plugin name="right_camera_controller" filename="libgazebo_ros_camera.so">
               <cameraName>right</cameraName>
@@ -668,15 +684,23 @@
               <lens>
                   <type>custom</type>
                   <custom_function>
-                      <c1>1.05</c1>   
-                      <c2>6</c2>     
-                      <f>1.0</f>    
+                      <c1>691.5</c1>   
+                      <c2>515.5</c2>     
+                      <f>341.43251966606937</f>    
                       <fun>tan</fun>
                   </custom_function>
                   <scale_to_hfov>true</scale_to_hfov>
                   <cutoff_angle>1.57075</cutoff_angle>
                   <env_texture_size>512</env_texture_size>
               </lens>
+              <distortion>
+                <k1>-.16492342967649815</k1>
+                <k2>0.016187172468110342</k2>
+                <k3>-0.00038951913220274415</k3>
+                <p1>0</p1>
+                <p2>0</p2>
+                <center>0 0</center>
+              </distortion>
           </camera>
           <plugin name="bottom_camera_controller" filename="libgazebo_ros_camera.so">
               <cameraName>bottom</cameraName>
