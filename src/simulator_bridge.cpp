@@ -159,7 +159,7 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
             -(msg.pose[ceiling_index].position.z -
                 msg.pose[pinger_index].position.z));
 
-    ROS_INFO_STREAM("pinger_position: " << pinger_position);
+    ROS_DEBUG_STREAM("pinger_position: " << pinger_position);
 
     // Calculate depth from the z positions of the water top and the sub
     depth_msg.depth = -(msg.pose[ceiling_index].position.z -
@@ -172,7 +172,6 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
     position_msg.z = depth_msg.depth;
     position_msg.x -= pinger_position[0];
     position_msg.y -= pinger_position[1];
-    position_msg.z -= pinger_position[2];
 
     // Copy sub orientation to orientation msg
     orientation_msg.quaternion.x = msg.pose[sub_index].orientation.x;
@@ -256,7 +255,7 @@ int main(int argc, char **argv)
             nh.advertise<robosub::ObstaclePosArray>("obstacles/positions", 1);
     hydrophone_deltas_pub = nh.advertise<robosub::HydrophoneDeltas>(
             "hydrophones/30khz/delta", 1);
-    lin_accel_pub = nh.advertise<geometry_msgs::Vector3Stamped>("rs_lin_accel_data", 1);
+    lin_accel_pub = nh.advertise<geometry_msgs::Vector3Stamped>("acceleration/linear", 1);
 
     ros::Subscriber orient_sub = nh.subscribe("gazebo/model_states", 1,
             modelStatesCallback);
