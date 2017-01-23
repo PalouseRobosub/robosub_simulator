@@ -795,7 +795,7 @@
       <topicName>gazebo/rs_imu</topicName>
       <serviceName>gazebo/rs_imu_service</serviceName>
       <gaussianNoise>0.0</gaussianNoise>
-      <updateRate>33.0</updateRate>
+      <updateRate>20.0</updateRate>
     </plugin>
   </model>
 </sdf>
