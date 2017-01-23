@@ -191,35 +191,6 @@
           <linear>0.002</linear>
           <angular>0.002</angular>
       </velocity_decay>
-      <!--
-      <sensor name="imu" type="imu">
-        <imu>
-          <topic>rs_lin_accel_data</topic>
-          <linear_acceleration>
-            <x>
-              <noise type="gaussian">
-                <mean>0.0</mean>
-                <stddev>0.0</stddev>
-              </noise>
-            </x>
-            <y>
-              <noise type="gaussian">
-                <mean>0.0</mean>
-                <stddev>0.0</stddev>
-              </noise>
-            </y>
-            <z>
-              <noise type="gaussian">
-                <mean>0.0</mean>
-                <stddev>0.0</stddev>
-              </noise>
-            </z>
-          </linear_acceleration>
-        </imu>
-        <always_on>1</always_on>
-        <update_rate>33</update_rate>
-      </sensor>
-        -->
     </link>
 
     <link name='hydrophone_h0'>
