@@ -10,6 +10,7 @@
 #include "robosub/QuaternionStampedAccuracy.h"
 #include "robosub/HydrophoneDeltas.h"
 #include "tf/transform_datatypes.h"
+#include "ThrottledPublisher.hpp"
 
 #include <cmath>
 #include <vector>
@@ -18,16 +19,17 @@
 
 using std::vector;
 using namespace Eigen;
+using namespace rs;
 
 static constexpr double _180_OVER_PI = 180.0 / 3.14159;
 
-ros::Publisher position_pub;
-ros::Publisher orientation_pub;
-ros::Publisher euler_pub;
-ros::Publisher depth_pub;
-ros::Publisher obstacle_pos_pub;
-ros::Publisher hydrophone_deltas_pub;
-ros::Publisher lin_accel_pub;
+ThrottledPublisher<geometry_msgs::Vector3> position_pub;
+ThrottledPublisher<robosub::QuaternionStampedAccuracy> orientation_pub;
+ThrottledPublisher<robosub::Euler> euler_pub;
+ThrottledPublisher<robosub::depth_stamped> depth_pub;
+ThrottledPublisher<robosub::ObstaclePosArray> obstacle_pos_pub;
+ThrottledPublisher<robosub::HydrophoneDeltas> hydrophone_deltas_pub;
+ThrottledPublisher<geometry_msgs::Vector3Stamped> lin_accel_pub;
 
 // List of names of objects to publish the position and name of. This will be
 // loaded from parameters.
@@ -246,16 +248,20 @@ int main(int argc, char **argv)
 
     ros::NodeHandle nh;
 
-    position_pub = nh.advertise<geometry_msgs::Vector3>("position/real", 1);
-    orientation_pub =
-            nh.advertise<robosub::QuaternionStampedAccuracy>("orientation", 1);
-    euler_pub = nh.advertise<robosub::Euler>( "orientation/pretty", 1);
-    depth_pub = nh.advertise<robosub::depth_stamped>("depth", 1);
-    obstacle_pos_pub =
-            nh.advertise<robosub::ObstaclePosArray>("obstacles/positions", 1);
-    hydrophone_deltas_pub = nh.advertise<robosub::HydrophoneDeltas>(
-            "hydrophones/30khz/delta", 1);
-    lin_accel_pub = nh.advertise<geometry_msgs::Vector3Stamped>("acceleration/linear", 1);
+    position_pub = ThrottledPublisher<geometry_msgs::Vector3>
+        ("position/real", 1, 0, "simulator/bridge_rates/position");
+    orientation_pub = ThrottledPublisher<robosub::QuaternionStampedAccuracy>
+        ("orientation", 1, 0, "simulator/bridge_rates/orientation");
+    euler_pub = ThrottledPublisher<robosub::Euler>
+        ( "orientation/pretty", 1, 0, "simulator/bridge_rates/euler");
+    depth_pub = ThrottledPublisher<robosub::depth_stamped>
+        ("depth", 1, 0, "simulator/bridge_rates/depth");
+    obstacle_pos_pub = ThrottledPublisher<robosub::ObstaclePosArray>
+        ("obstacles/positions", 1, 0, "simulator/bridge_rates/obstacle_pos");
+    hydrophone_deltas_pub = ThrottledPublisher<robosub::HydrophoneDeltas>
+        ("hydrophones/30khz/delta", 1, 0, "simulator/bridge_rates/hydrophone_deltas");
+    lin_accel_pub = ThrottledPublisher<geometry_msgs::Vector3Stamped>
+        ("acceleration/linear", 1, 0, "simulator/bridge_rates/lin_accel");
 
     ros::Subscriber orient_sub = nh.subscribe("gazebo/model_states", 1,
             modelStatesCallback);
@@ -266,11 +272,11 @@ int main(int argc, char **argv)
     ros::Subscriber imu_sub = nh.subscribe("gazebo/rs_imu", 1,
             imuCallback);
 
-    int rate;
-    if(!nh.getParam("simulator/bridge_rate", rate))
+    double rate;
+    if(!nh.getParam("simulator/bridge_rates/max", rate))
     {
-        rate = 30;
-        ROS_WARN_STREAM("failed to load simulator bridge rate. defaulting to 30");
+        ROS_ERROR_STREAM("failed to load max simulator bridge rate");
+        return 0;
     }
     ros::Rate r(rate);
 
