@@ -1,5 +1,5 @@
 #include "ros/ros.h"
-#include "robosub/depth_stamped.h"
+#include "robosub/Float32Stamped.h"
 #include "robosub/Euler.h"
 #include "geometry_msgs/Vector3Stamped.h"
 #include "gazebo_msgs/ModelState.h"
@@ -26,7 +26,7 @@ static constexpr double _180_OVER_PI = 180.0 / 3.14159;
 ThrottledPublisher<geometry_msgs::Vector3> position_pub;
 ThrottledPublisher<robosub::QuaternionStampedAccuracy> orientation_pub;
 ThrottledPublisher<robosub::Euler> euler_pub;
-ThrottledPublisher<robosub::depth_stamped> depth_pub;
+ThrottledPublisher<robosub::Float32Stamped> depth_pub;
 ThrottledPublisher<robosub::ObstaclePosArray> obstacle_pos_pub;
 ThrottledPublisher<robosub::HydrophoneDeltas> hydrophone_deltas_pub;
 ThrottledPublisher<geometry_msgs::Vector3Stamped> lin_accel_pub;
@@ -119,7 +119,7 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
 {
     geometry_msgs::Vector3 position_msg;
     robosub::QuaternionStampedAccuracy orientation_msg;
-    robosub::depth_stamped depth_msg;
+    robosub::Float32Stamped depth_msg;
     robosub::Euler euler_msg;
 
     // Find top of water and subs indices in modelstates lists
@@ -164,14 +164,14 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
     ROS_DEBUG_STREAM("pinger_position: " << pinger_position);
 
     // Calculate depth from the z positions of the water top and the sub
-    depth_msg.depth = -(msg.pose[ceiling_index].position.z -
+    depth_msg.data = -(msg.pose[ceiling_index].position.z -
                      msg.pose[sub_index].position.z);
     depth_msg.header.stamp = ros::Time::now();
 
     // Copy sub pos to position msg
     position_msg.x = msg.pose[sub_index].position.x;
     position_msg.y = msg.pose[sub_index].position.y;
-    position_msg.z = depth_msg.depth;
+    position_msg.z = depth_msg.data;
     position_msg.x -= pinger_position[0];
     position_msg.y -= pinger_position[1];
 
@@ -254,7 +254,7 @@ int main(int argc, char **argv)
         ("orientation", 1, 0, "simulator/bridge_rates/orientation");
     euler_pub = ThrottledPublisher<robosub::Euler>
         ( "orientation/pretty", 1, 0, "simulator/bridge_rates/euler");
-    depth_pub = ThrottledPublisher<robosub::depth_stamped>
+    depth_pub = ThrottledPublisher<robosub::Float32Stamped>
         ("depth", 1, 0, "simulator/bridge_rates/depth");
     obstacle_pos_pub = ThrottledPublisher<robosub::ObstaclePosArray>
         ("obstacles/positions", 1, 0, "simulator/bridge_rates/obstacle_pos");
