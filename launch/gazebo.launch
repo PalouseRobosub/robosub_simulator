@@ -13,6 +13,6 @@
    <arg name="world_name" value="$(arg world_file)"/>
 </include>
 <node name="virtual_serial_port" pkg="robosub_simulator" type="create_thruster_vsp.sh" />
-<node name="spawn_robosub" pkg="robosub_simulator" type="spawn_robosub.sh"/>
+<node name="spawn_robosub" pkg="robosub_simulator" type="spawn_robosub.sh" />
 <node name="simulator_bridge" pkg="robosub_simulator" type="simulator_bridge" required="true" />
 </launch>
