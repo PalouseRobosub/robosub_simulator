@@ -9,39 +9,16 @@ Thruster::~Thruster() { }
 
 void Thruster::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 {
-    this->sub = _parent;
+    sub = _parent;
 
     // Grab frame, hull link ptr
     frame = sub->GetLink("frame");
     hull = sub->GetLink("hull");
 
     // This sets gazebo msg publisher
-    this->node = transport::NodePtr(new transport::Node());
-    this->node->Init(sub->GetWorld()->GetName());
-    vis_pub = this->node->Advertise<msgs::Visual>("~/visual", 80);
-
-    // Start ros node named thruster
-    int argc = 0;
-    char **argv = NULL;
-    ros::init(argc, argv, "thruster",
-            ros::init_options::NoSigintHandler);
-
-    if(!ros::isInitialized())
-    {
-        //this goes to cerr just in case ROS logging mechanisms aren't working
-        std::cerr << "ROS Not initialized" << std::endl;
-        return;
-    }
-
-    ROS_DEBUG_STREAM("thruster node started");
-
-    max_thrust = 0.0;
-    if(!ros::param::get("/control/max_thrust", max_thrust))
-    {
-        ROS_FATAL("Failed to load max_thrust");
-        return;
-    }
-    ROS_DEBUG_STREAM("max_thrust: " << max_thrust);
+    node = transport::NodePtr(new transport::Node());
+    node->Init(sub->GetWorld()->GetName());
+    vis_pub = node->Advertise<msgs::Visual>("~/visual", 80);
 
     XmlRpc::XmlRpcValue thruster_settings;
     if(!ros::param::get("thrusters", thruster_settings))
@@ -50,14 +27,6 @@ void Thruster::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
         return;
     }
     ROS_DEBUG_STREAM("thruster_settings: " << thruster_settings);
-
-    double thruster_timeout_d;
-    if(!ros::param::get("simulator/thruster_timeout", thruster_timeout_d))
-    {
-        ROS_WARN("no thruster timeout specified. defaulting to 5.0 seconds");
-        thruster_timeout_d = 5.0;
-    }
-    thruster_timeout = ros::Duration(thruster_timeout_d);
 
     // Just getting the names of thrusters right now since were using the
     // actual model links to get position
@@ -69,16 +38,6 @@ void Thruster::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
         thruster_names.push_back(thruster_settings[i]["name"]);
         num_thrusters++;
     }
-
-    back_thrust_ratio = 1.0;
-    if(!ros::param::get("control/back_thrust_ratio", back_thrust_ratio))
-    {
-        ROS_WARN_STREAM("failed to load control/back_thrust_ratio. defaulting to 1.0");
-    }
-    ROS_DEBUG_STREAM("back_thrust_ratio: " << back_thrust_ratio);
-
-    nh = new ros::NodeHandle();
-	thruster_sub = nh->subscribe("thruster", 1, &Thruster::thrusterCallback, this);
 
     ROS_DEBUG_STREAM("Thruster plugin initialized");
     ROS_DEBUG_STREAM("Thruster_settings: " << thruster_settings);
@@ -149,6 +108,9 @@ void Thruster::InitVisualizers()
 
 void Thruster::UpdateThrusters()
 {
+    // Update the thruster emulator to read all data out of the serial port.
+    thruster_port.update();
+
     // Calculate and apply appropriate force to each thruster. For each
     // thruster, force is first applied in the z axis of a vector3. It is then
     // rotated to the orientation of the thruster so that the force is along
@@ -158,98 +120,62 @@ void Thruster::UpdateThrusters()
     // TODO: (If needed): Optimize this section so that the force is only
     // calculated once per thruster per message instead of once per frame per
     // thruster.
-    if(last_thruster_msg.data.size() == num_thrusters)
+    for(int i=0; i < num_thrusters; i++)
     {
-        for(int i=0; i < num_thrusters; i++)
-        {
-            // Grab thruster ptr
-            physics::LinkPtr t = thruster_links[i];
+        // Grab thruster ptr
+        physics::LinkPtr t = thruster_links[i];
 
-            // If the force is in the negative direction, scale the output
-            // by the back thrust ratio
-            math::Vector3 force(0, 0, 0);
-            if(last_thruster_msg.data[i] < 0)
-                force.z = last_thruster_msg.data[i]*max_thrust*back_thrust_ratio;
-            else
-                force.z = last_thruster_msg.data[i]*max_thrust;
+        // Get the thruster force from the emulator.
+        math::Vector3 force(0, 0, 0);
+        force.z = thruster_port.getThrusterForce(i);
 
-            // Get pose of thruster relative to frame then rotate force
-            // vector as appropriate to output along thrusters z axis
-            math::Pose thruster_world_pose = t->GetWorldPose();
-            math::Pose thruster_rel_pose = t->GetRelativePose();
-            force = thruster_rel_pose.rot * force;
-            //force = frame_pose.rot * force;
+        // Get pose of thruster relative to frame then rotate force
+        // vector as appropriate to output along thrusters z axis
+        math::Pose thruster_world_pose = t->GetWorldPose();
+        math::Pose thruster_rel_pose = t->GetRelativePose();
+        force = thruster_rel_pose.rot * force;
 
-            // Add the force directly to the frame of the sub (instead of the
-            // thruster itself)
-            frame->AddLinkForce(force, thruster_rel_pose.pos);
-        }
+        // Add the force directly to the frame of the sub (instead of the
+        // thruster itself)
+        frame->AddLinkForce(force, thruster_rel_pose.pos);
     }
 }
 
 void Thruster::UpdateVisualizers()
 {
-    if(last_thruster_msg.data.size() == num_thrusters)
+    for(unsigned int i=0; i < num_thrusters; i++)
     {
-        for(unsigned int i=0; i < num_thrusters; i++)
-        {
-            // Modify length of cylinder based on thruster strength
-            msgs::Geometry *geomMsg = visual_msgs[i].mutable_geometry();
-            geomMsg->mutable_cylinder()->set_length(std::fabs(last_thruster_msg.data[i]));
+        // Modify length of cylinder based on thruster strength
+        const double thrust_force = thruster_port.getThrusterForce(i);
+        msgs::Geometry *geomMsg = visual_msgs[i].mutable_geometry();
+        geomMsg->mutable_cylinder()->set_length(std::fabs(thrust_force));
 
-            physics::LinkPtr t = thruster_links[i];
+        physics::LinkPtr t = thruster_links[i];
 
-            // Rotate and offset visualizer line as appropriate
-            math::Pose p = t->GetWorldPose();
+        // Rotate and offset visualizer line as appropriate
+        math::Pose p = t->GetWorldPose();
 
-            // Move the cylinder to one side of the thruster to show forward
-            // direction.
-            double thruster_length = 0.101;
-            math::Vector3 line_offset;
-            if(last_thruster_msg.data[i] < 0.0)
-            {
-                line_offset.z = last_thruster_msg.data[i]/2.0 - thruster_length/2.0;
-            }
-            else
-            {
-                line_offset.z = last_thruster_msg.data[i]/2.0 + thruster_length/2.0;
-            }
+        // Move the cylinder to one side of the thruster to show forward
+        // direction.
+        double thruster_length = 0.101;
+        math::Vector3 line_offset;
+        line_offset.z = thrust_force/2.0 + thruster_length/2.0 *
+            ((thrust_force < 0)? -1 : 1);
 
-            line_offset = p.rot * line_offset;
-            ignition::math::Pose3d ip(p.pos.x-line_offset.x, p.pos.y-line_offset.y, p.pos.z-line_offset.z, p.rot.w, p.rot.x, p.rot.y, p.rot.z);
-            msgs::Set(visual_msgs[i].mutable_pose(), ip);
+        line_offset = p.rot * line_offset;
+        ignition::math::Pose3d ip(p.pos.x-line_offset.x, p.pos.y-line_offset.y, p.pos.z-line_offset.z, p.rot.w, p.rot.x, p.rot.y, p.rot.z);
+        msgs::Set(visual_msgs[i].mutable_pose(), ip);
 
-            if(visualize_thrusters && !thrusters_timed_out)
-            {
-                visual_msgs[i].set_visible(true);
-            }
-            else
-            {
-                visual_msgs[i].set_visible(false);
-            }
+        visual_msgs[i].set_visible(visualize_thrusters);
 
-            // Update line
-            vis_pub->Publish(visual_msgs[i]);
-        }
+        // Update line
+        vis_pub->Publish(visual_msgs[i]);
     }
 }
 
 void Thruster::Update()
 {
-    ros::Duration time_since_last_message = ros::Time::now() - last_msg_receive_time;
-    if(time_since_last_message > thruster_timeout)
-    {
-        thrusters_timed_out = true;
-    }
-    else
-    {
-        thrusters_timed_out = false;
-    }
-
-    if(!thrusters_timed_out)
-    {
-        UpdateThrusters();
-    }
+    UpdateThrusters();
 
     // The reason this is being run at a constant rate now is because I ran
     // into a wierd issue where the visualizers would disappear (despite the
@@ -264,20 +190,6 @@ void Thruster::Update()
         last_update_time = ros::Time::now();
         UpdateVisualizers();
         ReloadParams();
-    }
-}
-
-void Thruster::thrusterCallback(const robosub::thruster::ConstPtr& msg)
-{
-    last_msg_receive_time = ros::Time::now();
-    last_thruster_msg.data = msg->data;
-
-    for(unsigned int i=0; i<last_thruster_msg.data.size(); i++)
-    {
-        if(std::isnan(last_thruster_msg.data[i]))
-        {
-            last_thruster_msg.data[i] = 0.0;
-        }
     }
 }
 
