@@ -9,6 +9,7 @@ Thruster::~Thruster() { }
 
 void Thruster::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 {
+    ROS_INFO("Initializing thruster plugin.");
     sub = _parent;
 
     // Grab frame, hull link ptr
@@ -70,6 +71,7 @@ void Thruster::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     {
         ROS_FATAL("Failed to initialize emulated thrusters.");
     }
+    ROS_INFO("Thruster plugin successfully initialized.");
 }
 
 void Thruster::ReloadParams()
@@ -90,7 +92,7 @@ void Thruster::ReloadParams()
 
 void Thruster::InitVisualizers()
 {
-    for(unsigned int i=0; i<num_thrusters; i++)
+    for(unsigned int i = 0; i < num_thrusters; i++)
     {
         // The visual message that will be sent to the gzserver
         // will tell it to create a cylinder showing thruster output
@@ -122,7 +124,11 @@ void Thruster::InitVisualizers()
 void Thruster::UpdateThrusters()
 {
     // Update the thruster emulator to read all data out of the serial port.
-    thruster_port.update();
+    if (thruster_port.update())
+    {
+        ROS_ERROR("Failed to update virtual thruster emulator.");
+        return;
+    }
 
     // Calculate and apply appropriate force to each thruster. For each
     // thruster, force is first applied in the z axis of a vector3. It is then
@@ -141,6 +147,7 @@ void Thruster::UpdateThrusters()
         // Get the thruster force from the emulator.
         math::Vector3 force(0, 0, 0);
         force.z = thruster_port.getThrusterForce(i);
+        ROS_INFO_STREAM("Thruster force " << i << " " << force.z);
 
         // Get pose of thruster relative to frame then rotate force
         // vector as appropriate to output along thrusters z axis

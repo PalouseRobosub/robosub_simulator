@@ -32,11 +32,6 @@ namespace rs
      */
     int Serial::Open(const char *port_name, int baud_rate)
     {
-        //arbitrary small delay to allow ports to be created during tests
-        //this is a hack, better solution would be to poll/check for a
-        //certain amount of time then fail out
-        ros::Duration(.1).sleep();
-
         this->m_port_fd = ::open(port_name, O_RDWR | O_NOCTTY | O_ASYNC |
                                  O_NDELAY);
         this->m_port_name = port_name;
