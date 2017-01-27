@@ -42,7 +42,7 @@ void Thruster::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     ROS_DEBUG_STREAM("Thruster plugin initialized");
     ROS_DEBUG_STREAM("Thruster_settings: " << thruster_settings);
     ROS_DEBUG_STREAM("Thruster names: ");
-    for(unsigned int i=0; i<num_thrusters; i++)
+    for(unsigned int i = 0; i < num_thrusters; i++)
     {
         // Get a pointer for each thruster link
         physics::LinkPtr t = sub->GetLink(thruster_names[i]);
@@ -57,6 +57,19 @@ void Thruster::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     // (which is frequently)
     updateConnection = event::Events::ConnectWorldUpdateBegin(
             boost::bind(&Thruster::Update, this));
+
+    // Initialize the emulated thruster class.
+    string thruster_virtual_port;
+    if (!ros::param::get("simulator/ports/simulated_thruster", thruster_virtual_port))
+    {
+        ROS_FATAL("Failed to load thruster simulated serial port.");
+        return;
+    }
+
+    if (thruster_port.init(num_thrusters, thruster_virtual_port) == false)
+    {
+        ROS_FATAL("Failed to initialize emulated thrusters.");
+    }
 }
 
 void Thruster::ReloadParams()
