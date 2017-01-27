@@ -14,7 +14,8 @@
 #include <ros/callback_queue.h>
 #include <ros/advertise_options.h>
 #include <std_msgs/String.h>
-#include "robosub/thruster.h"
+
+#include "maestro_emulator.h"
 
 #include <iostream>
 #include <vector>
@@ -31,23 +32,16 @@ private:
     event::ConnectionPtr updateConnection;
 
     // ros comms
-    ros::NodeHandle *nh;
     ros::Publisher pub;
-    ros::Subscriber thruster_sub;
 
     // Thruster objects
+    MaestroEmulator thruster_port;
     int num_thrusters;
     std::vector<std::string> thruster_names;
     std::vector<physics::LinkPtr> thruster_links;
-    robosub::thruster last_thruster_msg;
     physics::LinkPtr frame;
     physics::LinkPtr hull;
-    double back_thrust_ratio;
     double buoyancy_percentage;
-    double max_thrust;
-    ros::Time last_msg_receive_time;
-    ros::Duration thruster_timeout;
-    bool thrusters_timed_out;
     ros::Duration visualizer_update_time;
 
     // gazebo messaging objects
@@ -68,7 +62,6 @@ public:
     ~Thruster();
     void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf);
     virtual void Update();
-    void thrusterCallback(const robosub::thruster::ConstPtr& msg);
 };
 
 }
