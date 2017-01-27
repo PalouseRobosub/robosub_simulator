@@ -27,6 +27,11 @@ void Thruster::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
         ROS_FATAL("thruster params failed to load");
         return;
     }
+    if (!ros::param::get("control/max_thrust", max_thrust))
+    {
+        ROS_FATAL("Failed to load maximum thrust value.");
+        return;
+    }
     ROS_DEBUG_STREAM("thruster_settings: " << thruster_settings);
 
     // Just getting the names of thrusters right now since were using the
@@ -34,7 +39,7 @@ void Thruster::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     // TODO: Get pos/orientation info from settings so that we can dynamically
     // spawn thrusters
     num_thrusters = 0;
-    for(unsigned int i=0; i < thruster_settings.size(); ++i)
+    for(unsigned int i = 0; i < thruster_settings.size(); ++i)
     {
         thruster_names.push_back(thruster_settings[i]["name"]);
         num_thrusters++;
@@ -139,7 +144,7 @@ void Thruster::UpdateThrusters()
     // TODO: (If needed): Optimize this section so that the force is only
     // calculated once per thruster per message instead of once per frame per
     // thruster.
-    for(int i=0; i < num_thrusters; i++)
+    for(int i = 0; i < num_thrusters; i++)
     {
         // Grab thruster ptr
         physics::LinkPtr t = thruster_links[i];
@@ -147,7 +152,6 @@ void Thruster::UpdateThrusters()
         // Get the thruster force from the emulator.
         math::Vector3 force(0, 0, 0);
         force.z = thruster_port.getThrusterForce(i);
-        ROS_INFO_STREAM("Thruster force " << i << " " << force.z);
 
         // Get pose of thruster relative to frame then rotate force
         // vector as appropriate to output along thrusters z axis
@@ -163,10 +167,20 @@ void Thruster::UpdateThrusters()
 
 void Thruster::UpdateVisualizers()
 {
-    for(unsigned int i=0; i < num_thrusters; i++)
+    for(unsigned int i = 0; i < num_thrusters; i++)
     {
         // Modify length of cylinder based on thruster strength
-        const double thrust_force = thruster_port.getThrusterForce(i);
+        double thrust_force = thruster_port.getThrusterForce(i)/max_thrust;
+
+        // Thrust force may never be zero. Modifying the visualizer
+        // cylinder length to be zero results in an exception. For
+        // this reason, round the thrust up a little if it is zero
+        // (this only affects visual feedback and not actual
+        // thrust).
+        if (thrust_force == 0)
+        {
+            thrust_force = 0.00001;
+        }
         msgs::Geometry *geomMsg = visual_msgs[i].mutable_geometry();
         geomMsg->mutable_cylinder()->set_length(std::fabs(thrust_force));
 
@@ -178,11 +192,19 @@ void Thruster::UpdateVisualizers()
         // Move the cylinder to one side of the thruster to show forward
         // direction.
         double thruster_length = 0.101;
-        math::Vector3 line_offset;
-        line_offset.z = thrust_force/2.0 + thruster_length/2.0 *
-            ((thrust_force < 0)? -1 : 1);
+        math::Vector3 line_offset(0, 0, 0);
+        line_offset.z = thrust_force/2.0;
+        if (thrust_force < 0)
+        {
+            line_offset.z -= thrust_force/2.0;
+        }
+        else
+        {
+            line_offset.z += thrust_force/2.0;
+        }
 
         line_offset = p.rot * line_offset;
+
         ignition::math::Pose3d ip(p.pos.x-line_offset.x, p.pos.y-line_offset.y, p.pos.z-line_offset.z, p.rot.w, p.rot.x, p.rot.y, p.rot.z);
         msgs::Set(visual_msgs[i].mutable_pose(), ip);
 
