@@ -37,6 +37,7 @@ private:
     // Thruster objects
     MaestroEmulator thruster_port;
     int num_thrusters;
+    double max_thrust;
     std::vector<std::string> thruster_names;
     std::vector<physics::LinkPtr> thruster_links;
     physics::LinkPtr frame;
