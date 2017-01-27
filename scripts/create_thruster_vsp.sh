@@ -1,24 +1,16 @@
 #!/bin/bash
 
 # Utilize socat to create a virtual serial port
-(socat -d -d pty,raw,echo=0 pty,raw,echo=0 > tmp 2>&1 & echo $! > socat_pid) | tee tmp
-socat_pid=`cat socat_pid`
-points=`head -2 tmp | sed 's/.* PTY is \(.*\)/\1/'`
-rm tmp
-rm socat_pid
+socat pty,raw,echo=0,link=to_thruster_vsp pty,raw,echo=0,link=from_thruster_vsp &
+socat_pid=$!
 
-# Utilize regular expressions to determine the names of the serial ports created
-# by socat.
-points=`echo "$points" | tr '\n' ' '`
-point_one=`echo "$points" | sed 's/\(.*\) \(.*\) /\1/'`
-point_two=`echo "$points" | sed 's/\(.*\) \(.*\) /\2/'`
-
-# Display which serial ports were created
-echo "ThrusterController writes to: $point_one and Simulated Thrusters read from: $point_two"
+# Get the absolute paths of the ports.
+port_to_thrusters="`pwd`/to_thruster_vsp"
+port_from_thrusters="`pwd`/from_thruster_vsp"
 
 # Override parameters to the virtual serial ports.
-rosparam set /ports/thruster $point_one
-rosparam set /ports/simulated_thruster $point_two
+rosparam set /ports/thruster $port_to_thrusters
+rosparam set /ports/simulated_thruster $port_from_thrusters
 
 # loop forever
 while true
