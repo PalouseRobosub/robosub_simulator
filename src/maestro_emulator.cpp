@@ -37,7 +37,7 @@ int MaestroEmulator::init(string port_name,
     /*
      * Open and configure the virtual serial port.
      */
-    if (_port->Open(port_name.c_str(), 115200))
+    if (_port.Open(port_name.c_str(), 115200))
     {
         ROS_FATAL("Failed to open serial port.");
         return -1;
@@ -127,10 +127,10 @@ int MaestroEmulator::update()
      * read if the maestro has not encountered a baud-detection
      * byte yet.
      */
-    while (_is_connected == false && _port->QueryBuffer() > 0)
+    while (_is_connected == false && _port.QueryBuffer() > 0)
     {
         uint8_t byte;
-        if (_port->Read(&byte, 1) != 1)
+        if (_port.Read(&byte, 1) != 1)
         {
             ROS_ERROR("Failed to read virtual serial port.");
             return -1;
@@ -147,7 +147,7 @@ int MaestroEmulator::update()
     /*
      * Continue to parse commands while data is available on the serial port.
      */
-    while (_port->QueryBuffer() > 1 && _is_connected)
+    while (_port.QueryBuffer() > 1 && _is_connected)
     {
         uint8_t byte;
         int channel;
@@ -161,7 +161,7 @@ int MaestroEmulator::update()
              * for the command.
              */
             case State::None:
-                if (_port->Read(&byte, 1) != 1)
+                if (_port.Read(&byte, 1) != 1)
                 {
                     ROS_ERROR("Failed to read virtual serial port.");
                     return -1;
@@ -181,7 +181,7 @@ int MaestroEmulator::update()
              * If the command byte was read, read the channel specification.
              */
             case State::ReadCommand:
-                if (_port->Read(&byte, 1) != 1)
+                if (_port.Read(&byte, 1) != 1)
                 {
                     ROS_ERROR("Failed to read virtual serial port.");
                     _current_state = State::None;
@@ -210,11 +210,11 @@ int MaestroEmulator::update()
              * data bytes that specify the pulse length.
              */
             case State::ReadChannel:
-                if (_port->QueryBuffer() < 2)
+                if (_port.QueryBuffer() < 2)
                 {
                     return 0;
                 }
-                if (_port->Read(data, 2) != 2)
+                if (_port.Read(data, 2) != 2)
                 {
                     ROS_ERROR("Failed to read virtual serial port.");
                     _current_state = State::None;
