@@ -10,8 +10,7 @@ using std::string;
 class MaestroEmulator
 {
     static constexpr double _kgf_to_newtons = 9.80665;
-
-    static constexpr double _minimum_thrust = 0.01;
+    static constexpr double _minimum_thrust_kgf = 0.01;
 
     enum class State
     {
@@ -23,29 +22,29 @@ class MaestroEmulator
 public:
     MaestroEmulator() :
         _port(nullptr),
-        _thruster_speeds(nullptr),
-        _thruster_timeouts(nullptr),
+        _thruster_speeds(),
+        _thruster_timeouts(),
+        _channel_names(),
         _is_initialized(false),
         _is_connected(false),
-        _current_state(State::None)
+        _current_state(State::None),
+        _thruster("None")
     {
     }
 
-    int init(int num_thruster, string port_name);
-
+    int init(string port_name, XmlRpc::XmlRpcValue thruster_settings);
     int update();
-
-    double getThrusterForce(int channel_index);
+    double getThrusterForce(string name);
 
 private:
     rs::Serial *_port;
-    int _num_thrusters;
-    uint16_t *_thruster_speeds;
-    ros::Time *_thruster_timeouts;
+    std::map<string, int> _thruster_speeds;
+    std::map<string, ros::Time> _thruster_timeouts;
+    std::map<int, string> _channel_names;
     bool _is_initialized;
     bool _is_connected;
     State _current_state;
-    int _channel;
+    string _thruster;
 
     /*
      * These values represent the thruster pulse width - thrust

@@ -10,7 +10,7 @@ port_from_thrusters="`pwd`/from_thruster_vsp"
 
 # Override parameters to the virtual serial ports.
 rosparam set /ports/thruster $port_to_thrusters
-rosparam set /ports/simulated_thruster $port_from_thrusters
+rosparam set /simulator/ports/simulated_thruster $port_from_thrusters
 
 # loop forever
 while true

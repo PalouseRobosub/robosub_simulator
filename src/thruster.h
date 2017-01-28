@@ -1,70 +1,31 @@
-#ifndef THRUSTERS
-#define THRUSTERS
+#include <string>
 
-#include <boost/bind.hpp>
-
-#include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
-#include <gazebo/rendering/rendering.hh>
-#include <gazebo/transport/transport.hh>
 #include <gazebo/common/common.hh>
+#include <gazebo/rendering/rendering.hh>
 #include <ignition/math.hh>
-
-#include <ros/ros.h>
-#include <ros/callback_queue.h>
-#include <ros/advertise_options.h>
-#include <std_msgs/String.h>
 
 #include "maestro_emulator.h"
 
-#include <iostream>
-#include <vector>
-#include <string>
+using std::string;
+using namespace gazebo;
 
-namespace gazebo
+class Thruster
 {
-
-class Thruster : public ModelPlugin
-{
-private:
-    // gazebo plugin objects
-    physics::ModelPtr sub;
-    event::ConnectionPtr updateConnection;
-
-    // ros comms
-    ros::Publisher pub;
-
-    // Thruster objects
-    MaestroEmulator thruster_port;
-    int num_thrusters;
-    double max_thrust;
-    std::vector<std::string> thruster_names;
-    std::vector<physics::LinkPtr> thruster_links;
-    physics::LinkPtr frame;
-    physics::LinkPtr hull;
-    double buoyancy_percentage;
-    ros::Duration visualizer_update_time;
-
-    // gazebo messaging objects
-    transport::PublisherPtr vis_pub;
-    std::vector<msgs::Visual> visual_msgs;
-    transport::NodePtr node;
-    bool visualize_thrusters;
-    ros::Time last_update_time;
-
-    void ReloadParams();
-    void InitVisualizers();
-    void UpdateVisualizers();
-    void UpdateBuoyancy();
-    void UpdateThrusters();
-
 public:
-    Thruster();
-    ~Thruster();
-    void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf);
-    virtual void Update();
+    Thruster(const string name, physics::ModelPtr parent, double max_force,
+             MaestroEmulator &emulator);
+
+    void setForce(double force);
+    void addLinkForce();
+    msgs::Visual getVisualizationMessage();
+
+private:
+    double _current_force;
+    double _max_force;
+    const string _name;
+    physics::LinkPtr _link_ptr;
+    physics::LinkPtr _frame;
+    msgs::Visual _visualization_message;
+    MaestroEmulator &_emulator;
 };
-
-}
-
-#endif
