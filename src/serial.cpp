@@ -32,6 +32,8 @@ namespace rs
      */
     int Serial::Open(const char *port_name, int baud_rate)
     {
+        ros::Duration(.1).sleep();
+
         this->m_port_fd = ::open(port_name, O_RDWR | O_NOCTTY | O_ASYNC |
                                  O_NDELAY);
         this->m_port_name = port_name;

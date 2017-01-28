@@ -1,6 +1,7 @@
 #include "maestro_emulator.h"
 
-int MaestroEmulator::init(int num_thrusters, string port_name)
+int MaestroEmulator::init(string port_name,
+                          XmlRpc::XmlRpcValue thruster_settings)
 {
     if (_is_initialized)
     {
@@ -14,19 +15,13 @@ int MaestroEmulator::init(int num_thrusters, string port_name)
         return -1;
     }
 
-    _num_thrusters = num_thrusters;
-    _thruster_speeds = new uint16_t[_num_thrusters];
-    _thruster_timeouts = new ros::Time[_num_thrusters];
-    if (_thruster_speeds == nullptr || _thruster_timeouts == nullptr)
+    for (int i = 0; i < thruster_settings.size(); ++i)
     {
-        ROS_FATAL("Failed to create thruster arrays.");
-        return -1;
-    }
-
-    for (int i = 0; i < num_thrusters; ++i)
-    {
-        _thruster_speeds[i] = 1500;
-        _thruster_timeouts[i] = ros::Time::now();
+        const string name = thruster_settings[i]["name"];
+        const int channel = thruster_settings[i]["channel"];
+        _channel_names[channel] = name;
+        _thruster_speeds[name] = 1500;
+        _thruster_timeouts[name] = ros::Time::now();
     }
 
     if (_port->Open(port_name.c_str(), 115200))
@@ -39,21 +34,21 @@ int MaestroEmulator::init(int num_thrusters, string port_name)
     return 0;
 }
 
-double MaestroEmulator::getThrusterForce(int channel)
+double MaestroEmulator::getThrusterForce(string name)
 {
-    if (channel > _num_thrusters)
+    if (_thruster_speeds.find(name) == _thruster_speeds.end())
     {
-        ROS_ERROR("Requested invalid thruster channel.");
-        return -1;
+        ROS_ERROR("Requested invalid thruster name.");
+        return 0;
     }
 
-    if (ros::Time::now() > _thruster_timeouts[channel])
+    if (ros::Time::now() > _thruster_timeouts[name])
     {
         return 0;
     }
 
-    const int pulse_length = _thruster_speeds[channel];
-    double force = 0;
+    const int pulse_length = _thruster_speeds[name];
+    double force_kgf = 0;
 
     /*
      * If the pulse width is outside of the deadband (+/- 25 from
@@ -62,36 +57,36 @@ double MaestroEmulator::getThrusterForce(int channel)
      */
     if (pulse_length < 1525)
     {
-        force = a_negative * pow(pulse_length, 3) +
-                b_negative * pow(pulse_length, 2) +
-                c_negative * pulse_length +
-                d_negative;
+        force_kgf = a_negative * pow(pulse_length, 3) +
+                    b_negative * pow(pulse_length, 2) +
+                    c_negative * pulse_length +
+                    d_negative;
     }
     else if ((pulse_length > 1475))
     {
-        force = a_positive * pow(pulse_length, 3) +
-                b_positive * pow(pulse_length, 2) +
-                c_positive * pulse_length +
-                d_positive;
+        force_kgf = a_positive * pow(pulse_length, 3) +
+                    b_positive * pow(pulse_length, 2) +
+                    c_positive * pulse_length +
+                    d_positive;
     }
     else
     {
-        force = 0;
+        force_kgf = 0;
     }
 
     /*
      * The BlueRobotics thrusters have a minimum force specified.
      * If our desired thrust is below that, truncate it upwards.
      */
-    if (force < _minimum_thrust)
+    if (force_kgf < _minimum_thrust_kgf)
     {
-        force = _minimum_thrust;
+        force_kgf = _minimum_thrust_kgf;
     }
 
     /*
      * Convert the force (so far specified in KgF) to newtons.
      */
-    return force * _kgf_to_newtons;
+    return force_kgf * _kgf_to_newtons;
 }
 
 int MaestroEmulator::update()
@@ -117,13 +112,14 @@ int MaestroEmulator::update()
         }
         if (byte == 0xAA)
         {
+            ROS_INFO("Thruster plugin synced.");
             _is_connected = true;
             _current_state = State::None;
-            _channel = 0;
+            _thruster = "None";
         }
     }
 
-    while (_port->QueryBuffer() > 1)
+    while (_port->QueryBuffer() > 1 && _is_connected)
     {
         uint8_t byte;
         int channel;
@@ -152,6 +148,7 @@ int MaestroEmulator::update()
                     _current_state = State::ReadCommand;
                 }
                 break;
+
             case State::ReadCommand:
                 if (_port->Read(&byte, 1) != 1)
                 {
@@ -161,15 +158,22 @@ int MaestroEmulator::update()
                 }
 
                 channel = static_cast<int>(byte);
-                if (channel < 0 || channel > _num_thrusters)
+                if (_channel_names.find(channel) == _channel_names.end())
                 {
                     ROS_ERROR("Read invalid channel index.");
                     _current_state = State::None;
                     return -1;
                 }
-                _channel = channel;
+                if (_channel_names.find(channel) == _channel_names.end())
+                {
+                    ROS_ERROR("Failed to look up channel name.");
+                    _current_state = State::None;
+                    return -1;
+                }
+                _thruster = _channel_names[channel];
                 _current_state = State::ReadChannel;
                 break;
+
             case State::ReadChannel:
                 if (_port->QueryBuffer() < 2)
                 {
@@ -192,9 +196,10 @@ int MaestroEmulator::update()
                  */
                 if (pulse_width == 1500)
                 {
-                    _thruster_timeouts[_channel] = ros::Time::now() + ros::Duration(155);
+                    _thruster_timeouts[_thruster] = ros::Time::now() + ros::Duration(155);
                 }
-                _thruster_speeds[_channel] = pulse_width;
+                ROS_INFO_STREAM("Setting " << _thruster << " to " << pulse_width);
+                _thruster_speeds[_thruster] = pulse_width;
                 _current_state = State::None;
                 break;
         }

@@ -1,4 +1,4 @@
-add_library(thruster SHARED thruster.cpp maestro_emulator.cpp serial.cpp)
+add_library(thruster SHARED thruster_plugin.cpp thruster.cpp maestro_emulator.cpp serial.cpp)
 add_dependencies(thruster ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(thruster ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
 
