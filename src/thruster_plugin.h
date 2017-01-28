@@ -1,5 +1,5 @@
-#ifndef THRUSTERS
-#define THRUSTERS
+#ifndef THRUSTER_PLUGIN_H
+#define THRUSTER_PLUGIN_H
 
 #include <boost/bind.hpp>
 
@@ -26,7 +26,9 @@ using std::vector;
 
 namespace gazebo
 {
-
+/**
+ * ThrusterPlugin for Gazebo.
+ */
 class ThrusterPlugin : public ModelPlugin
 {
 public:
@@ -56,7 +58,5 @@ private:
     void UpdateBuoyancy();
     void UpdateThrusters();
 };
-
 }
-
-#endif
+#endif //THRUSTER_PLUGIN_H
