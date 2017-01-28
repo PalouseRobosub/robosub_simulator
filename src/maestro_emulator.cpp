@@ -78,9 +78,9 @@ double MaestroEmulator::getThrusterForce(string name)
      * The BlueRobotics thrusters have a minimum force specified.
      * If our desired thrust is below that, truncate it upwards.
      */
-    if (force_kgf < _minimum_thrust_kgf)
+    if (std::fabs(force_kgf) < _minimum_thrust_kgf)
     {
-        force_kgf = _minimum_thrust_kgf;
+        force_kgf = _minimum_thrust_kgf * ((force_kgf < 0)? -1 : 1);
     }
 
     /*
