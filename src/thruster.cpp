@@ -28,13 +28,10 @@ Thruster::Thruster(const string name, physics::ModelPtr parent,
     cylinder->set_type(msgs::Geometry::CYLINDER);
     cylinder->mutable_cylinder()->set_radius(.004);
     cylinder->mutable_cylinder()->set_length(1);
-    _visualization_message.mutable_material()->mutable_script()->set_name("Gazebo/RedGlow");
-    msgs::Set(_visualization_message.mutable_pose(), ignition::math::Pose3d(1000, 1000, 1000, 0, 0, 0));
-}
-
-void Thruster::setForce(double force)
-{
-    _current_force = force;
+    _visualization_message.mutable_material()->mutable_script()->set_name(
+            "Gazebo/RedGlow");
+    msgs::Set(_visualization_message.mutable_pose(),
+              ignition::math::Pose3d(1000, 1000, 1000, 0, 0, 0));
 }
 
 /**
@@ -69,6 +66,9 @@ msgs::Visual Thruster::getVisualizationMessage()
     cylinder->mutable_cylinder()->set_length(std::fabs(force));
     math::Pose thruster_pose = _link_ptr->GetWorldPose();
 
+    /*
+     * Update the visualizer line position based upon the current force.
+     */
     const double thruster_length = 0.101;
     math::Vector3 line_offset(0, 0, 0);
     line_offset.z = force / 2.0 + thruster_length / 2.0 * ((force < 0)? -1 : 1);
