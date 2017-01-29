@@ -46,6 +46,7 @@ private:
     vector<Thruster> thrusters;
     double buoyancy_percentage;
     ros::Duration visualizer_update_time;
+    double surface_z;
 
     // gazebo messaging objects
     transport::PublisherPtr vis_pub;

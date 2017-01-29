@@ -27,7 +27,7 @@ class Thruster
 {
 public:
     Thruster(const string name, physics::ModelPtr parent, double max_force,
-             MaestroEmulator &emulator);
+            MaestroEmulator &emulator, double surface_z);
 
     void addLinkForce();
     msgs::Visual getVisualizationMessage();
@@ -71,5 +71,10 @@ private:
      * queried.
      */
     MaestroEmulator &_emulator;
+
+    /*
+     * Z position of the surface of the water
+     */
+    const double _surface_z;
 };
 #endif //THRUSTER_H

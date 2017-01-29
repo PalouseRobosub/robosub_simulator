@@ -44,10 +44,22 @@ void ThrusterPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
         ROS_FATAL("Failed to initialize emulated thrusters.");
     }
 
+    // Get z coords of top of water
+    double surface_z;
+    if (_sdf->HasElement("surface_z"))
+    {
+        surface_z = _sdf->Get<double>("surface_z");
+    }
+    else
+    {
+        surface_z = 0.0;
+        gzwarn << "surface_z element missing. assuming top of fluid is at z == 0" << std::endl;
+    }
+
     for(unsigned int i = 0; i < thruster_settings.size(); ++i)
     {
         thrusters.push_back(Thruster(thruster_settings[i]["name"], _parent,
-                                     max_thrust, thruster_port));
+                                     max_thrust, thruster_port, surface_z));
     }
 
     ReloadParams();

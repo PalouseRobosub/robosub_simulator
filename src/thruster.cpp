@@ -9,14 +9,15 @@
  * @param max_force The maximum force that a thruster can apply.
  */
 Thruster::Thruster(const string name, physics::ModelPtr parent,
-                   double max_force, MaestroEmulator &emulator) :
+                   double max_force, MaestroEmulator &emulator, double surface_z) :
     _current_force(0),
     _max_force(max_force),
     _name(name),
     _link_ptr(parent->GetLink(name)),
     _frame(parent->GetLink("frame")),
     _visualization_message(),
-    _emulator(emulator)
+    _emulator(emulator),
+    _surface_z(surface_z)
 {
     /*
      * Initialize the visualization message properties.
@@ -41,11 +42,24 @@ Thruster::Thruster(const string name, physics::ModelPtr parent,
  */
 void Thruster::addLinkForce()
 {
-    _current_force = _emulator.getThrusterForce(_name);
-    math::Vector3 force(0, 0, 0);
-    force.z = _current_force;
-    force = _link_ptr->GetRelativePose().rot * force;
-    _frame->AddLinkForce(force, _link_ptr->GetRelativePose().pos);
+    math::Vector3 abs_pos = _link_ptr->GetWorldPose().pos;
+    if(abs_pos.z < _surface_z)
+    {
+        _current_force = _emulator.getThrusterForce(_name);
+        math::Vector3 force(0, 0, 0);
+        force.z = _current_force;
+        force = _link_ptr->GetRelativePose().rot * force;
+        _frame->AddLinkForce(force, _link_ptr->GetRelativePose().pos);
+
+        _visualization_message.mutable_material()->mutable_script()->set_name(
+                "Gazebo/RedGlow");
+    }
+    else
+    {
+        _visualization_message.mutable_material()->mutable_script()->set_name(
+                "Gazebo/BlueGlow");
+
+    }
 }
 
 /**
