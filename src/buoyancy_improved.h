@@ -103,6 +103,11 @@ namespace gazebo
         /// of volume) and volume of the link.
     protected:
         std::map<int, VolumeProperties> volPropsMap;
+
+        /// \brief Z position of the surface of the fluid in which the object is
+        /// submerged
+    protected:
+        double surface_z;
     };
 }
 

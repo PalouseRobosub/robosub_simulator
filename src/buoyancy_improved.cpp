@@ -49,6 +49,16 @@ void BuoyancyPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
         this->fluidDensity = this->sdf->Get<double>("fluid_density");
     }
 
+    if (this->sdf->HasElement("surface_z"))
+    {
+        surface_z = this->sdf->Get<double>("surface_z");
+    }
+    else
+    {
+        surface_z = 0.0;
+        gzwarn << "surface_z element missing. assuming top of fluid is at z == 0" << std::endl;
+    }
+
     // Get "center of volume" and "volume" that were inputted in SDF
     // SDF input is recommended for mesh or polylines collision shapes
     if (this->sdf->HasElement("link"))
@@ -132,6 +142,7 @@ void BuoyancyPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
                        << "] in BuoyancyPlugin SDF" << std::endl;
                 continue;
             }
+
         }
     }
 
@@ -189,12 +200,20 @@ void BuoyancyPlugin::OnUpdate()
             -this->fluidDensity * volume * this->physicsEngine->GetGravity();
 
         math::Pose linkFrame = link->GetWorldPose();
+
         // rotate buoyancy into the link frame before applying the force.
         math::Vector3 buoyancyLinkFrame =
             linkFrame.rot.GetInverse().RotateVector(buoyancy);
 
         net_buoyancy += buoyancy;
 
-        link->AddLinkForce(buoyancyLinkFrame, volumeProperties.cov);
+        math::Vector3 absCov = linkFrame.pos + volumeProperties.cov;
+
+        // Check if the links center of volume is out of water. If it is, do not add
+        // buoyancy. This is a very simple approximation of buoyancy at the surface
+        if(absCov.z < surface_z)
+        {
+            link->AddLinkForce(buoyancyLinkFrame, volumeProperties.cov);
+        }
     }
 }

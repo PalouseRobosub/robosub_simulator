@@ -270,7 +270,6 @@
         <mass>0.344</mass>
       </inertial>
       <visual name='dive_front_left_visual'>
-          <!-- <plugin name="thruster_vis" filename="libthruster_vis.so"/> -->
         <geometry>
           <cylinder>
             <radius>0.0485</radius>
@@ -300,7 +299,6 @@
         <mass>0.344</mass>
       </inertial>
       <visual name='dive_front_right_visual'>
-          <!-- <plugin name="thruster_vis" filename="libthruster_vis.so"/> -->
         <geometry>
           <cylinder>
             <radius>0.0485</radius>
@@ -330,7 +328,6 @@
         <mass>0.344</mass>
       </inertial>
       <visual name='dive_back_left_visual'>
-          <!-- <plugin name="thruster_vis" filename="libthruster_vis.so"/> -->
         <geometry>
           <cylinder>
             <radius>0.0485</radius>
@@ -360,7 +357,6 @@
         <mass>0.344</mass>
       </inertial>
       <visual name='dive_back_right_visual'>
-          <!-- <plugin name="thruster_vis" filename="libthruster_vis.so"/> -->
         <geometry>
           <cylinder>
             <radius>0.0485</radius>
@@ -390,7 +386,6 @@
         <mass>0.344</mass>
       </inertial>
       <visual name='strafe_front_visual'>
-          <!-- <plugin name="thruster_vis" filename="libthruster_vis.so"/> -->
         <geometry>
           <cylinder>
             <radius>0.0485</radius>
@@ -420,7 +415,6 @@
         <mass>0.344</mass>
       </inertial>
       <visual name='strafe_back_visual'>
-          <!-- <plugin name="thruster_vis" filename="libthruster_vis.so"/> -->
         <geometry>
           <cylinder>
             <radius>0.0485</radius>
@@ -450,7 +444,6 @@
         <mass>0.344</mass>
       </inertial>
       <visual name='forward_left_visual'>
-          <!-- <plugin name="thruster_vis" filename="libthruster_vis.so"/> -->
         <geometry>
           <cylinder>
             <radius>0.0485</radius>
@@ -480,7 +473,6 @@
         <mass>0.344</mass>
       </inertial>
       <visual name='forward_right_visual'>
-          <!-- <plugin name="thruster_vis" filename="libthruster_vis.so"/> -->
         <geometry>
           <cylinder>
             <radius>0.0485</radius>
@@ -711,53 +703,13 @@
       </sensor>
     </link>
 
-    <!---
-    <plugin name="frame_drag" filename="libLiftDragPlugin.so">
-         <air_density>1000</air_density>
-         <cla>1.2535816618911175</cla>
-         <cla_stall>-1.4326647564469914</cla_stall>
-         <cda>0</cda>
-         <cda_stall>1.4326647564469914</cda_stall>
-         <alpha_stall>1.396</alpha_stall>
-         <a0>0</a0>
-         <area>0.27637</area>
-         <upward>0 -0.7071067811865476 -0.7071067811865475</upward>
-         <forward>0 -0.7071067811865475 0.7071067811865476</forward>
-         <link_name>frame</link_name>
-         <cp>0.35 0 0</cp>
-    </plugin>
-
-    <plugin name="hull_drag" filename="libLiftDragPlugin.so">
-         <air_density>1000</air_density>
-         <cla>1.2535816618911175</cla>
-         <cla_stall>-1.4326647564469914</cla_stall>
-         <cda>0</cda>
-         <cda_stall>1.4326647564469914</cda_stall>
-         <alpha_stall>1.396</alpha_stall>
-         <a0>0</a0>
-         <area>0.27637</area>
-         <upward>0 -0.7071067811865476 -0.7071067811865475</upward>
-         <forward>0 -0.7071067811865475 0.7071067811865476</forward>
-         <link_name>hull</link_name>
-         <cp>0.35 0 0</cp>
-     </plugin>
-    -->
-
-<!-- <plugin name="submarine_propeller_1" filename="libLiftDragPlugin.so">
-         <air_density>1000</air_density><cla>1.2535816618911175</cla><cla_stall>-1.4326647564469914</cla_stall><cda>0</cda><cda_stall>1.4326647564469914</cda_stall><alpha_stall>1.396</alpha_stall><a0>0</a0>
-         <area>0.27637</area>
-         <upward>0 -0.7071067811865476 -0.7071067811865475</upward>
-         <forward>0 -0.7071067811865475 0.7071067811865476</forward>
-         <link_name>propeller</link_name>
-         <cp>0.35 0 0</cp>
-       </plugin> -->
-
     <allow_auto_disable>0</allow_auto_disable>
 
     <plugin name="thruster" filename="libthruster.so"/>
 
     <plugin name="buoyancy_improved" filename="libbuoyancy_improved.so">
       <fluid_density>1000</fluid_density>
+      <surface_z>-0.8</surface_z>
       <link name="frame">
         <volume>0.0026</volume>
       </link>
