@@ -67,6 +67,18 @@ double MaestroEmulator::getThrusterForce(string name)
         return 0;
     }
 
+    /*
+     * The autokill timeout is in place to handle cases when the thruster
+     * messages stop getting plublished on the serial port and will
+     * automatically set the thrusters to zero. Note that this does not update
+     * the _thruster_timeout value required for the reset.
+     */
+    if (ros::Time::now() > _autokill_timeouts[name])
+    {
+        _thruster_speeds[name] = 1500;
+    }
+
+
     const int pulse_length = _thruster_speeds[name];
     double force_kgf = 0;
 
@@ -75,14 +87,14 @@ double MaestroEmulator::getThrusterForce(string name)
      * 1500), then map the pulse width to a thrust force. Otherwise, there is
      * no thrust force.
      */
-    if (pulse_length < 1525)
+    if (pulse_length > 1525)
     {
         force_kgf = a_negative * pow(pulse_length, 3) +
                     b_negative * pow(pulse_length, 2) +
                     c_negative * pulse_length +
                     d_negative;
     }
-    else if ((pulse_length > 1475))
+    else if (pulse_length < 1475)
     {
         force_kgf = a_positive * pow(pulse_length, 3) +
                     b_positive * pow(pulse_length, 2) +
@@ -91,7 +103,7 @@ double MaestroEmulator::getThrusterForce(string name)
     }
     else
     {
-        force_kgf = 0;
+        return 0;
     }
 
     /*
@@ -231,10 +243,14 @@ int MaestroEmulator::update()
                  */
                 if (pulse_width == 1500)
                 {
-                    _thruster_timeouts[_thruster] = ros::Time::now() + ros::Duration(155);
+                    _thruster_timeouts[_thruster] = ros::Time::now() +
+                        ros::Duration(155);
                 }
-                ROS_INFO_STREAM("Setting " << _thruster << " to " << pulse_width);
+                ROS_DEBUG_STREAM("Setting " << _thruster << " to " <<
+                        pulse_width);
                 _thruster_speeds[_thruster] = pulse_width;
+                _autokill_timeouts[_thruster] = ros::Time::now() +
+                        ros::Duration(1.0);
                 _current_state = State::None;
                 break;
         }

@@ -75,6 +75,12 @@ private:
     std::map<string, ros::Time> _thruster_timeouts;
 
     /*
+     * A hashmap of the next thruster autokill timeouts indexed by the name of
+     * the thruster.
+     */
+    std::map<string, ros::Time> _autokill_timeouts;
+
+    /*
      * A hashmap of the names of a given maestro channel (as specified in the
      * settings) into a specific thruster name.
      */

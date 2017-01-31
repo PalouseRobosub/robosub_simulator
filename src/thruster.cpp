@@ -57,23 +57,30 @@ msgs::Visual Thruster::getVisualizationMessage()
 {
     _current_force = _emulator.getThrusterForce(_name);
     double force = _current_force / _max_force;
-    if (force == 0)
-    {
-        force = 0.00001;
-    }
-
-    msgs::Geometry *cylinder = _visualization_message.mutable_geometry();
-    cylinder->mutable_cylinder()->set_length(std::fabs(force));
-    math::Pose thruster_pose = _link_ptr->GetWorldPose();
+    const double thruster_length = 0.101;
 
     /*
-     * Update the visualizer line position based upon the current force.
+     * Update the visualizer line position based upon the current force. If the
+     * current force is zero, place the visualizer in the center of the
+     * thruster so that it isn't shown to the user.
      */
-    const double thruster_length = 0.101;
+    msgs::Geometry *cylinder = _visualization_message.mutable_geometry();
     math::Vector3 line_offset(0, 0, 0);
-    line_offset.z = force / 2.0 + thruster_length / 2.0 * ((force < 0)? -1 : 1);
+    if (force == 0)
+    {
+        cylinder->mutable_cylinder()->set_length(std::fabs(0.00001));
+        line_offset.z;
+    }
+    else
+    {
+        cylinder->mutable_cylinder()->set_length(std::fabs(force));
+        line_offset.z = force / 2.0 +
+                thruster_length / 2.0 * ((force < 0)? -1 : 1);
+    }
 
+    math::Pose thruster_pose = _link_ptr->GetWorldPose();
     line_offset = thruster_pose.rot * line_offset;
+
     msgs::Set(_visualization_message.mutable_pose(),
               ignition::math::Pose3d(thruster_pose.pos.x - line_offset.x,
                                      thruster_pose.pos.y - line_offset.y,
