@@ -89,17 +89,17 @@ double MaestroEmulator::getThrusterForce(string name)
      */
     if (pulse_length > 1525)
     {
-        force_kgf = a_negative * pow(pulse_length, 3) +
-                    b_negative * pow(pulse_length, 2) +
-                    c_negative * pulse_length +
-                    d_negative;
-    }
-    else if (pulse_length < 1475)
-    {
         force_kgf = a_positive * pow(pulse_length, 3) +
                     b_positive * pow(pulse_length, 2) +
                     c_positive * pulse_length +
                     d_positive;
+    }
+    else if (pulse_length < 1475)
+    {
+        force_kgf = a_negative * pow(pulse_length, 3) +
+                    b_negative * pow(pulse_length, 2) +
+                    c_negative * pulse_length +
+                    d_negative;
     }
     else
     {
