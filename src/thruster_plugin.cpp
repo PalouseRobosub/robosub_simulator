@@ -45,15 +45,15 @@ void ThrusterPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     }
 
     // Get z coords of top of water
-    double surface_z;
-    if (_sdf->HasElement("surface_z"))
+    physics::ModelPtr ceiling = _parent->GetWorld()->GetModel("ceiling_plane");
+    if (ceiling)
     {
-        surface_z = _sdf->Get<double>("surface_z");
+        surface_z = ceiling->GetWorldPose().pos.z;
     }
     else
     {
         surface_z = 0.0;
-        gzwarn << "surface_z element missing. assuming top of fluid is at z == 0" << std::endl;
+        gzwarn << "ceiling_plane model missing. assuming top of fluid is at z == 0" << std::endl;
     }
 
     for(unsigned int i = 0; i < thruster_settings.size(); ++i)

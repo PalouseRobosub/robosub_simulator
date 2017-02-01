@@ -44,19 +44,16 @@ void BuoyancyPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     GZ_ASSERT(_sdf != NULL, "Received NULL SDF pointer");
     this->sdf = _sdf;
 
-    if (this->sdf->HasElement("fluid_density"))
+    // Get z coords of top of water
+    physics::ModelPtr ceiling = _model->GetWorld()->GetModel("ceiling_plane");
+    if (ceiling)
     {
-        this->fluidDensity = this->sdf->Get<double>("fluid_density");
-    }
-
-    if (this->sdf->HasElement("surface_z"))
-    {
-        surface_z = this->sdf->Get<double>("surface_z");
+        surface_z = ceiling->GetWorldPose().pos.z;
     }
     else
     {
         surface_z = 0.0;
-        gzwarn << "surface_z element missing. assuming top of fluid is at z == 0" << std::endl;
+        gzwarn << "ceiling_plane model missing. assuming top of fluid is at z == 0" << std::endl;
     }
 
     // Get "center of volume" and "volume" that were inputted in SDF
