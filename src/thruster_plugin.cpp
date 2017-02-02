@@ -17,14 +17,14 @@ void ThrusterPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     vis_pub = node->Advertise<msgs::Visual>("~/visual", 80);
 
     XmlRpc::XmlRpcValue thruster_settings;
-    if(!ros::param::get("thrusters", thruster_settings))
+    if(!ros::param::get("thrusters/mapping", thruster_settings))
     {
         ROS_FATAL("thruster params failed to load");
         return;
     }
 
     double max_thrust = 0;
-    if (!ros::param::get("control/max_thrust", max_thrust))
+    if (!ros::param::get("thrusters/max_thrust", max_thrust))
     {
         ROS_FATAL("Failed to load maximum thrust value.");
         return;
