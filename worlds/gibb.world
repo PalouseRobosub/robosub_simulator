@@ -150,7 +150,7 @@
 
     <include>
         <name>robosub</name>
-        <pose>0 0 0 0 0 0</pose>
+        <pose>21 -25 3 0 0 3</pose>
         <uri>model://cobalt</uri>
     </include>
 
