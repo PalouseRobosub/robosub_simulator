@@ -705,13 +705,10 @@
 
     <allow_auto_disable>0</allow_auto_disable>
 
-    <plugin name="thruster" filename="libthruster.so">
-        <surface_z>-0.8</surface_z>
-    </plugin>
+    <plugin name="thruster" filename="libthruster.so"/>
 
     <plugin name="buoyancy_improved" filename="libbuoyancy_improved.so">
       <fluid_density>1000</fluid_density>
-      <surface_z>-0.8</surface_z>
       <link name="frame">
         <volume>0.0026</volume>
       </link>
