@@ -3,7 +3,7 @@
 <rosparam command="load" file="$(find robosub_simulator)/param/cobalt_sim.yaml"/>
 <rosparam command="load" file="$(find robosub_simulator)/param/obstacles.yaml"/>
 <rosparam command="load" file="$(find robosub_simulator)/param/simulator.yaml"/>
-<arg name="world_file"  default="underwater.world"/>
+<arg name="world_file"  default="transdec.world"/>
 <arg name="gui"  default="true"/>
 <include file="$(find gazebo_ros)/launch/empty_world.launch">
    <arg name="use_sim_time" value="true"/>
@@ -13,6 +13,5 @@
    <arg name="world_name" value="$(find robosub_simulator)/worlds/$(arg world_file)"/>
 </include>
 <node name="virtual_serial_port" pkg="robosub_simulator" type="create_thruster_vsp.sh" />
-<node name="spawn_robosub" pkg="robosub_simulator" type="spawn_robosub.sh" />
 <node name="simulator_bridge" pkg="robosub_simulator" type="simulator_bridge" required="true" />
 </launch>

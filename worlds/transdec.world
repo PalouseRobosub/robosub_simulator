@@ -271,6 +271,12 @@
       <uri>model://torpedo_target</uri>
     </include>
 
+    <include>
+        <name>robosub</name>
+        <pose>7.0 -26.2 -1.2 0 0 0.8</pose>
+        <uri>model://cobalt</uri>
+    </include>
+
     <!-- Side B -->
 
     <!-- Side C -->
