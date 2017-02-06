@@ -1,5 +1,5 @@
 <?xml version='1.0'?>
-<sdf version='1.6'>
+<sdf version='1.5'>
 
     <model name='gibb_pool'>
         <pose>0 0 0 1.575 0 0</pose>
