@@ -84,13 +84,13 @@
       <static>true</static>
       <pose>0 0 4.49 0 0 0</pose>
       <link name="link">
-        <collision name="collision">
-          <geometry>
-            <box>
-              <size>90 60 .001</size>
-            </box>
-          </geometry>
-        </collision>
+        <!-- <collision name="collision"> -->
+        <!--   <geometry> -->
+        <!--     <box> -->
+        <!--       <size>90 60 .001</size> -->
+        <!--     </box> -->
+        <!--   </geometry> -->
+        <!-- </collision> -->
         <visual name="visual">
           <cast_shadows>false</cast_shadows>
           <geometry>
