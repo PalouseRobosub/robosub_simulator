@@ -218,9 +218,11 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
 
             // Extract necessary data from modelstates.
             robosub::ObstaclePos pos;
-            pos.x = msg.pose[idx].position.x;
-            pos.y = msg.pose[idx].position.y;
-            pos.z = msg.pose[idx].position.z;
+            pos.x = msg.pose[idx].position.x - pinger_position[0];
+            pos.y = msg.pose[idx].position.y - pinger_position[1];
+            pos.z = -(msg.pose[ceiling_index].position.z -
+                    msg.pose[idx].position.z);
+
             pos.name = msg.name[idx];
 
             object_array.data.push_back(pos);
