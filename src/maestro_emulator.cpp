@@ -30,7 +30,7 @@ int MaestroEmulator::init(string port_name,
         const string name = thruster_settings[i]["name"];
         const int channel = thruster_settings[i]["channel"];
         _channel_names[channel] = name;
-        _thruster_speeds[name] = 1500;
+        _thruster_speeds[name] = 6000;
         _thruster_timeouts[name] = ros::Time::now();
     }
 
@@ -75,7 +75,7 @@ double MaestroEmulator::getThrusterForce(string name)
      */
     if (ros::Time::now() > _autokill_timeouts[name])
     {
-        _thruster_speeds[name] = 1500;
+        _thruster_speeds[name] = 6000;
     }
 
 
@@ -87,18 +87,18 @@ double MaestroEmulator::getThrusterForce(string name)
      * 1500), then map the pulse width to a thrust force. Otherwise, there is
      * no thrust force.
      */
-    if (pulse_length > 1525)
+    if (pulse_length/4 > 1525)
     {
-        force_kgf = a_positive * pow(pulse_length, 3) +
-                    b_positive * pow(pulse_length, 2) +
-                    c_positive * pulse_length +
+        force_kgf = a_positive * pow(pulse_length/4, 3) +
+                    b_positive * pow(pulse_length/4, 2) +
+                    c_positive * pulse_length/4 +
                     d_positive;
     }
-    else if (pulse_length < 1475)
+    else if (pulse_length/4 < 1475)
     {
-        force_kgf = a_negative * pow(pulse_length, 3) +
-                    b_negative * pow(pulse_length, 2) +
-                    c_negative * pulse_length +
+        force_kgf = a_negative * pow(pulse_length/4, 3) +
+                    b_negative * pow(pulse_length/4, 2) +
+                    c_negative * pulse_length/4 +
                     d_negative;
     }
     else
@@ -236,12 +236,12 @@ int MaestroEmulator::update()
                         (static_cast<uint16_t>(data[1]) << 7);
 
                 /*
-                 * If this is a 1500-centered command, reset the
-                 * next reset duration. Note that this is not
-                 * identical to the maestro behavior. The reset
-                 * signal must be maintained for 185ms.
+                 * If this is a 1500microsecond-centered command (values
+                 * represent a quarter microsecond), reset the next reset
+                 * duration. Note that this is not identical to the maestro
+                 * behavior. The reset signal must be maintained for 185ms.
                  */
-                if (pulse_width == 1500)
+                if (pulse_width == 6000)
                 {
                     _thruster_timeouts[_thruster] = ros::Time::now() +
                         ros::Duration(155);
