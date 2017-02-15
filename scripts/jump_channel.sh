@@ -1,5 +1,5 @@
 #!/bin/bash
-# this script will jump the sub in the simulator
+# this script will jump the sub
 rosservice call /gazebo/set_model_state "model_state:
   model_name: 'robosub'
   pose:
