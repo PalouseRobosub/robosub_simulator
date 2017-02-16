@@ -260,7 +260,7 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
 
     position_pub = ThrottledPublisher<geometry_msgs::Vector3>
-        ("position/real", 1, 0, "simulator/bridge_rates/position");
+        ("real/position", 1, 0, "simulator/bridge_rates/position");
     orientation_pub = ThrottledPublisher<robosub::QuaternionStampedAccuracy>
         ("orientation", 1, 0, "simulator/bridge_rates/orientation");
     euler_pub = ThrottledPublisher<robosub::Euler>
