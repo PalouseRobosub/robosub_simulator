@@ -36,6 +36,7 @@ ThrottledPublisher<geometry_msgs::Vector3Stamped> lin_accel_pub;
 std::vector<std::string> object_names;
 
 Vector3d pinger_position;
+Vector3d ceiling_plane_position;
 
 void linkStatesCallback(const gazebo_msgs::LinkStates &msg)
 {
@@ -66,7 +67,8 @@ void linkStatesCallback(const gazebo_msgs::LinkStates &msg)
         hydrophone_positions.push_back(
                 Vector3d(msg.pose[hydrophone_indices[i]].position.x,
                 msg.pose[hydrophone_indices[i]].position.y,
-                msg.pose[hydrophone_indices[i]].position.z));
+                -(ceiling_plane_position[2] -
+                    msg.pose[hydrophone_indices[i]].position.z)));
     }
 
     /*
@@ -153,12 +155,19 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
     }
 
     /*
+     * Update the global water top position.
+     */
+    ceiling_plane_position = Vector3d(msg.pose[ceiling_index].position.x,
+            msg.pose[ceiling_index].position.y,
+            msg.pose[ceiling_index].position.z);
+
+    /*
      * Update the global pinger position. Depth of pinger is relative to water
      * top position
      */
     pinger_position = Vector3d(msg.pose[pinger_index].position.x,
             msg.pose[pinger_index].position.y,
-            -(msg.pose[ceiling_index].position.z -
+            -(ceiling_plane_position[2] -
                 msg.pose[pinger_index].position.z));
 
     ROS_DEBUG_STREAM("pinger_position: " << pinger_position);
