@@ -5,6 +5,7 @@
 <rosparam command="load" file="$(find robosub_simulator)/param/simulator.yaml"/>
 <arg name="world"  default="transdec"/>
 <arg name="gui"  default="true"/>
+<arg name="minimal"  default="false"/>
 <include file="$(find gazebo_ros)/launch/empty_world.launch">
    <arg name="use_sim_time" value="true"/>
    <arg name="debug" value="false"/>
@@ -14,4 +15,11 @@
 </include>
 <node name="virtual_serial_port" pkg="robosub_simulator" type="create_thruster_vsp.sh" />
 <node name="simulator_bridge" pkg="robosub_simulator" type="simulator_bridge" required="true" />
+
+<!-- launch basic sub software, unless we are just running the minimal simulator-->
+<group unless="$(arg minimal)">
+<node name="control" pkg="robosub" type="control" />
+<node name="thruster" pkg="robosub" type="delayed_node.sh" args="2 thruster_maestro"/>
+</group>
+
 </launch>
