@@ -264,7 +264,7 @@ int main(int argc, char **argv)
     orientation_pub = ThrottledPublisher<robosub::QuaternionStampedAccuracy>
         ("orientation", 1, 0, "simulator/bridge_rates/orientation");
     euler_pub = ThrottledPublisher<robosub::Euler>
-        ( "orientation/pretty", 1, 0, "simulator/bridge_rates/euler");
+        ( "pretty/orientation", 1, 0, "simulator/bridge_rates/euler");
     depth_pub = ThrottledPublisher<robosub::Float32Stamped>
         ("depth", 1, 0, "simulator/bridge_rates/depth");
     obstacle_pos_pub = ThrottledPublisher<robosub::ObstaclePosArray>
