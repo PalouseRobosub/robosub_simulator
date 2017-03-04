@@ -9,6 +9,7 @@
 #include "robosub/ObstaclePosArray.h"
 #include "robosub/QuaternionStampedAccuracy.h"
 #include "robosub/HydrophoneDeltas.h"
+#include "tf/transform_datatypes.h"
 #include "ThrottledPublisher.hpp"
 
 #include <cmath>
@@ -27,9 +28,12 @@ static constexpr double _180_OVER_PI = 180.0 / 3.14159;
 Bno055Emulator bno_emulator;
 
 ThrottledPublisher<geometry_msgs::Vector3> position_pub;
+ThrottledPublisher<robosub::QuaternionStampedAccuracy> orientation_pub;
+ThrottledPublisher<robosub::Euler> euler_pub;
 ThrottledPublisher<robosub::Float32Stamped> depth_pub;
 ThrottledPublisher<robosub::ObstaclePosArray> obstacle_pos_pub;
 ThrottledPublisher<robosub::HydrophoneDeltas> hydrophone_deltas_pub;
+ThrottledPublisher<geometry_msgs::Vector3Stamped> lin_accel_pub;
 
 // List of names of objects to publish the position and name of. This will be
 // loaded from parameters.
@@ -120,7 +124,9 @@ void linkStatesCallback(const gazebo_msgs::LinkStates &msg)
 void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
 {
     geometry_msgs::Vector3 position_msg;
+    robosub::QuaternionStampedAccuracy orientation_msg;
     robosub::Float32Stamped depth_msg;
+    robosub::Euler euler_msg;
 
     // Find top of water and subs indices in modelstates lists
     int sub_index = -1, pinger_index = -1, ceiling_index = -1;
@@ -182,6 +188,23 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
     position_msg.x -= pinger_position[0];
     position_msg.y -= pinger_position[1];
 
+    orientation_msg.quaternion.x = msg.pose[sub_index].orientation.x;
+    orientation_msg.quaternion.y = msg.pose[sub_index].orientation.y;
+    orientation_msg.quaternion.z = msg.pose[sub_index].orientation.z;
+    orientation_msg.quaternion.w = msg.pose[sub_index].orientation.w;
+    orientation_msg.header.stamp = ros::Time::now();
+    orientation_msg.accuracy = 1;
+
+    tf::Matrix3x3 m(tf::Quaternion(orientation_msg.quaternion.x,
+                                   orientation_msg.quaternion.y,
+                                   orientation_msg.quaternion.z,
+                                   orientation_msg.quaternion.w));
+
+    m.getRPY(euler_msg.roll, euler_msg.pitch, euler_msg.yaw);
+    euler_msg.roll *= _180_OVER_PI;
+    euler_msg.pitch *= _180_OVER_PI;
+    euler_msg.yaw *= _180_OVER_PI;
+
     if (bno_emulator.setOrientation(msg.pose[sub_index].orientation.x,
                                     msg.pose[sub_index].orientation.y,
                                     msg.pose[sub_index].orientation.z,
@@ -192,7 +215,9 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
 
     // Publish sub position and orientation
     position_pub.publish(position_msg);
+    orientation_pub.publish(orientation_msg);
     depth_pub.publish(depth_msg);
+    euler_pub.publish(euler_msg);
 
     // Iterate through object_names and for each iteration search through the
     // msg.name array and attempt to find object_names[i]. If it is not found
@@ -230,6 +255,15 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
 
 void imuCallback(const sensor_msgs::Imu::ConstPtr& msg)
 {
+    geometry_msgs::Vector3Stamped lin_accel;
+
+    lin_accel.vector.x = msg->linear_acceleration.x;
+    lin_accel.vector.y = msg->linear_acceleration.y;
+    lin_accel.vector.z = msg->linear_acceleration.z;
+
+    lin_accel.header.stamp = ros::Time::now();
+    lin_accel_pub.publish(lin_accel);
+
     bno_emulator.setLinearAcceleration(msg->linear_acceleration.x,
                                        msg->linear_acceleration.y,
                                        msg->linear_acceleration.z);
@@ -269,12 +303,18 @@ int main(int argc, char **argv)
 
     position_pub = ThrottledPublisher<geometry_msgs::Vector3>
         ("real/position", 1, 0, "simulator/bridge_rates/position");
+    orientation_pub = ThrottledPublisher<robosub::QuaternionStampedAccuracy>
+        ("orientation_simulator", 1, 0, "simulator/bridge_rates/orientation");
+    euler_pub = ThrottledPublisher<robosub::Euler>
+        ("pretty/orientation_simulator", 1, 0, "simulator/bridge_rates/euler");
     depth_pub = ThrottledPublisher<robosub::Float32Stamped>
         ("depth", 1, 0, "simulator/bridge_rates/depth");
     obstacle_pos_pub = ThrottledPublisher<robosub::ObstaclePosArray>
         ("obstacles/positions", 1, 0, "simulator/bridge_rates/obstacle_pos");
     hydrophone_deltas_pub = ThrottledPublisher<robosub::HydrophoneDeltas>
         ("hydrophones/30khz/delta", 1, 0, "simulator/bridge_rates/hydrophone_deltas");
+    lin_accel_pub = ThrottledPublisher<geometry_msgs::Vector3Stamped>
+        ("acceleration/linear_simulator", 1, 0, "simulator/bridge_rates/lin_accel");
 
     ros::Subscriber orient_sub = nh.subscribe("gazebo/model_states", 1,
             modelStatesCallback);
