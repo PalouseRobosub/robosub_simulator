@@ -37,7 +37,7 @@ int MaestroEmulator::init(string port_name,
     /*
      * Open and configure the virtual serial port.
      */
-    if (_port.Open(port_name.c_str(), 115200))
+    if (_port.Open(port_name.c_str(), B9600))
     {
         ROS_FATAL("Failed to open serial port.");
         return -1;
