@@ -14,3 +14,4 @@ simulator:
         lin_accel: 20.0
     ports:
         simulated_thruster: "/dev/null"
+        simulated_sensor: "/dev/null"

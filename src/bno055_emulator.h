@@ -1,12 +1,14 @@
 #ifndef BNO055_EMULATOR_H
 #define BNO055_EMULATOR_H
 
-#include <map>
 #include <cstdint>
+#include <ros/ros.h>
+#include <string>
 
 #include "serial.h"
+#include "tf/transform_datatypes.h"
 
-using std::map
+using std::string;
 
 namespace rs
 {
@@ -20,6 +22,12 @@ class Bno055Emulator
     static constexpr uint8_t error_header = 0xEE;
     static constexpr uint8_t reply_header = 0xBB;
     static constexpr uint8_t max_registers[2] = {0x6B, 0x20};
+
+    /*
+     * The data sheet does not specify the exact timeout. Use 1 second to be
+     * safe.
+     */
+    static constexpr uint8_t serial_timeout = 1;
 
     enum class State
     {
@@ -166,37 +174,40 @@ class Bno055Emulator
     };
 
 public:
-    Bno055Emulator(Serial &port) :
-        _port(port),
+    Bno055Emulator() :
+        _port(),
         _registers(),
+        _current_state(State::None),
         _read_not_write(true),
         _length(0),
-        _address(0)
+        _address(0),
+        _previous_serial_time()
     {
         /*
          * Ensure register space is initialized to zero.
          */
-        memset(registers[0], 0, 0x6A);
-        memset(registers[1], 0, 0x6A);
+        memset(_registers[0], 0, 0x6A);
+        memset(_registers[1], 0, 0x6A);
     }
 
-    int init();
+    ~Bno055Emulator();
+    void init();
+    int setPort(string port_name);
     int update();
-    void setOrientation(double x, double y, double z, double w);
+    int setOrientation(double x, double y, double z, double w);
     void setLinearAcceleration(double x, double y, double z);
 
 private:
-    int write_registers(Register reg, uint8_t len, const uint8_t *data);
-    int write_register(Register reg, const uint8_t data);
-    int read_registers(Register reg, uint8_t len, uint8_t *data);
-    int send_error(Error error);
+    int send_response(Response response);
+    int send_data(uint8_t addr, uint8_t len);
 
-    Serial &_port;
+    Serial _port;
     uint8_t _registers[2][0x6A];
     State _current_state;
     bool _read_not_write;
     uint8_t _length;
     uint8_t _address;
+    ros::Time _previous_serial_time;
 };
 }
 
