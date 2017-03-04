@@ -135,13 +135,13 @@ namespace rs
              * Wait for atleast one byte to be available before reading so that
              * timeout is also valid if no bytes are received on the port.
              */
-            ros::Time exit_time = ros::Time::now() + ros::Duration(0.5);
-            while (QueryBuffer() == 0 && ros::Time::now() < exit_time)
+            ros::WallTime exit_time = ros::WallTime::now() + ros::WallDuration(0.5);
+            while (QueryBuffer() == 0 && ros::WallTime::now() < exit_time)
             {
-                ros::Duration(0.02).sleep();
+                ros::WallDuration(0.02).sleep();
             }
 
-            if (ros::Time::now() > exit_time)
+            if (ros::WallTime::now() > exit_time)
             {
                 ROS_INFO("No serial bytes were available");
                 return 0;
@@ -191,11 +191,12 @@ namespace rs
         struct termios options = {0};
         int fd = this->m_port_fd;
 
-        ROS_INFO("configuring serial port");
+        ROS_INFO_STREAM("configuring serial port:" << m_port_name);
 
         if (tcgetattr(this->m_port_fd, &options) != 0)
         {
-            ROS_ERROR("Failed to get serial attributes.");
+            ROS_ERROR_STREAM("Failed to get serial attributes for " <<
+                    m_port_name);
         }
 
         options.c_iflag = 0; //no input handling
@@ -227,7 +228,8 @@ namespace rs
 
         if (tcsetattr(fd, TCSANOW, &options) != 0)
         {
-            ROS_ERROR("Failed to set the serial port options.");
+            ROS_ERROR_STREAM("Failed to set the serial port options for " <<
+                    m_port_name);
         }
     }
 };
