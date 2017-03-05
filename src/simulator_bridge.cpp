@@ -201,14 +201,21 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
                                    orientation_msg.quaternion.w));
 
     m.getRPY(euler_msg.roll, euler_msg.pitch, euler_msg.yaw);
+
+    /*
+     * The actual BNO mounting position causes it to give positive roll as
+     * rolling left and positive pitch as pitching up. As such, emulate the
+     * sensor to also define values in this way.
+     */
+    tf::Quaternion q = tf::createQuaternionFromRPY(euler_msg.roll * -1,
+            euler_msg.pitch * -1, euler_msg.yaw);
+
     euler_msg.roll *= _180_OVER_PI;
     euler_msg.pitch *= _180_OVER_PI;
     euler_msg.yaw *= _180_OVER_PI;
 
-    if (bno_emulator.setOrientation(msg.pose[sub_index].orientation.x,
-                                    msg.pose[sub_index].orientation.y,
-                                    msg.pose[sub_index].orientation.z,
-                                    msg.pose[sub_index].orientation.w))
+
+    if (bno_emulator.setOrientation(q.x(), q.y(), q.z(), q.w()))
     {
         ROS_ERROR("Failed to update the BNO emulator orientation.");
     }
@@ -304,17 +311,18 @@ int main(int argc, char **argv)
     position_pub = ThrottledPublisher<geometry_msgs::Vector3>
         ("real/position", 1, 0, "simulator/bridge_rates/position");
     orientation_pub = ThrottledPublisher<robosub::QuaternionStampedAccuracy>
-        ("orientation_simulator", 1, 0, "simulator/bridge_rates/orientation");
+        ("real/orientation", 1, 0, "simulator/bridge_rates/orientation");
     euler_pub = ThrottledPublisher<robosub::Euler>
-        ("pretty/orientation_simulator", 1, 0, "simulator/bridge_rates/euler");
+        ("real/pretty/orientation", 1, 0, "simulator/bridge_rates/euler");
     depth_pub = ThrottledPublisher<robosub::Float32Stamped>
         ("depth", 1, 0, "simulator/bridge_rates/depth");
     obstacle_pos_pub = ThrottledPublisher<robosub::ObstaclePosArray>
         ("obstacles/positions", 1, 0, "simulator/bridge_rates/obstacle_pos");
     hydrophone_deltas_pub = ThrottledPublisher<robosub::HydrophoneDeltas>
-        ("hydrophones/30khz/delta", 1, 0, "simulator/bridge_rates/hydrophone_deltas");
+        ("hydrophones/30khz/delta", 1, 0,
+         "simulator/bridge_rates/hydrophone_deltas");
     lin_accel_pub = ThrottledPublisher<geometry_msgs::Vector3Stamped>
-        ("acceleration/linear_simulator", 1, 0, "simulator/bridge_rates/lin_accel");
+        ("real/acceleration/linear", 1, 0, "simulator/bridge_rates/lin_accel");
 
     ros::Subscriber orient_sub = nh.subscribe("gazebo/model_states", 1,
             modelStatesCallback);
