@@ -5,7 +5,7 @@
 #include <ros/ros.h>
 #include <string>
 
-#include "serial.h"
+#include "utility/serial.hpp"
 #include "tf/transform_datatypes.h"
 
 using std::string;

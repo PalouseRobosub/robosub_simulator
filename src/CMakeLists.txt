@@ -6,9 +6,9 @@ add_library(buoyancy_improved SHARED buoyancy_improved.cpp)
 add_dependencies(buoyancy_improved  ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(buoyancy_improved   ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
 
-add_library(sensor SHARED bno055_emulator.cpp serial.cpp)
+add_library(sensor SHARED bno055_emulator.cpp)
 add_dependencies(sensor ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(sensor ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(sensor ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} serial)
 
 #simulator bridge
 add_executable(simulator_bridge simulator_bridge.cpp)
