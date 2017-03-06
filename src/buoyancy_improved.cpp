@@ -19,6 +19,7 @@
 #include "gazebo/common/Events.hh"
 #include "ros/ros.h"
 #include "buoyancy_improved.h"
+#include <string>
 
 using namespace gazebo;
 
@@ -53,7 +54,9 @@ void BuoyancyPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     else
     {
         surface_z = 0.0;
-        gzwarn << "ceiling_plane model missing. assuming top of fluid is at z == 0" << std::endl;
+        gzwarn <<
+            "ceiling_plane model missing. assuming top of fluid is at z == 0"
+            << std::endl;
     }
 
     // Get "center of volume" and "volume" that were inputted in SDF
@@ -72,7 +75,8 @@ void BuoyancyPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
                 link = this->model->GetLink(name);
                 if (!link)
                 {
-                    gzwarn << "Specified link [" << name << "] not found." << std::endl;
+                    gzwarn << "Specified link [" << name << "] not found."
+                           << std::endl;
                     continue;
                 }
                 id = link->GetId();
@@ -87,14 +91,16 @@ void BuoyancyPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
             if (this->volPropsMap.count(id) != 0)
             {
-                gzwarn << "Properties for link [" << name << "] already set, skipping "
+                gzwarn << "Properties for link [" <<
+                    name << "] already set, skipping "
                        << "second property block" << std::endl;
             }
 
             if (linkElem->HasElement("center_of_volume"))
             {
                 math::Vector3 cov =
-                    linkElem->GetElement("center_of_volume")->Get<math::Vector3>();
+                    linkElem->GetElement("center_of_volume")->
+                    Get<math::Vector3>();
                 this->volPropsMap[id].cov = cov;
             }
             else
@@ -105,8 +111,9 @@ void BuoyancyPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
                     double volumeSum = 0;
                     math::Vector3 weightedPosSum = math::Vector3::Zero;
 
-                    // The center of volume of the link is a weighted average over the pose
-                    // of each collision shape, where the weight is the volume of the shape
+                    // The center of volume of the link is a weighted average
+                    // over the pose of each collision shape, where the weight
+                    // is the volume of the shape
                     for (auto collision : link->GetCollisions())
                     {
                         double volume = collision->GetShape()->ComputeVolume();
@@ -135,11 +142,11 @@ void BuoyancyPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
             }
             else
             {
-                gzwarn << "Required element volume missing from element link [" << name
+                gzwarn << "Required element volume missing from element link ["
+                       << name
                        << "] in BuoyancyPlugin SDF" << std::endl;
                 continue;
             }
-
         }
     }
 
@@ -153,8 +160,9 @@ void BuoyancyPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
             double volumeSum = 0;
             math::Vector3 weightedPosSum = math::Vector3::Zero;
 
-            // The center of volume of the link is a weighted average over the pose
-            // of each collision shape, where the weight is the volume of the shape
+            // The center of volume of the link is a weighted average over the
+            // pose of each collision shape, where the weight is the volume of
+            // the shape
             for (auto collision : link->GetCollisions())
             {
                 double volume = collision->GetShape()->ComputeVolume();
@@ -206,8 +214,9 @@ void BuoyancyPlugin::OnUpdate()
 
         math::Vector3 absCov = linkFrame.pos + volumeProperties.cov;
 
-        // Check if the links center of volume is out of water. If it is, do not add
-        // buoyancy. This is a very simple approximation of buoyancy at the surface
+        // Check if the links center of volume is out of water. If it is, do
+        // not add buoyancy. This is a very simple approximation of buoyancy at
+        // the surface
         if(absCov.z < surface_z)
         {
             link->AddLinkForce(buoyancyLinkFrame, volumeProperties.cov);

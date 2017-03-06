@@ -1,4 +1,5 @@
 #include "world_plugin_example.h"
+#include <string>
 
 namespace gazebo
 {
@@ -14,7 +15,8 @@ void WorldPluginExample::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
     int argc = 0;
     char **argv = NULL;
     ros::init(argc, argv, "world_plugin_example",
-            ros::init_options::NoSigintHandler | ros::init_options::AnonymousName);
+            ros::init_options::NoSigintHandler |
+            ros::init_options::AnonymousName);
 
     if(!ros::isInitialized())
     {

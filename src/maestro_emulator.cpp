@@ -1,4 +1,5 @@
 #include "maestro_emulator.h"
+#include <string>
 
 /**
  * Initializes the emulator.

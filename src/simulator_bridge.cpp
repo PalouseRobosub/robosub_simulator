@@ -14,6 +14,7 @@
 
 #include <cmath>
 #include <vector>
+#include <string>
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Geometry>
 
@@ -114,7 +115,6 @@ void linkStatesCallback(const gazebo_msgs::LinkStates &msg)
     deltas.zDelta = ros::Duration(hydrophone_time_delays[3]);
 
     hydrophone_deltas_pub.publish(deltas);
-
 }
 
 // ModelStates msg consists of a name, a pose (position and orientation), and a
@@ -130,7 +130,7 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
 
     // Find top of water and subs indices in modelstates lists
     int sub_index = -1, pinger_index = -1, ceiling_index = -1;
-    for(int i=0; i<msg.name.size(); i++)
+    for(int i = 0; i < msg.name.size(); i++)
     {
         if (msg.name[i] == "robosub") sub_index = i;
         if (msg.name[i] == "ceiling_plane") ceiling_index = i;
@@ -234,7 +234,7 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
     // wthin the msg.name (and therefore msg.pose array since they contain the
     // same objects in the same order).
     robosub::ObstaclePosArray object_array;
-    for(int i=0; i<object_names.size(); i++)
+    for(int i = 0; i < object_names.size(); i++)
     {
         auto it = std::find(msg.name.begin(), msg.name.end(), object_names[i]);
 

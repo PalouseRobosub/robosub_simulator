@@ -1,5 +1,5 @@
-#ifndef WORLDPLUGINEXAMPLE
-#define WORLDPLUGINEXAMPLE
+#ifndef WORLD_PLUGIN_EXAMPLE_H
+#define WORLD_PLUGIN_EXAMPLE_H
 
 #include <boost/bind.hpp>
 
@@ -35,4 +35,4 @@ public:
 
 }
 
-#endif
+#endif // WORLD_PLUGIN_EXAMPLE_H

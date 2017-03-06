@@ -14,7 +14,8 @@ void ModelPluginExample::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     int argc = 0;
     char **argv = NULL;
     ros::init(argc, argv, "model_plugin_example",
-            ros::init_options::NoSigintHandler | ros::init_options::AnonymousName);
+            ros::init_options::NoSigintHandler |
+            ros::init_options::AnonymousName);
 
     if(!ros::isInitialized())
     {
