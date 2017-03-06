@@ -2,7 +2,7 @@
 #define MAESTRO_EMULATOR_H
 
 #include <ros/ros.h>
-#include "serial.h"
+#include "utility/serial.hpp"
 #include <string>
 
 using std::string;
