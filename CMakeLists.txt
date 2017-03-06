@@ -28,6 +28,10 @@ find_package(gazebo REQUIRED)
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
 # catkin_python_setup()
 
+
+file (GLOB_RECURSE FILES *.cpp *.h *.hpp)
+roslint_custom(${robosub_SOURCE_DIR}/tools/linters/cpplint "--extensions=cpp,hpp,h" ${FILES})
+
 ################################################
 ## Declare ROS messages, services and actions ##
 ################################################
