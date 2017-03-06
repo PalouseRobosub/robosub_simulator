@@ -13,8 +13,8 @@ rosservice call /gazebo/set_model_state "model_state:
       z: 0.73
       w: 0.68"
 rostopic pub --once /control robosub/control "
-forward_state: 0
-strafe_state: 0
+forward_state: 3
+strafe_state: 3
 dive_state: 1
 roll_state: 1
 pitch_state: 1
