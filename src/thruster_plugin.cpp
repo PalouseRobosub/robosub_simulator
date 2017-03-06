@@ -1,4 +1,5 @@
 #include "thruster_plugin.h"
+#include <string>
 
 namespace gazebo
 {
@@ -53,7 +54,9 @@ void ThrusterPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     else
     {
         surface_z = 0.0;
-        gzwarn << "ceiling_plane model missing. assuming top of fluid is at z == 0" << std::endl;
+        gzwarn <<
+            "ceiling_plane model missing. assuming top of fluid is at z == 0"
+            << std::endl;
     }
 
     for(unsigned int i = 0; i < thruster_settings.size(); ++i)

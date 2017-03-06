@@ -1,5 +1,5 @@
-#ifndef MODELPLUGINEXAMPLE
-#define MODELPLUGINEXAMPLE
+#ifndef MODEL_PLUGIN_EXAMPLE_H
+#define MODEL_PLUGIN_EXAMPLE_H
 
 #include <boost/bind.hpp>
 
@@ -36,4 +36,4 @@ public:
 
 }
 
-#endif
+#endif // MODEL_PLUGIN_EXAMPLE_H

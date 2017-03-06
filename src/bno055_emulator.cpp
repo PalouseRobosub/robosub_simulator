@@ -1,4 +1,5 @@
 #include "bno055_emulator.h"
+#include <string>
 
 namespace rs
 {
@@ -246,20 +247,20 @@ int Bno055Emulator::setOrientation(double x, double y, double z, double w)
     int x_int = static_cast<int16_t>(x * (1 << 14));
     int y_int = static_cast<int16_t>(y * (1 << 14));
     int z_int = static_cast<int16_t>(z * (1 << 14));
-    _registers[0][static_cast<uint8_t>(Register::QUAT_Data_w_MSB)] = w_int >> 8 &
-        0xFF;
+    _registers[0][static_cast<uint8_t>(Register::QUAT_Data_w_MSB)] = w_int >> 8
+        & 0xFF;
     _registers[0][static_cast<uint8_t>(Register::QUAT_Data_w_LSB)] = w_int &
         0xFF;
-    _registers[0][static_cast<uint8_t>(Register::QUAT_Data_x_MSB)] = x_int >> 8 &
-        0xFF;
+    _registers[0][static_cast<uint8_t>(Register::QUAT_Data_x_MSB)] = x_int >> 8
+        & 0xFF;
     _registers[0][static_cast<uint8_t>(Register::QUAT_Data_x_LSB)] = x_int &
         0xFF;
-    _registers[0][static_cast<uint8_t>(Register::QUAT_Data_y_MSB)] = y_int >> 8 &
-        0xFF;
+    _registers[0][static_cast<uint8_t>(Register::QUAT_Data_y_MSB)] = y_int >> 8
+        & 0xFF;
     _registers[0][static_cast<uint8_t>(Register::QUAT_Data_y_LSB)] = y_int &
         0xFF;
-    _registers[0][static_cast<uint8_t>(Register::QUAT_Data_z_MSB)] = z_int >> 8 &
-        0xFF;
+    _registers[0][static_cast<uint8_t>(Register::QUAT_Data_z_MSB)] = z_int >> 8
+        & 0xFF;
     _registers[0][static_cast<uint8_t>(Register::QUAT_Data_z_LSB)] = z_int &
         0xFF;
 
@@ -301,16 +302,16 @@ int Bno055Emulator::setOrientation(double x, double y, double z, double w)
         pitch_int = pitch / 16.0;
         yaw_int = yaw / 16.0;
     }
-    _registers[0][static_cast<uint8_t>(Register::EUL_Pitch_MSB)] = pitch_int >> 8
-        & 0xFF;
+    _registers[0][static_cast<uint8_t>(Register::EUL_Pitch_MSB)] = pitch_int
+        >> 8 & 0xFF;
     _registers[0][static_cast<uint8_t>(Register::EUL_Pitch_LSB)] = pitch_int
         & 0xFF;
-    _registers[0][static_cast<uint8_t>(Register::EUL_Roll_MSB)] = roll_int >> 8
-        & 0xFF;
+    _registers[0][static_cast<uint8_t>(Register::EUL_Roll_MSB)] = roll_int
+        >> 8 & 0xFF;
     _registers[0][static_cast<uint8_t>(Register::EUL_Roll_LSB)] = roll_int
         & 0xFF;
-    _registers[0][static_cast<uint8_t>(Register::EUL_Heading_MSB)] = yaw_int >> 8
-        & 0xFF;
+    _registers[0][static_cast<uint8_t>(Register::EUL_Heading_MSB)] = yaw_int
+        >> 8 & 0xFF;
     _registers[0][static_cast<uint8_t>(Register::EUL_Heading_LSB)] = yaw_int
         & 0xFF;
 

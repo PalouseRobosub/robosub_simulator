@@ -9,7 +9,8 @@
  * @param max_force The maximum force that a thruster can apply.
  */
 Thruster::Thruster(const string name, physics::ModelPtr parent,
-                   double max_force, MaestroEmulator &emulator, double surface_z) :
+                   double max_force, MaestroEmulator &emulator,
+                   double surface_z) :
     _current_force(0),
     _max_force(max_force),
     _name(name),
@@ -58,7 +59,6 @@ void Thruster::addLinkForce()
     {
         _visualization_message.mutable_material()->mutable_script()->set_name(
                 "Gazebo/BlueGlow");
-
     }
 }
 

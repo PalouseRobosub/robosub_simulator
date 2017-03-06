@@ -4,6 +4,7 @@
 #include <ros/ros.h>
 #include "utility/serial.hpp"
 #include <string>
+#include <map>
 
 using std::string;
 
