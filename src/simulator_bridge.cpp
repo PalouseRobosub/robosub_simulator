@@ -10,7 +10,7 @@
 #include "robosub/QuaternionStampedAccuracy.h"
 #include "robosub/HydrophoneDeltas.h"
 #include "tf/transform_datatypes.h"
-#include "ThrottledPublisher.hpp"
+#include "utility/ThrottledPublisher.hpp"
 
 #include <cmath>
 #include <vector>

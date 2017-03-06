@@ -1,6 +1,6 @@
-add_library(thruster SHARED thruster_plugin.cpp thruster.cpp maestro_emulator.cpp serial.cpp)
+add_library(thruster SHARED thruster_plugin.cpp thruster.cpp maestro_emulator.cpp)
 add_dependencies(thruster ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(thruster ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(thruster ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} serial)
 
 add_library(buoyancy_improved SHARED buoyancy_improved.cpp)
 add_dependencies(buoyancy_improved  ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
