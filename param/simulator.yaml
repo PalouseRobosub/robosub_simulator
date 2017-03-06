@@ -15,6 +15,10 @@ rate:
 simulator:
     visualize_thrusters: true
     visualizer_update_rate: 10
+    sensor_deviation:
+        imu: 0.1
+        depth: 0.02
+        accel: .01
     ports:
         simulated_thruster: "/dev/null"
         simulated_sensor: "/dev/null"

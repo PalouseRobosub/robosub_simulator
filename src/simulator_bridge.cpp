@@ -15,12 +15,14 @@
 #include <cmath>
 #include <vector>
 #include <string>
+#include <random>
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Geometry>
 
 #include "bno055_emulator.h"
 
 using std::vector;
+using std::normal_distribution;
 using namespace Eigen;
 using namespace rs;
 
@@ -32,9 +34,21 @@ ThrottledPublisher<geometry_msgs::Vector3> position_pub;
 ThrottledPublisher<robosub::QuaternionStampedAccuracy> orientation_pub;
 ThrottledPublisher<robosub::Euler> euler_pub;
 ThrottledPublisher<robosub::Float32Stamped> depth_pub;
+ThrottledPublisher<robosub::Float32Stamped> depth_real_pub;
 ThrottledPublisher<robosub::ObstaclePosArray> obstacle_pos_pub;
 ThrottledPublisher<robosub::HydrophoneDeltas> hydrophone_deltas_pub;
 ThrottledPublisher<geometry_msgs::Vector3Stamped> lin_accel_pub;
+
+/*
+ * Global parameters for storing sensor standard deviations.
+ */
+double imu_deviation = 0;
+double depth_deviation = 0;
+double accel_deviation = 0;
+std::default_random_engine generator;
+normal_distribution<double> depth_error(0, 0);
+normal_distribution<double> imu_error(0, 0);
+normal_distribution<double> accel_error(0, 0);
 
 // List of names of objects to publish the position and name of. This will be
 // loaded from parameters.
@@ -125,7 +139,7 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
 {
     geometry_msgs::Vector3 position_msg;
     robosub::QuaternionStampedAccuracy orientation_msg;
-    robosub::Float32Stamped depth_msg;
+    robosub::Float32Stamped depth_msg, depth_real_msg;
     robosub::Euler euler_msg;
 
     // Find top of water and subs indices in modelstates lists
@@ -177,9 +191,12 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
     ROS_DEBUG_STREAM("pinger_position: " << pinger_position);
 
     // Calculate depth from the z positions of the water top and the sub
-    depth_msg.data = -(msg.pose[ceiling_index].position.z -
-                     msg.pose[sub_index].position.z);
-    depth_msg.header.stamp = ros::Time::now();
+    depth_real_msg.data = -(msg.pose[ceiling_index].position.z -
+            msg.pose[sub_index].position.z);
+    depth_real_msg.header.stamp = ros::Time::now();
+
+    depth_msg.data = depth_real_msg.data + depth_error(generator);
+    depth_msg.header.stamp = depth_real_msg.header.stamp;
 
     // Copy sub pos to position msg
     position_msg.x = msg.pose[sub_index].position.x;
@@ -207,23 +224,29 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
      * rolling left and positive pitch as pitching up. As such, emulate the
      * sensor to also define values in this way.
      */
-    tf::Quaternion q = tf::createQuaternionFromRPY(euler_msg.roll * -1,
-            euler_msg.pitch * -1, euler_msg.yaw);
 
-    euler_msg.roll *= _180_OVER_PI;
-    euler_msg.pitch *= _180_OVER_PI;
-    euler_msg.yaw *= _180_OVER_PI;
-
+    tf::Quaternion q = tf::createQuaternionFromRPY(
+                euler_msg.roll * -1 + imu_error(generator),
+                euler_msg.pitch * -1 + imu_error(generator),
+                euler_msg.yaw + imu_error(generator));
 
     if (bno_emulator.setOrientation(q.x(), q.y(), q.z(), q.w()))
     {
         ROS_ERROR("Failed to update the BNO emulator orientation.");
     }
 
+    /*
+     * Convert euler from radians to degrees for pretty-printing.
+     */
+    euler_msg.roll *= _180_OVER_PI;
+    euler_msg.pitch *= _180_OVER_PI;
+    euler_msg.yaw *= _180_OVER_PI;
+
     // Publish sub position and orientation
     position_pub.publish(position_msg);
     orientation_pub.publish(orientation_msg);
     depth_pub.publish(depth_msg);
+    depth_real_pub.publish(depth_real_msg);
     euler_pub.publish(euler_msg);
 
     // Iterate through object_names and for each iteration search through the
@@ -271,9 +294,10 @@ void imuCallback(const sensor_msgs::Imu::ConstPtr& msg)
     lin_accel.header.stamp = ros::Time::now();
     lin_accel_pub.publish(lin_accel);
 
-    bno_emulator.setLinearAcceleration(msg->linear_acceleration.x,
-                                       msg->linear_acceleration.y,
-                                       msg->linear_acceleration.z);
+    bno_emulator.setLinearAcceleration(
+            msg->linear_acceleration.x + accel_error(generator),
+            msg->linear_acceleration.y + accel_error(generator),
+            msg->linear_acceleration.z + accel_error(generator));
 }
 
 int main(int argc, char **argv)
@@ -314,6 +338,8 @@ int main(int argc, char **argv)
         ("real/orientation", 1, 0, "rate/imu");
     euler_pub = ThrottledPublisher<robosub::Euler>
         ("real/pretty/orientation", 1, 0, "rate/simulator/euler");
+    depth_real_pub = ThrottledPublisher<robosub::Float32Stamped>
+        ("real/depth", 1, 0, "simulator/bridge_rates/depth");
     depth_pub = ThrottledPublisher<robosub::Float32Stamped>
         ("depth", 1, 0, "rate/depth");
     obstacle_pos_pub = ThrottledPublisher<robosub::ObstaclePosArray>
@@ -345,6 +371,35 @@ int main(int argc, char **argv)
     {
         ROS_WARN_STREAM("failed to load obstacle names");
     }
+
+    /*
+     * Load all sensor standard deviations for gaussian noise.
+     */
+    if (!nh.getParam("simulator/sensor_deviation/imu", imu_deviation))
+    {
+        ROS_WARN("Failed to load IMU deviation. Defaulting to zero.");
+        imu_deviation = 0;
+    }
+
+    if (!nh.getParam("simulator/sensor_deviation/depth", depth_deviation))
+    {
+        ROS_WARN("Failed to load depth deviation. Defaulting to zero.");
+        depth_deviation = 0;
+    }
+
+    if (!nh.getParam("simulator/sensor_deviation/accel", accel_deviation))
+    {
+        ROS_WARN("Failed to load accelerometer deviation. Defaulting to zero.");
+        accel_deviation = 0;
+    }
+
+    /*
+     * Note that the IMU deviation is in degrees but the error distribution
+     * should be represented in radians.
+     */
+    depth_error = normal_distribution<double>(0, depth_deviation);
+    imu_error = normal_distribution<double>(0, imu_deviation / _180_OVER_PI);
+    accel_error = normal_distribution<double>(0, accel_deviation);
 
     // I use spinOnce and sleeps here because the simulator publishes
     // at a very high rate and we don't need every message.
