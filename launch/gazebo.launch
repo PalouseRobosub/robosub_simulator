@@ -1,28 +1,31 @@
+<?xml version='1.0' ?>
+
 <launch>
-<rosparam command="load" file="$(find robosub)/param/cobalt.yaml"/>
-<rosparam command="load" file="$(find robosub_simulator)/param/cobalt_sim.yaml"/>
-<rosparam command="load" file="$(find robosub_simulator)/param/obstacles.yaml"/>
-<rosparam command="load" file="$(find robosub_simulator)/param/simulator.yaml"/>
-<arg name="world"  default="transdec"/>
-<arg name="gui"  default="true"/>
-<arg name="minimal"  default="false"/>
-<include file="$(find gazebo_ros)/launch/empty_world.launch">
-   <arg name="use_sim_time" value="true"/>
-   <arg name="debug" value="false"/>
-   <arg name="gui" value="$(arg gui)" />
-   <arg name="verbose" value="true"/>
-   <arg name="world_name" value="$(find robosub_simulator)/worlds/$(arg world).world"/>
-</include>
+    <rosparam command="load" file="$(find robosub)/param/cobalt.yaml"/>
+    <rosparam command="load" file="$(find robosub_simulator)/param/cobalt_sim.yaml"/>
+    <rosparam command="load" file="$(find robosub_simulator)/param/obstacles.yaml"/>
+    <rosparam command="load" file="$(find robosub_simulator)/param/simulator.yaml"/>
+    
+    <arg name="world"  default="transdec"/>
+    <arg name="gui"  default="true"/>
+    <arg name="minimal"  default="false"/>
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="use_sim_time" value="true"/>
+        <arg name="debug" value="false"/>
+        <arg name="gui" value="$(arg gui)" />
+        <arg name="verbose" value="true"/>
+        <arg name="world_name" value="$(find robosub_simulator)/worlds/$(arg world).world"/>
+    </include>
 
-<node name="virtual_serial_port_thruster" pkg="robosub_simulator" type="create_thruster_vsp.sh" />
-<node name="virtual_serial_port_sensor" pkg="robosub_simulator" type="create_sensor_vsp.sh" />
-<node name="simulator_bridge" pkg="robosub_simulator" type="simulator_bridge" required="true" />
+    <node name="virtual_serial_port_thruster" pkg="robosub_simulator" type="create_thruster_vsp.sh" />
+    <node name="virtual_serial_port_sensor" pkg="robosub_simulator" type="create_sensor_vsp.sh" />
+    <node name="simulator_bridge" pkg="robosub_simulator" type="simulator_bridge" required="true" />
 
-<!-- launch basic sub software, unless we are just running the minimal simulator-->
-<group unless="$(arg minimal)">
-<node name="control" pkg="robosub" type="control" />
-<node name="thruster" pkg="robosub" type="delayed_node.sh" args="2 thruster_maestro"/>
-<node name="imu" pkg="robosub" type="delayed_node.sh" args="2 bno055_sensor"/>
-</group>
+    <!-- launch basic sub software, unless we are just running the minimal simulator-->
+    <group unless="$(arg minimal)">
+        <node name="control" pkg="robosub" type="control" />
+        <node name="thruster" pkg="robosub" type="delayed_node.sh" args="2 thruster_maestro"/>
+        <node name="imu" pkg="robosub" type="delayed_node.sh" args="2 bno055_sensor"/>
+    </group>
 
 </launch>

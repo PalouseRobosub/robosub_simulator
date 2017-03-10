@@ -289,10 +289,12 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
 
     obstacle_pos_pub.publish(object_array);
 
+    /* Commented out as unsure if necessary for rebase */
     /*
      * Additionally, publish the submarine's position with respect to the
      * pinger for validating hydrophone trilateration.
      */
+    /*
     position_msg.x = msg.pose[sub_index].position.x -
             msg.pose[pinger_index].position.x;
     position_msg.y = msg.pose[sub_index].position.y -
@@ -301,6 +303,7 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
             msg.pose[pinger_index].position.z;
 
     hydrophone_position_pub.publish(position_msg);
+    */
 
     /*
      * Update the current POSE to the UWSim topic. Beware the UWSim treats
@@ -397,28 +400,14 @@ int main(int argc, char **argv)
     srand(time(NULL));
     */
 
-    uwsim_pub = nh.advertise<geometry_msgs::Pose>("/gazebo/Cobalt/pose", 1);
+    uwsim_pub = ThrottledPublisher<geometry_msgs::Pose>
+        ("/gazebo/Cobalt/pose", 1, 0, "simulator/bridge_rates/uwsim");
 
     ros::Subscriber orient_sub = nh.subscribe("gazebo/model_states", 1,
             modelStatesCallback);
 
     ros::Subscriber link_sub = nh.subscribe("gazebo/link_states", 1,
             linkStatesCallback);
-    float pinger_rate;
-    if (!nh.getParamCached("hydrophones/pinger/rate", pinger_rate))
-    {
-        pinger_rate = 50;
-    }
-    if (!nh.getParamCached("hydrophones/pinger/frequency", pinger_frequency))
-    {
-        ROS_ERROR_STREAM("Failed to load pinger frequency.");
-        return -1;
-    }
-
-    hydrophone_deltas_pub = new
-            rs::ThrottledPublisher<robosub::HydrophoneDeltas> (
-                "hydrophone/30khz/delta", 1, pinger_rate);
-
 
     ros::Subscriber imu_sub = nh.subscribe("gazebo/rs_imu", 1,
             imuCallback);

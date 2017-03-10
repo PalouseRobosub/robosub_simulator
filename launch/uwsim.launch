@@ -1,31 +1,24 @@
 <?xml version="1.0"?>
 <launch>
-    <rosparam command="load" file="$(find robosub)/param/cobalt.yaml"/>
-    <rosparam command="load" file="$(find robosub_simulator)/param/obstacles.yaml"/>
-
-    <!-- Arguments -->
-    <arg name="world_file"  default="$(find robosub_simulator)/worlds/underwater.world"/>
-    <arg name="gui"  default="false"/>
+    <arg name="world" default="transdec"/>
+    <arg name="gazebo_gui" default="false"/>
+    <arg name="minimal" default="false"/>
     <arg name="shaders" default="true"/>
-    <arg name="disableShaders" default="" if="$(arg shaders)"/>
-    <arg name="disableShaders" default="--disableShaders" unless="$(arg shaders)"/>
 
+    <arg name="disableShaders" value="" if="$(arg shaders)"/>
+    <arg name="disableShaders" value="--disableShaders" unless="$(arg shaders)"/>
+   
     <group>
-        <!-- launch uwsim -->
-        <node name="uwsim" pkg="uwsim" type="uwsim"
-            args="$(arg disableShaders) --configfile $(find robosub_simulator)/worlds/uwsim_world.xml --dataPath $(find robosub_simulator)" />
-
-        <!-- Launch Gazebo without the GUI. -->
-        <include file="$(find gazebo_ros)/launch/empty_world.launch">
-            <arg name="gui" value="$(arg gui)" />
-            <arg name="world_name" value="$(arg world_file)" />
-            <arg name="use_sim_time" value="true"/>
-            <arg name="debug" value="false"/>
-            <arg name="verbose" value="true"/>
+        <include file="$(find robosub_simulator)/launch/gazebo.launch">
+            <arg name="world" value="$(arg world)"/>
+            <arg name="gui" value="$(arg gazebo_gui)"/>
+            <arg name="minimal" value="$(arg minimal)"/>
         </include>
 
-        <!-- Spawn the robosub and start the simulator bridge. -->
-        <node name="spawn_robosub" pkg="robosub_simulator" type="spawn_robosub.sh"/>
-        <node name="simulator_bridge" pkg="robosub_simulator" type="simulator_bridge" required="false"/>
+        <!-- launch uwsim -->
+        <node name="uwsim" pkg="uwsim" type="uwsim"
+            args="$(arg disableShaders) --configfile worlds/uwsim_world.xml
+                  --dataPath $(find robosub_simulator)"
+            output="screen" required="true"/>
     </group>
 </launch>

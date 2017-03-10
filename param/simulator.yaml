@@ -12,6 +12,7 @@ simulator:
         obstacle_pos: 1.0
         hydrophone_deltas: 10.0
         lin_accel: 20.0
+        uwsim: 30.0
     ports:
         simulated_thruster: "/dev/null"
         simulated_sensor: "/dev/null"
