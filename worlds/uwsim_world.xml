@@ -84,6 +84,42 @@
       <p>0</p>
       <y>0</y>
     </orientation>
+
+    <virtualCamera>
+        <name>LeftCam</name>
+        <relativeTo>left_camera</relativeTo>
+        <resw>640</resw>
+        <resh>640</resh>
+        <position>
+            <x>0</x>
+            <y>0</y>
+            <z>0</z>
+        </position>
+        <orientation>
+            <r>0</r>
+            <p>0</p>
+            <y>0</y>
+        </orientation>
+        <fovy>100</fovy>
+    </virtualCamera>
+
+    <virtualCamera>
+        <name>RightCam</name>
+        <relativeTo>right_camera</relativeTo>
+        <resw>640</resw>
+        <resh>640</resh>
+        <position>
+            <x>0</x>
+            <y>0</y>
+            <z>0</z>
+        </position>
+        <orientation>
+            <r>0</r>
+            <p>0</p>
+            <y>0</y>
+        </orientation>
+        <fovy>100</fovy>
+    </virtualCamera>
   </vehicle>
 
   <object>
@@ -116,6 +152,20 @@
   </object>
 
   <rosInterfaces>
+    <VirtualCameraToROSImage>
+        <cameraName>LeftCam</cameraName>
+        <imageTopic>camera/leftTest</imageTopic>
+        <infoTopic>camera/leftTest/infoIgnore</infoTopic>
+        <rate>5</rate>
+    </VirtualCameraToROSImage>
+
+    <VirtualCameraToROSImage>
+        <cameraName>RightCam</cameraName>
+        <imageTopic>camera/rightTest</imageTopic>
+        <infoTopic>camera/rightTest/infoIgnore</infoTopic>
+        <rate>5</rate>
+    </VirtualCameraToROSImage>
+
     <ROSPoseToPAT>
       <topic> /gazebo/Cobalt/pose</topic>
       <vehicleName> cobalt </vehicleName>
