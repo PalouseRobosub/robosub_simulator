@@ -748,7 +748,7 @@
       <gaussianNoise>0.0</gaussianNoise>
       <updateRate>20.0</updateRate>
     </plugin>
-   <!-- <plugin name="marker_dropper" filename="libmarkerdrop.so"/> -->
+   <plugin name="marker_dropper" filename="libmarkerdrop.so"/>
   </model>
 </sdf>
 
