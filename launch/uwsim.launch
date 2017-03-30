@@ -17,8 +17,8 @@
 
         <!-- launch uwsim -->
         <node name="uwsim" pkg="uwsim" type="uwsim"
-            args="$(arg disableShaders) --configfile worlds/uwsim_world.xml
-                  --dataPath $(find robosub_simulator)"
+            args="$(arg disableShaders) --dataPath $(find robosub_simulator)
+                                        --configfile worlds/uwsim_world.xml"
             output="screen" required="true"/>
     </group>
 </launch>

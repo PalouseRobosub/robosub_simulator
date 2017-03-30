@@ -120,6 +120,24 @@
         </orientation>
         <fovy>100</fovy>
     </virtualCamera>
+
+    <virtualCamera>
+        <name>BottomCam</name>
+        <relativeTo>bottom_camera</relativeTo>
+        <resw>640</resw>
+        <resh>640</resh>
+        <position>
+            <x>0</x>
+            <y>0</y>
+            <z>0</z>
+        </position>
+        <orientation>
+            <r>0</r>
+            <p>0</p>
+            <y>0</y>
+        </orientation>
+        <fovy>100</fovy>
+    </virtualCamera>
   </vehicle>
 
   <object>
@@ -151,6 +169,209 @@
     </physics>
   </object>
 
+  <object>
+    <name>gate</name>
+    <file>models/gate/Gate.3ds</file>
+    <position>
+      <x> 13</x>
+      <y> 25 </y>
+      <z> 0 </z>
+    </position>
+    <orientation>
+      <r>3.14159265358979</r>
+      <p>0</p>
+      <y>0</y>
+    </orientation>
+    <offsetp>
+      <x>0</x>
+      <y>0</y>
+      <z>0</z>
+    </offsetp>
+    <offsetr>
+      <x> 0</x>
+      <y> 0</y>
+      <z>.45</z>
+    </offsetr>
+    <physics>
+      <mass> 0 </mass>
+      <collisionShapeType> trimesh </collisionShapeType>
+    </physics>
+  </object>
+
+  <object>
+    <name>buoys</name>
+    <file>models/buoys/Buoys.3ds</file>
+    <position>
+      <x> 20</x>
+      <y> 20 </y>
+      <z> 4 </z>
+    </position>
+    <orientation>
+      <r>3.14159265358979</r>
+      <p>0</p>
+      <y>0</y>
+    </orientation>
+    <offsetp>
+      <x>0</x>
+      <y>0</y>
+      <z>0</z>
+    </offsetp>
+    <offsetr>
+      <x> 0</x>
+      <y> 0</y>
+      <z>-.8</z>
+    </offsetr>
+    <physics>
+      <mass> 0 </mass>
+      <collisionShapeType> trimesh </collisionShapeType>
+    </physics>
+  </object>
+
+  <object>
+    <name>navigation_channel</name>
+    <file>models/navigation_channel/NavChannel.3ds</file>
+    <position>
+      <x> 25</x>
+      <y> 15 </y>
+      <z> 4 </z>
+    </position>
+    <orientation>
+      <r>3.14159265358979</r>
+      <p>0</p>
+      <y>0</y>
+    </orientation>
+    <offsetp>
+      <x>0</x>
+      <y>0</y>
+      <z>0</z>
+    </offsetp>
+    <offsetr>
+      <x> 0</x>
+      <y> 0</y>
+      <z> .6</z>
+    </offsetr>
+    <physics>
+      <mass> 0 </mass>
+      <collisionShapeType> trimesh </collisionShapeType>
+    </physics>
+  </object>
+
+  <object>
+    <name>bin1</name>
+    <file>models/bins/Bin.3ds</file>
+    <position>
+      <x> 30</x>
+      <y> 5</y>
+      <z> 4 </z>
+    </position>
+    <orientation>
+      <r>3.14159265358979</r>
+      <p>0</p>
+      <y>0</y>
+    </orientation>
+    <offsetp>
+      <x>0</x>
+      <y>0</y>
+      <z>0</z>
+    </offsetp>
+    <offsetr>
+      <x> 0</x>
+      <y> 0</y>
+      <z> 0</z>
+    </offsetr>
+    <physics>
+      <mass> 0 </mass>
+      <collisionShapeType> trimesh </collisionShapeType>
+    </physics>
+  </object>
+
+  <object>
+    <name>bin1cover</name>
+    <file>models/bin_cover/BinCover.3ds</file>
+    <position>
+      <x> 30</x>
+      <y> 5</y>
+      <z> 3 </z>
+    </position>
+    <orientation>
+      <r>3.14159265358979</r>
+      <p>0</p>
+      <y>0</y>
+    </orientation>
+    <offsetp>
+      <x>0</x>
+      <y>0</y>
+      <z>0</z>
+    </offsetp>
+    <offsetr>
+      <x> 0</x>
+      <y> 0</y>
+      <z> 0</z>
+    </offsetr>
+    <physics>
+      <mass> 0 </mass>
+      <collisionShapeType> trimesh </collisionShapeType>
+    </physics>
+  </object>
+
+  <object>
+    <name>torpedo_target</name>
+    <file>models/torpedo_target/TorpedoTarget.3ds</file>
+    <position>
+      <x> 31</x>
+      <y> 5</y>
+      <z> 2 </z>
+    </position>
+    <orientation>
+      <r>3.14159265358979</r>
+      <p>0</p>
+      <y>0</y>
+    </orientation>
+    <offsetp>
+      <x>0</x>
+      <y>0</y>
+      <z>0</z>
+    </offsetp>
+    <offsetr>
+      <x> 0</x>
+      <y> 0</y>
+      <z> 1.575</z>
+    </offsetr>
+    <physics>
+      <mass> 0 </mass>
+      <collisionShapeType> trimesh </collisionShapeType>
+    </physics>
+  </object>
+
+  <object>
+    <name>octagon</name>
+    <file>models/octagon/Octagon.3ds</file>
+    <position>
+      <x> 35</x>
+      <y> 10 </y>
+      <z> 0 </z>
+    </position>
+    <orientation>
+      <r>3.14159265358979</r>
+      <p>0</p>
+      <y>0</y>
+    </orientation>
+    <offsetp>
+      <x>0</x>
+      <y>0</y>
+      <z>0</z>
+    </offsetp>
+    <offsetr>
+      <x> 0</x>
+      <y> 0</y>
+      <z> 0</z>
+    </offsetr>
+    <physics>
+      <mass> 0 </mass>
+      <collisionShapeType> trimesh </collisionShapeType>
+    </physics>
+  </object>
+
   <rosInterfaces>
     <VirtualCameraToROSImage>
         <cameraName>LeftCam</cameraName>
@@ -166,10 +387,18 @@
         <rate>5</rate>
     </VirtualCameraToROSImage>
 
+    <VirtualCameraToROSImage>
+        <cameraName>BottomCam</cameraName>
+        <imageTopic>camera/bottomTest</imageTopic>
+        <infoTopic>camera/bottomTest/infoIgnore</infoTopic>
+        <rate>5</rate>
+    </VirtualCameraToROSImage>
+
     <ROSPoseToPAT>
       <topic> /gazebo/Cobalt/pose</topic>
       <vehicleName> cobalt </vehicleName>
     </ROSPoseToPAT>
+
   </rosInterfaces>
 </UWSimScene>
 
