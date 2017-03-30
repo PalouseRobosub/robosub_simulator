@@ -6,6 +6,22 @@ namespace gazebo
 bool MarkerDropper::drop(std_srvs::Empty::Request  &req,
    	 std_srvs::Empty::Response &res)
 {
+	
+	world->InsertModelFile("model://marker");
+
+	// Sleep here maybe
+
+	physics::ModelPtr marker = world->GetModel("marker");
+
+	//Check if the marker is NULL at some point!
+
+	math::Pose sub_position = sub->GetWorldPose();
+
+	ROS_INFO("<%f, %f, %f>", sub_position.pos.x, sub_position.pos.y, sub_position.pos.z);
+
+	sub_position.pos.z -= 1;
+	marker->SetWorldPose(sub_position);
+	
 	ROS_INFO("Marker Dropped!");
 	return true;
 }
@@ -75,11 +91,7 @@ void MarkerDropper::Load(physics::ModelPtr _parent, sdf::ElementPtr)
 
 void MarkerDropper::Update()
 {
-    static const double timeout = 0.001;
-    while (nh->ok())
-    {
-        service_callback_queue.callAvailable(ros::WallDuration(timeout));
-    }
+    service_callback_queue.callAvailable();
 }
 
 
