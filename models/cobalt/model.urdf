@@ -14,7 +14,7 @@
     <joint name="baselink_to_leftcam" type="fixed">
         <parent link="base_link"/>
         <child link="left_camera"/>
-        <origin rpy="-1.57079632679 0 1.57079632679" xyz="0.37 0.20 0.04"/>
+        <origin rpy="-1.57079632679 0 1.57079632679" xyz="0.37 -0.20 0.04"/>
     </joint>
 
     <link name="right_camera">
@@ -23,7 +23,7 @@
     <joint name="baselink_to_rightcam" type="fixed">
         <parent link="base_link"/>
         <child link="right_camera"/>
-        <origin rpy="-1.57079632679 0 1.57079632679" xyz="0.37 -0.20 0.04"/>
+        <origin rpy="-1.57079632679 0 1.57079632679" xyz="0.37 0.20 0.28"/>
     </joint>
 
     <link name="bottom_camera">
@@ -32,6 +32,6 @@
     <joint name="baselink_to_bottomcam" type="fixed">
         <parent link="base_link"/>
         <child link="bottom_camera"/>
-        <origin rpy="-1.57079632679 0 1.57079632679" xyz="0.37 -0.20 0.04"/>
+        <origin rpy="-1.57079632679 0 1.57079632679" xyz="0 0 0.1"/>
     </joint>
 </robot>
