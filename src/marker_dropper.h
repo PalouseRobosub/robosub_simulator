@@ -31,8 +31,6 @@ class MarkerDropper : public ModelPlugin
 	bool drop(std_srvs::Empty::Request  &req,
         	 std_srvs::Empty::Response &res);
 
-	
-
   public: 
 	MarkerDropper() {}
 	~MarkerDropper() {}
