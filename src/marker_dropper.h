@@ -20,23 +20,23 @@ namespace gazebo
 class MarkerDropper : public ModelPlugin
 {
   private:
-	event::ConnectionPtr updateConnection;
-    	ros::NodeHandle *nh;
-    	ros::Publisher pub;
-    	ros::CallbackQueue service_callback_queue;
-    	ros::ServiceServer service_server;
-	physics::ModelPtr sub;
-	physics::WorldPtr world;
+    event::ConnectionPtr updateConnection;
+    ros::NodeHandle *nh;
+    ros::Publisher pub;
+    ros::CallbackQueue service_callback_queue;
+    ros::ServiceServer service_server;
+    physics::ModelPtr sub;
+    physics::WorldPtr world;
 
-	bool drop(std_srvs::Empty::Request  &req,
-        	 std_srvs::Empty::Response &res);
+    bool drop(std_srvs::Empty::Request  &req,
+             std_srvs::Empty::Response &res);
 
   public: 
-	MarkerDropper() {}
-	~MarkerDropper() {}
-	
-	void Load(physics::ModelPtr _parent, sdf::ElementPtr);
-	void Update();
+    MarkerDropper() {}
+    ~MarkerDropper() {}
+    
+    void Load(physics::ModelPtr _parent, sdf::ElementPtr);
+    void Update();
 
 };
 }

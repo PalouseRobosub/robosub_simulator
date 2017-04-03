@@ -10,13 +10,13 @@ add_library(sensor SHARED bno055_emulator.cpp)
 add_dependencies(sensor ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(sensor ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} serial)
 
+# Plugin for the Marker Dropper
+add_library(markerdrop SHARED marker_dropper.cpp)
+add_dependencies(markerdrop ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(markerdrop ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
+
 #simulator bridge
 add_executable(simulator_bridge simulator_bridge.cpp)
 add_dependencies(simulator_bridge ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 target_link_libraries(simulator_bridge sensor ${catkin_LIBRARIES})
-
-add_library(markerdrop SHARED marker_dropper.cpp)
-add_dependencies(markerdrop ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(markerdrop ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
-

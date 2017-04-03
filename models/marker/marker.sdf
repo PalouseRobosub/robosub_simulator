@@ -7,7 +7,7 @@
 
     <link name='marker'>
       <pose> 0 0 0 0 0 0</pose>
- 	<inertial>
+     <inertial>
         <mass>0.05</mass>
         </inertial>
       <visual name='marker_vis'>
@@ -27,15 +27,12 @@
         </geometry>
       </collision>
     </link>
-   
     <plugin name="buoyancy_improved" filename="libbuoyancy_improved.so">
       <fluid_density>1000</fluid_density>
       <link name="marker">
         <volume>0.00003351</volume>
       </link>
     </plugin>
-
-
 
   </model>
 </sdf>
