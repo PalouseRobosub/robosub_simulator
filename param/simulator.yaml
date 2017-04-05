@@ -1,19 +1,20 @@
 # This file is for general simulator params
 rate:
-    # The rate at which the simulator bridge runs, this must be faster
-    #  than any rates used for topics published by the simulator
-    #  such as control, depth, sensor, etc. (see cobalt_sim.yaml)
-    simulator_bridge: 30
+    simulator:
+        # The rate at which the simulator bridge runs, this must be faster
+        #  than any rates used for topics published by the simulator
+        #  such as control, depth, sensor in cobalt_sim.yaml and
+        #  any rate parameters below
+        simulator_bridge: 30
+        position: 10
+        euler: 20
+        obstacle_pos: 1
+        hydrophone_deltas: 10
+        lin_accel: 20
 
 simulator:
     visualize_thrusters: true
     visualizer_update_rate: 10
-    bridge_rates:
-        position: 10.0
-        euler: 20.0
-        obstacle_pos: 1.0
-        hydrophone_deltas: 10.0
-        lin_accel: 20.0
     ports:
         simulated_thruster: "/dev/null"
         simulated_sensor: "/dev/null"
