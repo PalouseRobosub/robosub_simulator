@@ -309,20 +309,19 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
 
     position_pub = ThrottledPublisher<geometry_msgs::Vector3>
-        ("real/position", 1, 0, "simulator/bridge_rates/position");
+        ("real/position", 1, 0, "rate/simulator/position");
     orientation_pub = ThrottledPublisher<robosub::QuaternionStampedAccuracy>
         ("real/orientation", 1, 0, "rate/sensor");
     euler_pub = ThrottledPublisher<robosub::Euler>
-        ("real/pretty/orientation", 1, 0, "simulator/bridge_rates/euler");
+        ("real/pretty/orientation", 1, 0, "rate/simulator/euler");
     depth_pub = ThrottledPublisher<robosub::Float32Stamped>
         ("depth", 1, 0, "rate/depth");
     obstacle_pos_pub = ThrottledPublisher<robosub::ObstaclePosArray>
-        ("obstacles/positions", 1, 0, "simulator/bridge_rates/obstacle_pos");
+        ("obstacles/positions", 1, 0, "rate/simulator/obstacle_pos");
     hydrophone_deltas_pub = ThrottledPublisher<robosub::HydrophoneDeltas>
-        ("hydrophones/30khz/delta", 1, 0,
-         "simulator/bridge_rates/hydrophone_deltas");
+        ("hydrophones/30khz/delta", 1, 0, "rate/simulator/hydrophone_deltas");
     lin_accel_pub = ThrottledPublisher<geometry_msgs::Vector3Stamped>
-        ("real/acceleration/linear", 1, 0, "simulator/bridge_rates/lin_accel");
+        ("real/acceleration/linear", 1, 0, "rate/simulator/lin_accel");
 
     ros::Subscriber orient_sub = nh.subscribe("gazebo/model_states", 1,
             modelStatesCallback);
@@ -334,7 +333,7 @@ int main(int argc, char **argv)
             imuCallback);
 
     double rate;
-    if(!nh.getParam("rate/simulator_bridge", rate))
+    if(!nh.getParam("rate/simulator/simulator_bridge", rate))
     {
         ROS_ERROR_STREAM("failed to load max simulator bridge rate");
         return 0;
