@@ -1,7 +1,11 @@
 # this settings file should be loaded after cobalt.yaml is loaded, is designed
 # for overwritting settings that should be different in the simulator
+rate:
+    control: 50
+    depth: 20
+    sensor: 20
+
 control:
-    rate: 50
     proportional:
         x: 1.0
         y: 1.0
@@ -42,3 +46,5 @@ control:
         translation: 0.5
     buoyancy_offset: -2.5
 
+thrusters:
+    timeout: 0.5
