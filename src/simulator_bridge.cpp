@@ -311,11 +311,11 @@ int main(int argc, char **argv)
     position_pub = ThrottledPublisher<geometry_msgs::Vector3>
         ("real/position", 1, 0, "simulator/bridge_rates/position");
     orientation_pub = ThrottledPublisher<robosub::QuaternionStampedAccuracy>
-        ("real/orientation", 1, 0, "simulator/bridge_rates/orientation");
+        ("real/orientation", 1, 0, "rate/sensor");
     euler_pub = ThrottledPublisher<robosub::Euler>
         ("real/pretty/orientation", 1, 0, "simulator/bridge_rates/euler");
     depth_pub = ThrottledPublisher<robosub::Float32Stamped>
-        ("depth", 1, 0, "simulator/bridge_rates/depth");
+        ("depth", 1, 0, "rate/depth");
     obstacle_pos_pub = ThrottledPublisher<robosub::ObstaclePosArray>
         ("obstacles/positions", 1, 0, "simulator/bridge_rates/obstacle_pos");
     hydrophone_deltas_pub = ThrottledPublisher<robosub::HydrophoneDeltas>
@@ -334,7 +334,7 @@ int main(int argc, char **argv)
             imuCallback);
 
     double rate;
-    if(!nh.getParam("simulator/bridge_rates/max", rate))
+    if(!nh.getParam("rate/simulator_bridge", rate))
     {
         ROS_ERROR_STREAM("failed to load max simulator bridge rate");
         return 0;
