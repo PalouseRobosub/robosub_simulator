@@ -1,3 +1,6 @@
+#ifndef MARKER_DROPPER_H
+#define MARKER_DROPPER_H
+
 #include <ignition/math/Pose3.hh>
 
 #include <boost/bind.hpp>
@@ -28,15 +31,13 @@ class MarkerDropper : public ModelPlugin
     physics::ModelPtr sub;
     physics::WorldPtr world;
 
-    bool drop(std_srvs::Empty::Request  &req,
-             std_srvs::Empty::Response &res);
+    bool drop(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &res);
 
-  public: 
+  public:
     MarkerDropper() {}
     ~MarkerDropper() {}
-    
     void Load(physics::ModelPtr _parent, sdf::ElementPtr);
     void Update();
-
 };
 }
+#endif // MARKER_DROPPER_H
