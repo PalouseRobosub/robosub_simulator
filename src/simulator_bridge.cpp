@@ -311,7 +311,7 @@ int main(int argc, char **argv)
     position_pub = ThrottledPublisher<geometry_msgs::Vector3>
         ("real/position", 1, 0, "rate/simulator/position");
     orientation_pub = ThrottledPublisher<robosub::QuaternionStampedAccuracy>
-        ("real/orientation", 1, 0, "rate/sensor");
+        ("real/orientation", 1, 0, "rate/imu");
     euler_pub = ThrottledPublisher<robosub::Euler>
         ("real/pretty/orientation", 1, 0, "rate/simulator/euler");
     depth_pub = ThrottledPublisher<robosub::Float32Stamped>
