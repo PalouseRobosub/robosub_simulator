@@ -50,8 +50,8 @@ void MarkerDropper::Load(physics::ModelPtr _parent, sdf::ElementPtr)
     world->InsertModelFile("model://marker");
     ros::AdvertiseServiceOptions drop_marker_aso =
         ros::AdvertiseServiceOptions::create<std_srvs::Empty>("drop_marker",
-        boost::bind(&MarkerDropper::drop, this, _1, _2),
-        ros::VoidPtr(), &service_callback_queue);
+                            boost::bind(&MarkerDropper::drop, this, _1, _2),
+                            ros::VoidPtr(), &service_callback_queue);
 
     service_server = nh->advertiseService(drop_marker_aso);
 
