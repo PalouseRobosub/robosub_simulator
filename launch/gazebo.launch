@@ -15,16 +15,16 @@
    <arg name="world_name" value="$(find robosub_simulator)/worlds/$(arg world).world"/>
 </include>
 
-<node name="virtual_serial_port_thruster" pkg="robosub_simulator" type="create_thruster_vsp.sh" />
 <node name="virtual_serial_port_sensor" pkg="robosub_simulator" type="create_sensor_vsp.sh" />
+<node name="virtual_serial_port_thruster" pkg="robosub_simulator" type="create_thruster_vsp.sh" />
 <node name="simulator_bridge" pkg="robosub_simulator" type="simulator_bridge" required="true" />
 
 <!-- launch basic sub software, unless we are just running the minimal simulator-->
 <group unless="$(arg minimal)">
 <node name="control" pkg="robosub" type="control" />
-<node name="thruster" pkg="robosub" type="delayed_node.sh" args="2 thruster_maestro"/>
-<node name="imu" pkg="robosub" type="delayed_node.sh" args="2 bno055_sensor"/>
-<node name="hydrophones" pkg="robosub" type="delayed_node.sh" args="2 hydrophones"/>
+<node name="thruster" pkg="robosub" type="delayed_node.sh" args="3 thruster_maestro"/>
+<node name="imu" pkg="robosub" type="delayed_node.sh" args="3 bno055_sensor"/>
+<node name="hydrophones" pkg="robosub" type="delayed_node.sh" args="3 hydrophones"/>
 </group>
 
 </launch>
