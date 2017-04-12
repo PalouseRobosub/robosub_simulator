@@ -343,7 +343,7 @@ void Bno055Emulator::setLinearAcceleration(double x, double y, double z)
      * A value of zero in bit position zero of the unit selection register
      * indicates units are m/s^2.
      */
-    if (!(_registers[0][static_cast<uint8_t>(Register::UNIT_SEL)] & 1 << 0))
+    if (!(_registers[0][static_cast<uint8_t>(Register::UNIT_SEL)] & (1 << 0)))
     {
         /*
          * Each m/s^2 is represented by 100 LSB according to section 3.6.1 of
