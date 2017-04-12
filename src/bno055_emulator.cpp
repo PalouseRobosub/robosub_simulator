@@ -364,18 +364,18 @@ void Bno055Emulator::setLinearAcceleration(double x, double y, double z)
         z_int = static_cast<int16_t>(z);
     }
 
-    _registers[0][static_cast<uint8_t>(Register::LIA_Data_Z_MSB)] = z_int >> 8 &
-        0xFF;
-    _registers[0][static_cast<uint8_t>(Register::LIA_Data_Z_LSB)] = z_int &
-        0xFF;
-    _registers[0][static_cast<uint8_t>(Register::LIA_Data_Y_MSB)] = y_int >> 8 &
-        0xFF;
-    _registers[0][static_cast<uint8_t>(Register::LIA_Data_Y_LSB)] = y_int &
-        0xFF;
-    _registers[0][static_cast<uint8_t>(Register::LIA_Data_X_MSB)] = x_int >> 8 &
-        0xFF;
-    _registers[0][static_cast<uint8_t>(Register::LIA_Data_X_LSB)] = x_int &
-        0xFF;
+    _registers[0][static_cast<uint8_t>(Register::LIA_Data_Z_MSB)] =
+            (z_int >> 8) & 0xFF;
+    _registers[0][static_cast<uint8_t>(Register::LIA_Data_Z_LSB)] =
+            z_int & 0xFF;
+    _registers[0][static_cast<uint8_t>(Register::LIA_Data_Y_MSB)] =
+            (y_int >> 8) & 0xFF;
+    _registers[0][static_cast<uint8_t>(Register::LIA_Data_Y_LSB)] =
+            y_int & 0xFF;
+    _registers[0][static_cast<uint8_t>(Register::LIA_Data_X_MSB)] =
+            (x_int >> 8) & 0xFF;
+    _registers[0][static_cast<uint8_t>(Register::LIA_Data_X_LSB)] =
+                x_int & 0xFF;
 }
 
 /**
