@@ -15,7 +15,7 @@ find_package(catkin REQUIRED
     gazebo_msgs
     std_msgs
     message_generation
-    robosub
+    robosub REQUIRED
 )
 
 find_package(gazebo REQUIRED)
@@ -127,6 +127,7 @@ catkin_package(
 ## Your package locations should be listed before other locations
 link_directories(${GAZEBO_LIBRARY_DIRS})
 include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS} ${SDFormat_INCLUDE_DIRS})
+include_directories(${robosub_SOURCE_DIR})
 #list(APPEND CMAKE_CXX_FLAGS "${GAZEBO_CXX_FLAGS}")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 
