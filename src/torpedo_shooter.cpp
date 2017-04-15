@@ -2,8 +2,8 @@
 
 namespace gazebo
 {
-bool TorpedoShooter::shoot(std_srvs::Empty::Request  &req,
-                         std_srvs::Empty::Response &res)
+bool TorpedoShooter::shoot(std_srvs::Trigger::Request  &req,
+                         std_srvs::Trigger::Response &res)
 {
     // Need to make a torpedo model
     physics::ModelPtr torpedo = world->GetModel("torpedo");
@@ -21,12 +21,14 @@ bool TorpedoShooter::shoot(std_srvs::Empty::Request  &req,
               sub_position.pos.y, sub_position.pos.z);
 
     //This sets the torpedo spawn position relative to the sub
-    sub_position.pos.z -= 0.3;
+    sub_position.pos.x += 0.3;
     // This will be where the sub velocity is added to the marker
     //marker->SetLinearAccel(math::Vector3(0.5,0.5,0.5));
     torpedo->SetWorldPose(sub_position);
 
     ROS_INFO("Torpedo Fired!");
+    res.success = true;
+    res.message = "Torpedoes Away!";
     return true;
 }
 
@@ -50,7 +52,7 @@ void TorpedoShooter::Load(physics::ModelPtr _parent, sdf::ElementPtr)
 
     world->InsertModelFile("model://torpedo");
     ros::AdvertiseServiceOptions shoot_torpedo_aso =
-        ros::AdvertiseServiceOptions::create<std_srvs::Empty>("shoot_torpedo",
+        ros::AdvertiseServiceOptions::create<std_srvs::Trigger>("shoot_torpedo",
         boost::bind(&TorpedoShooter::shoot, this, _1, _2),
         ros::VoidPtr(), &service_callback_queue);
 
