@@ -9,6 +9,7 @@ rate:
         position: 10
         euler: 20
         obstacle_pos: 1
+        depth: 10
         hydrophone_deltas: 10
         lin_accel: 20
 

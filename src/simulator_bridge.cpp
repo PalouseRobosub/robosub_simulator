@@ -339,7 +339,7 @@ int main(int argc, char **argv)
     euler_pub = ThrottledPublisher<robosub::Euler>
         ("real/pretty/orientation", 1, 0, "rate/simulator/euler");
     depth_real_pub = ThrottledPublisher<robosub::Float32Stamped>
-        ("real/depth", 1, 0, "simulator/bridge_rates/depth");
+        ("real/depth", 1, 0, "rate/simulator/depth");
     depth_pub = ThrottledPublisher<robosub::Float32Stamped>
         ("depth", 1, 0, "rate/depth");
     obstacle_pos_pub = ThrottledPublisher<robosub::ObstaclePosArray>
