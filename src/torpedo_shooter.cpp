@@ -2,7 +2,7 @@
 
 namespace gazebo
 {
-bool TorpedoShooter::drop(std_srvs::Empty::Request  &req,
+bool TorpedoShooter::shoot(std_srvs::Empty::Request  &req,
                          std_srvs::Empty::Response &res)
 {
     // Need to make a torpedo model
@@ -49,17 +49,17 @@ void TorpedoShooter::Load(physics::ModelPtr _parent, sdf::ElementPtr)
     nh = new ros::NodeHandle();
 
     world->InsertModelFile("model://torpedo");
-    ros::AdvertiseServiceOptions drop_marker_aso =
+    ros::AdvertiseServiceOptions shoot_torpedo_aso =
         ros::AdvertiseServiceOptions::create<std_srvs::Empty>("shoot_torpedo",
-        boost::bind(&MarkerDropper::drop, this, _1, _2),
+        boost::bind(&TorpedoShooter::shoot, this, _1, _2),
         ros::VoidPtr(), &service_callback_queue);
 
-    service_server = nh->advertiseService(drop_marker_aso);
+    service_server = nh->advertiseService(shoot_torpedo_aso);
 
     ROS_INFO_STREAM(service_server.getService() << " started");
 
     updateConnection = event::Events::ConnectWorldUpdateBegin(
-    boost::bind(&MarkerDropper::Update, this));
+    boost::bind(&TorpedoShooter::Update, this));
 
     ROS_INFO("Torpedo Shooter Plugin loaded");
 }
