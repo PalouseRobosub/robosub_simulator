@@ -14,7 +14,7 @@
 #include <ros/callback_queue.h>
 #include <ros/advertise_options.h>
 #include <std_msgs/String.h>
-#include "std_srvs/Empty.h"
+#include "std_srvs/Trigger.h"
 
 #include <iostream>
 
@@ -31,7 +31,7 @@ class TorpedoShooter : public ModelPlugin
     physics::ModelPtr sub;
     physics::WorldPtr world;
 
-    bool shoot(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &res);
+    bool shoot(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
 
   public:
     TorpedoShooter() {}
