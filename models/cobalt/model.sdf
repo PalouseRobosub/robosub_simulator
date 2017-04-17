@@ -528,8 +528,8 @@
           <camera>
               <horizontal_fov>3.1415</horizontal_fov>
               <image>
-                  <width>640</width>
-                  <height>640</height>
+                  <width>1384</width>
+                  <height>1032</height>
               </image>
               <clip>
                   <near>0.001</near>
@@ -538,9 +538,9 @@
               <lens>
                   <type>custom</type>
                   <custom_function>
-                      <c1>691.5</c1>   
-                      <c2>515.5</c2>     
-                      <f>341.43251966606937</f>    
+                      <c1>685.4</c1>
+                      <c2>525.2</c2>
+                      <f>307.53251966606937</f>
                       <fun>tan</fun>
                   </custom_function>
                   <scale_to_hfov>true</scale_to_hfov>
@@ -597,8 +597,8 @@
           <camera>
               <horizontal_fov>3.1415</horizontal_fov>
               <image>
-                  <width>640</width>
-                  <height>640</height>
+                  <width>1384</width>
+                  <height>1032</height>
               </image>
               <clip>
                   <near>0.1</near>
@@ -607,9 +607,9 @@
               <lens>
                   <type>custom</type>
                   <custom_function>
-                      <c1>691.5</c1>   
-                      <c2>515.5</c2>     
-                      <f>341.43251966606937</f>    
+                      <c1>667.1</c1>
+                      <c2>536.7</c2>
+                      <f>317.86251966606937</f>
                       <fun>tan</fun>
                   </custom_function>
                   <scale_to_hfov>true</scale_to_hfov>
@@ -666,8 +666,8 @@
           <camera>
               <horizontal_fov>3.1415</horizontal_fov>
               <image>
-                  <width>640</width>
-                  <height>640</height>
+                  <width>1384</width>
+                  <height>1032</height>
               </image>
               <clip>
                   <near>0.1</near>
