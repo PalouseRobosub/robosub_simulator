@@ -15,6 +15,11 @@ add_library(markerdrop SHARED marker_dropper.cpp)
 add_dependencies(markerdrop ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(markerdrop ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
 
+# Plugin for the Torpedo Shooter
+add_library(torpedoshoot SHARED torpedo_shooter.cpp)
+add_dependencies(torpedoshoot ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(torpedoshoot ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
+
 #simulator bridge
 add_executable(simulator_bridge simulator_bridge.cpp)
 add_dependencies(simulator_bridge ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
