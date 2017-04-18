@@ -12,8 +12,8 @@
 
     <!-- launch basic sub software, unless we are just running the minimal simulator-->
     <group unless="$(arg minimal)">
-        <node pkg="robosub" name="delayed_imu_launch" type="delayed_launch.sh" args="3 $(find robosub)/launch/imu.launch load:=False" />
-        <node pkg="robosub" name="delayed_thruster_launch" type="delayed_launch.sh" args="3 $(find robosub)/launch/thrusters.launch load:=False" />
+        <node pkg="robosub" name="" type="delayed_launch.sh" args="3 imu.launch load:=False" />
+        <node pkg="robosub" name="delayed_thruster_launch" type="delayed_launch.sh" args="3 thrusters.launch load:=False" />
         <node pkg="robosub" name="delayed_node" type="delayed_node.sh" args="3 control" />
     </group>
 
