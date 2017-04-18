@@ -64,7 +64,7 @@
         <parent>frame</parent>
         <child>bottom_camera</child>
     </joint>
-    
+
     <joint name='hydrophone_h0_frame' type="fixed">
         <parent>frame</parent>
         <child>hydrophone_h0</child>
@@ -676,9 +676,9 @@
               <lens>
                   <type>custom</type>
                   <custom_function>
-                      <c1>691.5</c1>   
-                      <c2>515.5</c2>     
-                      <f>341.43251966606937</f>    
+                      <c1>691.5</c1>
+                      <c2>515.5</c2>
+                      <f>341.43251966606937</f>
                       <fun>tan</fun>
                   </custom_function>
                   <scale_to_hfov>true</scale_to_hfov>
@@ -749,5 +749,6 @@
       <updateRate>20.0</updateRate>
     </plugin>
    <plugin name="marker_dropper" filename="libmarkerdrop.so"/>
+   <plugin name="torpedo_shooter" filename="libtorpedoshoot.so"/>
   </model>
 </sdf>
