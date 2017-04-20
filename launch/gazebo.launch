@@ -2,10 +2,10 @@
 <launch>
 <rosparam command="load" file="$(find robosub_simulator)/param/obstacles.yaml"/>
 <rosparam command="load" file="$(find robosub_simulator)/param/simulator.yaml"/>
-<arg name="world"  default="transdec"/>
-<arg name="gui"  default="true"/>
-<arg name="minimal"  default="false"/>
-<arg name="fast" default="true"/>
+<arg name="world"  default="transdec" doc="String: The name of the world to use. There should be a '.world' file with this name in the 'worlds' directory. Default: transdec"/>
+<arg name="gui"  default="true" doc="Bool: Whether or not to show the gzclient window on launch. Default: true"/>
+<arg name="minimal"  default="false" doc="Bool: If true, none of the core nodes will be launched with the simulator. Default: false"/>
+<arg name="fast" default="true" doc: "Bool: Prevents the vision system from being run to improve performance if true. Default: true"/>
 
 <include file="$(find gazebo_ros)/launch/empty_world.launch">
    <arg name="use_sim_time" value="true"/>
