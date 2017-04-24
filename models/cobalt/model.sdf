@@ -558,7 +558,7 @@
           </camera>
           <plugin name="left_camera_controller" filename="libgazebo_ros_camera.so">
               <cameraName>left</cameraName>
-              <imageTopicName>/camera/left</imageTopicName>
+              <imageTopicName>/camera/left/image_raw</imageTopicName>
           </plugin>
           <always_on>1</always_on>
           <update_rate>5</update_rate>
@@ -627,7 +627,7 @@
           </camera>
           <plugin name="right_camera_controller" filename="libgazebo_ros_camera.so">
               <cameraName>right</cameraName>
-              <imageTopicName>/camera/right</imageTopicName>
+              <imageTopicName>/camera/right/image_raw</imageTopicName>
           </plugin>
           <always_on>1</always_on>
           <update_rate>5</update_rate>
@@ -696,7 +696,7 @@
           </camera>
           <plugin name="bottom_camera_controller" filename="libgazebo_ros_camera.so">
               <cameraName>bottom</cameraName>
-              <imageTopicName>/camera/bottom</imageTopicName>
+              <imageTopicName>/camera/bottom/image_raw</imageTopicName>
           </plugin>
           <always_on>1</always_on>
           <update_rate>5</update_rate>
