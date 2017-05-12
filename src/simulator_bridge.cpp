@@ -7,7 +7,7 @@
 #include "gazebo_msgs/LinkStates.h"
 #include "sensor_msgs/Imu.h"
 #include "robosub/ObstaclePosArray.h"
-#include "robosub/QuaternionStampedAccuracy.h"
+#include "geometry_msgs/QuaternionStamped.h"
 #include "robosub/HydrophoneDeltas.h"
 #include "tf/transform_datatypes.h"
 #include "utility/ThrottledPublisher.hpp"
@@ -29,7 +29,7 @@ static constexpr double _180_OVER_PI = 180.0 / 3.14159;
 Bno055Emulator bno_emulator;
 
 ThrottledPublisher<geometry_msgs::Vector3> position_pub;
-ThrottledPublisher<robosub::QuaternionStampedAccuracy> orientation_pub;
+ThrottledPublisher<geometry_msgs::QuaternionStamped> orientation_pub;
 ThrottledPublisher<robosub::Euler> euler_pub;
 ThrottledPublisher<robosub::Float32Stamped> depth_pub;
 ThrottledPublisher<robosub::ObstaclePosArray> obstacle_pos_pub;
@@ -124,7 +124,7 @@ void linkStatesCallback(const gazebo_msgs::LinkStates &msg)
 void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
 {
     geometry_msgs::Vector3 position_msg;
-    robosub::QuaternionStampedAccuracy orientation_msg;
+    geometry_msgs::QuaternionStamped orientation_msg;
     robosub::Float32Stamped depth_msg;
     robosub::Euler euler_msg;
 
@@ -193,7 +193,6 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
     orientation_msg.quaternion.z = msg.pose[sub_index].orientation.z;
     orientation_msg.quaternion.w = msg.pose[sub_index].orientation.w;
     orientation_msg.header.stamp = ros::Time::now();
-    orientation_msg.accuracy = 1;
 
     tf::Matrix3x3 m(tf::Quaternion(orientation_msg.quaternion.x,
                                    orientation_msg.quaternion.y,
@@ -310,7 +309,7 @@ int main(int argc, char **argv)
 
     position_pub = ThrottledPublisher<geometry_msgs::Vector3>
         ("real/position", 1, 0, "rate/simulator/position");
-    orientation_pub = ThrottledPublisher<robosub::QuaternionStampedAccuracy>
+    orientation_pub = ThrottledPublisher<geometry_msgs::QuaternionStamped>
         ("real/orientation", 1, 0, "rate/imu");
     euler_pub = ThrottledPublisher<robosub::Euler>
         ("real/pretty/orientation", 1, 0, "rate/simulator/euler");
