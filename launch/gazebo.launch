@@ -21,10 +21,13 @@
 
 <!-- launch basic sub software, unless we are just running the minimal simulator-->
 <group unless="$(arg minimal)">
-<node name="control" pkg="robosub" type="control" />
-<node name="thruster" pkg="robosub" type="delayed_node.sh" args="3 thruster_maestro"/>
-<node name="imu" pkg="robosub" type="delayed_node.sh" args="3 bno055_sensor"/>
-<node name="hydrophones" pkg="robosub" type="delayed_node.sh" args="3 hydrophones"/>
+  <node name="control" pkg="robosub" type="control" />
+  <node name="imu" pkg="robosub" type="imu">
+    <param name="active_imu" value="bno055_left"/>
+  </node>
+  <node name="thruster" pkg="robosub" type="delayed_node.sh" args="3 thruster_maestro"/>
+  <node name="bno055_left" pkg="robosub" type="bno055_sensor" launch-prefix="$(find robosub)/scripts/sleepme.sh 3"/>
+  <node name="hydrophones" pkg="robosub" type="delayed_node.sh" args="3 hydrophones"/>
 </group>
 
 </launch>

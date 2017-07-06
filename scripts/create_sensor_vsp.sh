@@ -9,7 +9,7 @@ port_to_sensors="`pwd`/to_sensor_vsp"
 port_from_sensors="`pwd`/from_sensor_vsp"
 
 # Override parameters to the virtual serial ports.
-rosparam set /ports/sensor $port_to_sensors
+rosparam set /ports/bno055_left $port_to_sensors
 rosparam set /simulator/ports/simulated_sensor $port_from_sensors
 
 # loop forever
