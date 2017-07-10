@@ -25,9 +25,9 @@
   <node name="imu" pkg="robosub" type="imu">
     <param name="active_imu" value="bno055_left"/>
   </node>
-  <node name="thruster" pkg="robosub" type="delayed_node.sh" args="3 thruster_maestro"/>
+  <node name="thruster" pkg="robosub" type="thruster_maestro" launch-prefix="$(find robosub)/scripts/sleepme.sh 3"/>
   <node name="bno055_left" pkg="robosub" type="bno055_sensor" launch-prefix="$(find robosub)/scripts/sleepme.sh 3"/>
-  <node name="hydrophones" pkg="robosub" type="delayed_node.sh" args="3 hydrophones"/>
+  <node name="hydrophones" pkg="robosub" type="hydrophones" args="$(find robosub)/scripts/sleepme.sh 3"/>
 </group>
 
 </launch>
