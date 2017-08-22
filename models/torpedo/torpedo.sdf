@@ -8,16 +8,16 @@
     <link name='torpedo'>
       <pose> 0 0 0 0 0 0</pose>
      <inertial>
-        <mass>0.03</mass>
+        <mass>0.0334</mass>
         </inertial>
       <visual name='torpedo_vis'>
         <geometry>
-          <box><size>0.3 0.05 0.05</size></box>
+          <box><size>0.05 0.01 0.01</size></box>
         </geometry>
         <material>
           <script>
             <uri>file://media/materials/scripts/gazebo.material</uri>
-            <name>Gazebo/Grey</name>
+            <name>Gazebo/Orange</name>
           </script>
         </material>
       </visual>
@@ -30,7 +30,6 @@
     <plugin name="buoyancy_improved" filename="libbuoyancy_improved.so">
       <fluid_density>1000</fluid_density>
       <link name="torpedo">
-        <volume>0.00003351</volume>
       </link>
     </plugin>
 

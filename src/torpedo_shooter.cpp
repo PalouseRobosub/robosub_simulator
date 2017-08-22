@@ -27,7 +27,7 @@ bool TorpedoShooter::shoot(std_srvs::Trigger::Request  &req,
     sub_position.pos.z -= 0.3;
     //sub_position.pos.y += 1;
     // This will be where the sub velocity is added to the marker
-    torpedo->SetLinearAccel(math::Vector3(0.0,0.0,0.5));
+    // torpedo->SetLinearAccel(math::Vector3(0.0,0.0,.001));
 
 
     // This is for calculating the direction of the initial velocity of the torpedo
