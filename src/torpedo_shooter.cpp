@@ -20,10 +20,15 @@ bool TorpedoShooter::shoot(std_srvs::Trigger::Request  &req,
     ROS_DEBUG("Current Sub Position x: %f, y: %f, z: %f", sub_position.pos.x,
               sub_position.pos.y, sub_position.pos.z);
 
+    ROS_DEBUG("Current Sub rotation roll: %f, pitch: %f, yaw: %f", sub_position.rot.GetAsEuler().x,
+              sub_position.rot.GetAsEuler().y, sub_position.rot.GetAsEuler().z);
+
     //This sets the torpedo spawn position relative to the sub
-    sub_position.pos.x += 0.3;
+    sub_position.pos.z -= 0.3;
+    //sub_position.pos.y += 1;
     // This will be where the sub velocity is added to the marker
-    //marker->SetLinearAccel(math::Vector3(0.5,0.5,0.5));
+    torpedo->SetLinearAccel(math::Vector3(0.0,0.0,0.8));
+    torpedo->SetLinearVel(math::Vector3(5.0,0.0,0.0));
     torpedo->SetWorldPose(sub_position);
 
     ROS_INFO("Torpedo Fired!");
