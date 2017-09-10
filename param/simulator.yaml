@@ -9,7 +9,7 @@ rate:
         position: 10
         euler: 20
         obstacle_pos: 1
-        hydrophone_deltas: 10
+        hydrophone_deltas: 0.5
         lin_accel: 20
 
 simulator:
