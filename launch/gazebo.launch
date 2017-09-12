@@ -27,7 +27,7 @@
   </node>
   <node name="thruster" pkg="robosub" type="thruster_maestro" launch-prefix="$(find robosub)/scripts/sleepme.sh 3"/>
   <node name="bno055_left" pkg="robosub" type="bno055_sensor" launch-prefix="$(find robosub)/scripts/sleepme.sh 3"/>
-  <node name="hydrophones" pkg="robosub" type="hydrophones" launch-prefix="$(find robosub)/scripts/sleepme.sh 3"/>
+  <node name="pinger_bearing" pkg="robosub" type="pinger_bearing" launch-prefix="$(find robosub)/scripts/sleepme.sh 3"/>
 </group>
 
 </launch>
