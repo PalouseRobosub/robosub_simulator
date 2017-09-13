@@ -105,7 +105,8 @@ void linkStatesCallback(const gazebo_msgs::LinkStates &msg)
      */
     for (unsigned int i = 1; i < hydrophone_time_delays.size(); ++i)
     {
-        hydrophone_time_delays[i] -= hydrophone_time_delays[0];
+        hydrophone_time_delays[i] = hydrophone_time_delays[0] -
+            hydrophone_time_delays[i];
     }
 
     robosub::HydrophoneDeltas deltas;
