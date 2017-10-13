@@ -24,7 +24,7 @@ bool TorpedoShooter::shoot(std_srvs::Trigger::Request  &req,
               sub_position.rot.GetAsEuler().y, sub_position.rot.GetAsEuler().z);
 
     //This sets the torpedo spawn position relative to the sub
-    sub_position.pos.z -= 0.3;
+    sub_position.pos.z -= 0.4;
     //sub_position.pos.y += 1;
     // This will be where the sub velocity is added to the marker
     // torpedo->SetLinearAccel(math::Vector3(0.0,0.0,.001));
