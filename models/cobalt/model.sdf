@@ -566,7 +566,7 @@
     </link>
 
     <link name='right_camera'>
-      <pose>0.37 -0.20 0.04 0 1.57079632679 0</pose>
+      <pose>0.37 -0.20 0.04 0 3.1415926 0</pose>
       <inertial>
         <mass>0.73</mass>
       </inertial>
@@ -593,7 +593,7 @@
         </geometry>
       </collision>
       <sensor name="right" type="wideanglecamera">
-          <pose>0 0 0.14 0 0 0</pose>
+          <pose>0 0 0.14 0 -1.570796 0</pose>
           <camera>
               <horizontal_fov>3.1415</horizontal_fov>
               <image>
