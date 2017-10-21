@@ -593,7 +593,7 @@
         </geometry>
       </collision>
       <sensor name="right" type="wideanglecamera">
-          <pose>0 0 0.14 0 -1.570796 0</pose>
+          <pose>0 0 0.14 0 0 0</pose>
           <camera>
               <horizontal_fov>3.1415</horizontal_fov>
               <image>
