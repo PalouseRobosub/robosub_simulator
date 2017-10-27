@@ -28,7 +28,7 @@ static constexpr double _180_OVER_PI = 180.0 / 3.14159;
 
 Bno055Emulator bno_emulator;
 
-ThrottledPublisher<geometry_msgs::Vector3> position_pub;
+ThrottledPublisher<geometry_msgs::PointStamped> position_pub;
 ThrottledPublisher<geometry_msgs::QuaternionStamped> orientation_pub;
 ThrottledPublisher<robosub::Euler> euler_pub;
 ThrottledPublisher<robosub::Float32Stamped> depth_pub;
@@ -124,7 +124,7 @@ void linkStatesCallback(const gazebo_msgs::LinkStates &msg)
 // well as a list (defined in params) of objects
 void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
 {
-    geometry_msgs::Vector3 position_msg;
+    geometry_msgs::PointStamped position_msg;
     geometry_msgs::QuaternionStamped orientation_msg;
     robosub::Float32Stamped depth_msg;
     robosub::Euler euler_msg;
@@ -182,12 +182,16 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
                      msg.pose[sub_index].position.z);
     depth_msg.header.stamp = ros::Time::now();
 
+    // Construct header for the sub's position
+    position_msg.header.stamp = ros::Time::now();
+    position_msg.header.frame_id = "world";
+
     // Copy sub pos to position msg
-    position_msg.x = msg.pose[sub_index].position.x;
-    position_msg.y = msg.pose[sub_index].position.y;
-    position_msg.z = depth_msg.data;
-    position_msg.x -= pinger_position[0];
-    position_msg.y -= pinger_position[1];
+    position_msg.point.x = msg.pose[sub_index].position.x;
+    position_msg.point.y = msg.pose[sub_index].position.y;
+    position_msg.point.z = depth_msg.data;
+    position_msg.point.x -= pinger_position[0];
+    position_msg.point.y -= pinger_position[1];
 
     orientation_msg.quaternion.x = msg.pose[sub_index].orientation.x;
     orientation_msg.quaternion.y = msg.pose[sub_index].orientation.y;
@@ -308,7 +312,7 @@ int main(int argc, char **argv)
 
     ros::NodeHandle nh;
 
-    position_pub = ThrottledPublisher<geometry_msgs::Vector3>
+    position_pub = ThrottledPublisher<geometry_msgs::PointStamped>
         ("real/position", 1, 0, "rate/simulator/position");
     orientation_pub = ThrottledPublisher<geometry_msgs::QuaternionStamped>
         ("real/orientation", 1, 0, "rate/imu");
