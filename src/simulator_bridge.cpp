@@ -3,6 +3,7 @@
 #include "robosub/Euler.h"
 #include "geometry_msgs/Vector3Stamped.h"
 #include "geometry_msgs/PointStamped.h"
+#include "geometry_msgs/Pose.h"
 #include "gazebo_msgs/ModelState.h"
 #include "gazebo_msgs/ModelStates.h"
 #include "gazebo_msgs/LinkStates.h"
@@ -246,7 +247,10 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
 
     // Publish sub position and orientation
 
-    publishTfFrame(msg.pose[sub_index], "cobalt_sim");
+    geometry_msgs::Pose subTFPose;
+    subTFPose.orientation = orientation_msg.quaternion;
+    subTFPose.position = position_msg.point;
+    publishTfFrame(subTFPose, "cobalt_sim");
     position_pub.publish(position_msg);
     orientation_pub.publish(orientation_msg);
     depth_pub.publish(depth_msg);
