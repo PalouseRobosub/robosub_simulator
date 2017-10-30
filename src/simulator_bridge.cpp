@@ -37,8 +37,6 @@ ThrottledPublisher<robosub::ObstaclePosArray> obstacle_pos_pub;
 ThrottledPublisher<robosub::HydrophoneDeltas> hydrophone_deltas_pub;
 ThrottledPublisher<geometry_msgs::Vector3Stamped> lin_accel_pub;
 
-
-
 // List of names of objects to publish the position and name of. This will be
 // loaded from parameters.
 std::vector<std::string> object_names;
