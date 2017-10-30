@@ -2,6 +2,7 @@
 #include "robosub/Float32Stamped.h"
 #include "robosub/Euler.h"
 #include "geometry_msgs/Vector3Stamped.h"
+#include "geometry_msgs/PointStamped.h"
 #include "gazebo_msgs/ModelState.h"
 #include "gazebo_msgs/ModelStates.h"
 #include "gazebo_msgs/LinkStates.h"
