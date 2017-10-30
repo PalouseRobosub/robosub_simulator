@@ -10,6 +10,7 @@
 #include "geometry_msgs/QuaternionStamped.h"
 #include "robosub/HydrophoneDeltas.h"
 #include "tf/transform_datatypes.h"
+#include "tf/transform_broadcaster.h"
 #include "utility/ThrottledPublisher.hpp"
 
 #include <cmath>
@@ -36,12 +37,32 @@ ThrottledPublisher<robosub::ObstaclePosArray> obstacle_pos_pub;
 ThrottledPublisher<robosub::HydrophoneDeltas> hydrophone_deltas_pub;
 ThrottledPublisher<geometry_msgs::Vector3Stamped> lin_accel_pub;
 
+
+
 // List of names of objects to publish the position and name of. This will be
 // loaded from parameters.
 std::vector<std::string> object_names;
 
 Vector3d pinger_position;
 Vector3d ceiling_plane_position;
+
+// Helper function to publish the sub's position onto the TF tree
+void publishTfFrame(const geometry_msgs::Pose pose, string frame_id,
+    string parent_frame_id = "world") {
+
+    static tf::TransformBroadcaster tfbr;
+
+    geometry_msgs::TransformStamped transform;
+    transform.transform.translation.x = pose.position.x;
+    transform.transform.translation.y = pose.position.y;
+    transform.transform.translation.z = pose.position.z;
+    transform.transform.rotation = pose.orientation;
+    transform.child_frame_id = frame_id;
+    transform.header.stamp = ros::Time::now();
+    transform.header.frame_id = parent_frame_id;
+
+    tfbr.sendTransform(transform);
+}
 
 void linkStatesCallback(const gazebo_msgs::LinkStates &msg)
 {
@@ -225,6 +246,8 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
     }
 
     // Publish sub position and orientation
+
+    publishTfFrame(msg.pose[sub_index], "cobalt_sim");
     position_pub.publish(position_msg);
     orientation_pub.publish(orientation_msg);
     depth_pub.publish(depth_msg);
