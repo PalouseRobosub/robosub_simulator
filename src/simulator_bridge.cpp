@@ -336,7 +336,7 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
 
     position_pub = ThrottledPublisher<geometry_msgs::PointStamped>
-        ("real/position", 1, 0, "rate/simulator/position");
+        ("simulator/cobalt/position", 1, 0, "rate/simulator/position");
     orientation_pub = ThrottledPublisher<geometry_msgs::QuaternionStamped>
         ("real/orientation", 1, 0, "rate/imu");
     euler_pub = ThrottledPublisher<robosub::Euler>
