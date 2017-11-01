@@ -20,3 +20,8 @@ add_executable(simulator_bridge simulator_bridge.cpp)
 add_dependencies(simulator_bridge ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 target_link_libraries(simulator_bridge sensor ${catkin_LIBRARIES})
+
+# Localization engine diag harness/error calculator
+add_executable(localization_harness localization_harness.cpp)
+add_dependencies(localization_harness ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(localization_harness ${catkin_LIBRARIES})
