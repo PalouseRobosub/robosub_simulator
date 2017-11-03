@@ -7,7 +7,6 @@
 
 int main(int argc, char **argv)
 {
-
     ros::init(argc, argv, "localization_harness");
 
     ros::NodeHandle nh;
@@ -28,8 +27,8 @@ int main(int argc, char **argv)
     tflr.waitForTransform("cobalt", "cobalt_sim", ros::Time::now(),
         ros::Duration(0.01));
 
-    while (ros::ok()) {
-
+    while (ros::ok())
+    {
         tflr.lookupTransform("cobalt", "cobalt_sim", ros::Time(0),
             resultantTransform);
 
@@ -41,7 +40,5 @@ int main(int argc, char **argv)
         loc_error_msg.header.stamp = ros::Time::now();
 
         loc_error_pub.publish<robosub::Float32Stamped>(loc_error_msg);
-
     }
-
 }
