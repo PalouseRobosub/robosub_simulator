@@ -24,21 +24,31 @@ int main(int argc, char **argv)
     ROS_DEBUG(
         "Waiting for available transformation from cobalt to cobalt_sim...");
 
-    tflr.waitForTransform("cobalt", "cobalt_sim", ros::Time::now(),
-        ros::Duration(0.01));
+    tflr.waitForTransform(tflr.resolve("cobalt_sim"), tflr.resolve("cobalt"), ros::Time::now(),
+        ros::Duration(60.0));
 
     while (ros::ok())
     {
-        tflr.lookupTransform("cobalt", "cobalt_sim", ros::Time(0),
+        try {
+            tflr.lookupTransform(tflr.resolve("cobalt_sim"), tflr.resolve("cobalt"), ros::Time(0),
             resultantTransform);
 
-        double loc_error = resultantTransform.getOrigin().length();
+            double loc_error = resultantTransform.getOrigin().length();
 
-        robosub::Float32Stamped loc_error_msg;
+            robosub::Float32Stamped loc_error_msg;
 
-        loc_error_msg.data = loc_error;
-        loc_error_msg.header.stamp = ros::Time::now();
+            loc_error_msg.data = loc_error;
+            loc_error_msg.header.stamp = ros::Time::now();
 
-        loc_error_pub.publish<robosub::Float32Stamped>(loc_error_msg);
+            loc_error_pub.publish<robosub::Float32Stamped>(loc_error_msg);
+
+        }
+        catch (tf::LookupException ex) {
+
+            ROS_WARN("Caught LookupException: %s", ex.what());
+
+        }
+
+
     }
 }
