@@ -30,8 +30,21 @@ int main(int argc, char **argv)
     ROS_DEBUG(
         "Waiting for available transformation from cobalt to cobalt_sim...");
 
-    tflr.waitForTransform(tflr.resolve("cobalt_sim"), tflr.resolve("cobalt"),
-        ros::Time::now(), ros::Duration(60.0));
+    bool isTransformAvailable = false;
+
+    while (!isTransformAvailable)
+    {
+        isTransformAvailable = tflr.waitForTransform(tflr.resolve("cobalt_sim"),
+            tflr.resolve("cobalt"), ros::Time::now(), ros::Duration(300.0));
+
+        if (!isTransformAvailable)
+        {
+            ROS_WARN("No TF frames from cobalt to cobalt_sim have appeared in "
+                "the last 5 minutes.");
+        }
+
+    }
+
 
     while (ros::ok())
     {
