@@ -72,4 +72,6 @@ int main(int argc, char **argv)
             ROS_WARN("Caught LookupException: %s", ex.what());
         }
     }
+
+    return 0;
 }
