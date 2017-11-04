@@ -42,7 +42,6 @@ int main(int argc, char **argv)
             ROS_WARN("No TF frames from cobalt to cobalt_sim have appeared in "
                 "the last 5 minutes.");
         }
-
     }
 
 
