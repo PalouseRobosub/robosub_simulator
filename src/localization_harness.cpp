@@ -2,6 +2,7 @@
 #include "robosub/Float32Stamped.h"
 #include "tf/transform_listener.h"
 #include "tf/transform_datatypes.h"
+#include "geometry_msgs/Vector3Stamped.h"
 
 #include <string>
 
@@ -15,8 +16,13 @@ int main(int argc, char **argv)
 
     tf::StampedTransform resultantTransform;
 
-    ros::Publisher loc_error_pub = nh.advertise<robosub::Float32Stamped>(
+    ros::Publisher linear_error_pub = nh.advertise<robosub::Float32Stamped>(
         "localization/error/linear", 1);
+
+    ros::Publisher vector_error_pub =
+        nh.advertise<geometry_msgs::Vector3Stamped>("localization/error/vector",
+        1);
+
 
     // Wait for a transform to be available between the localization engine's
     // position and the simulator's position.
@@ -24,31 +30,33 @@ int main(int argc, char **argv)
     ROS_DEBUG(
         "Waiting for available transformation from cobalt to cobalt_sim...");
 
-    tflr.waitForTransform(tflr.resolve("cobalt_sim"), tflr.resolve("cobalt"), ros::Time::now(),
-        ros::Duration(60.0));
+    tflr.waitForTransform(tflr.resolve("cobalt_sim"), tflr.resolve("cobalt"),
+        ros::Time::now(), ros::Duration(60.0));
 
     while (ros::ok())
     {
-        try {
-            tflr.lookupTransform(tflr.resolve("cobalt_sim"), tflr.resolve("cobalt"), ros::Time(0),
-            resultantTransform);
+        try
+        {
+            tflr.lookupTransform(tflr.resolve("cobalt_sim"),
+                tflr.resolve("cobalt"), ros::Time(0), resultantTransform);
 
-            double loc_error = resultantTransform.getOrigin().length();
+            tf::Vector3 error_vector = resultantTransform.getOrigin();
 
-            robosub::Float32Stamped loc_error_msg;
+            robosub::Float32Stamped linear_error_msg;
+            geometry_msgs::Vector3Stamped vector_error_msg;
 
-            loc_error_msg.data = loc_error;
-            loc_error_msg.header.stamp = ros::Time::now();
+            linear_error_msg.header.stamp = vector_error_msg.header.stamp =
+                ros::Time::now();
 
-            loc_error_pub.publish<robosub::Float32Stamped>(loc_error_msg);
+            tf::vector3TFToMsg(error_vector, vector_error_msg.vector);
+            linear_error_msg.data = error_vector.length();
 
+            linear_error_pub.publish(linear_error_msg);
+            vector_error_pub.publish(vector_error_msg);
         }
-        catch (tf::LookupException ex) {
-
+        catch (tf::LookupException ex)
+        {
             ROS_WARN("Caught LookupException: %s", ex.what());
-
         }
-
-
     }
 }
