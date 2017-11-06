@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 
     ros::Publisher vector_error_pub =
         nh.advertise<geometry_msgs::Vector3Stamped>("localization/error/vector",
-        1);
+                                                    1);
 
 
     // Wait for a transform to be available between the localization engine's
@@ -34,13 +34,14 @@ int main(int argc, char **argv)
 
     while (!isTransformAvailable)
     {
-        isTransformAvailable = tflr.waitForTransform(tflr.resolve("cobalt_sim"),
-            tflr.resolve("cobalt"), ros::Time::now(), ros::Duration(300.0));
+        isTransformAvailable = tflr.waitForTransform("cobalt_sim", "cobalt",
+                                                     ros::Time::now(),
+                                                     ros::Duration(300.0));
 
         if (!isTransformAvailable)
         {
             ROS_WARN("No TF frames from cobalt to cobalt_sim have appeared in "
-                "the last 5 minutes.");
+                     "the last 5 minutes.");
         }
     }
 
@@ -49,8 +50,8 @@ int main(int argc, char **argv)
     {
         try
         {
-            tflr.lookupTransform(tflr.resolve("cobalt_sim"),
-                tflr.resolve("cobalt"), ros::Time(0), resultantTransform);
+            tflr.lookupTransform("cobalt_sim", "cobalt", ros::Time(0),
+                                 resultantTransform);
 
             tf::Vector3 error_vector = resultantTransform.getOrigin();
 
