@@ -18,10 +18,10 @@
 <node name="virtual_serial_port_sensor" pkg="robosub_simulator" type="create_sensor_vsp.sh" />
 <node name="virtual_serial_port_thruster" pkg="robosub_simulator" type="create_thruster_vsp.sh" />
 <node name="simulator_bridge" pkg="robosub_simulator" type="simulator_bridge" required="true" />
-<node name="localization_harness" pkg="robosub_simulator" type="localization_harness" required="true" />
 
 <!-- launch basic sub software, unless we are just running the minimal simulator-->
 <group unless="$(arg minimal)">
+  <node name="localization_harness" pkg="robosub_simulator" type="localization_harness" output="screen" />
   <node name="control" pkg="robosub" type="control" />
   <node name="imu" pkg="robosub" type="imu">
     <param name="active_imu" value="bno055_left"/>
