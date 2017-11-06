@@ -12,6 +12,8 @@ int main(int argc, char **argv)
 
     ros::NodeHandle nh;
 
+    ros::Rate publishRate(200.0);
+
     tf::TransformListener tflr;
 
     tf::StampedTransform resultantTransform;
@@ -71,6 +73,8 @@ int main(int argc, char **argv)
         {
             ROS_WARN("Caught LookupException: %s", ex.what());
         }
+
+        publishRate.sleep();
     }
 
     return 0;
