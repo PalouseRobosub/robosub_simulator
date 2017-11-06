@@ -12,7 +12,7 @@ int main(int argc, char **argv)
 
     ros::NodeHandle nh;
 
-    ros::Rate publishRate(200.0);
+    ros::Rate publishRate(100.0);
 
     tf::TransformListener tflr;
 
