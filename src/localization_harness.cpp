@@ -35,7 +35,7 @@ int main(int argc, char **argv)
     ROS_DEBUG(
         "Waiting for available transformation from cobalt to cobalt_sim...");
 
-    while (nh.ok())
+    while (ros::ok())
     {
         try
         {
