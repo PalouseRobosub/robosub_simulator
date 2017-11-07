@@ -1,8 +1,10 @@
 #include "ros/ros.h"
 #include "robosub/Float32Stamped.h"
-#include "tf/transform_listener.h"
+#include "tf2_ros/transform_listener.h"
+#include "tf2/exceptions.h"
 #include "tf/transform_datatypes.h"
 #include "geometry_msgs/Vector3Stamped.h"
+#include "geometry_msgs/TransformStamped.h"
 
 #include <string>
 
@@ -14,9 +16,10 @@ int main(int argc, char **argv)
 
     ros::Rate publishRate(100.0);
 
-    tf::TransformListener tflr;
+    tf2_ros::Buffer tfb;
+    tf2_ros::TransformListener tflr(tfb);
 
-    tf::StampedTransform resultantTransform;
+    geometry_msgs::TransformStamped resultantTransform;
 
     ros::Publisher linear_error_pub = nh.advertise<robosub::Float32Stamped>(
         "localization/error/linear", 1);
@@ -32,30 +35,13 @@ int main(int argc, char **argv)
     ROS_DEBUG(
         "Waiting for available transformation from cobalt to cobalt_sim...");
 
-    bool isTransformAvailable = false;
-
-    while (!isTransformAvailable)
-    {
-        isTransformAvailable = tflr.waitForTransform("cobalt_sim", "cobalt",
-                                                     ros::Time::now(),
-                                                     ros::Duration(300.0));
-
-        if (!isTransformAvailable)
-        {
-            ROS_WARN("No TF frames from cobalt to cobalt_sim have appeared in "
-                     "the last 5 minutes.");
-        }
-    }
-
-
-    while (ros::ok())
+    while (nh.ok())
     {
         try
         {
-            tflr.lookupTransform("cobalt_sim", "cobalt", ros::Time(0),
-                                 resultantTransform);
-
-            tf::Vector3 error_vector = resultantTransform.getOrigin();
+            resultantTransform = tfb.lookupTransform("cobalt_sim", "cobalt",
+                                                      ros::Time(0),
+                                                      ros::Duration(300.0));
 
             robosub::Float32Stamped linear_error_msg;
             geometry_msgs::Vector3Stamped vector_error_msg;
@@ -63,13 +49,16 @@ int main(int argc, char **argv)
             linear_error_msg.header.stamp = vector_error_msg.header.stamp =
                 ros::Time::now();
 
-            tf::vector3TFToMsg(error_vector, vector_error_msg.vector);
-            linear_error_msg.data = error_vector.length();
+            vector_error_msg.vector = resultantTransform.transform.translation;
+            linear_error_msg.data = tf::Vector3(vector_error_msg.vector.x,
+                                                vector_error_msg.vector.y,
+                                                vector_error_msg.vector.z)
+                                                .length();
 
             linear_error_pub.publish(linear_error_msg);
             vector_error_pub.publish(vector_error_msg);
         }
-        catch (tf::LookupException ex)
+        catch (tf2::LookupException ex)
         {
             ROS_WARN("Caught LookupException: %s", ex.what());
         }
