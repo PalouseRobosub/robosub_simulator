@@ -14,7 +14,7 @@ int main(int argc, char **argv)
 
     ros::NodeHandle nh;
 
-    ros::Rate publishRate(100.0);
+    ros::Rate publishRate(30.0);
 
     tf2_ros::Buffer tfb;
     tf2_ros::TransformListener tflr(tfb);
