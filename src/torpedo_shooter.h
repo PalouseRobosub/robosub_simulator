@@ -31,7 +31,7 @@ class TorpedoShooter : public ModelPlugin
     physics::ModelPtr sub;
     physics::WorldPtr world;
 
-    bool shoot(std_srvs::Trigger::Request &req, \
+    bool shoot(std_srvs::Trigger::Request &req, 
         std_srvs::Trigger::Response &res);
 
   public:
