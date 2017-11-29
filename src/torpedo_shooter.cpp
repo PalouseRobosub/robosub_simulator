@@ -34,8 +34,8 @@ bool TorpedoShooter::shoot(std_srvs::Trigger::Request  &req,
     // This is for calculating the direction of the initial velocity of
     // the torpedo
     // Using just trig
-    math::Vector3 magnitude = 
-                  math::Vector3(cos(sub_position.rot.GetAsEuler().z), 
+    math::Vector3 magnitude =
+                  math::Vector3(cos(sub_position.rot.GetAsEuler().z),
                       sin(sub_position.rot.GetAsEuler().z), 0.0);
 
     torpedo->SetLinearVel(magnitude);
@@ -54,7 +54,7 @@ void TorpedoShooter::Load(physics::ModelPtr _parent, sdf::ElementPtr)
 
     int argc = 0;
     char **argv = NULL;
-    ros::init(argc, argv, "torpedo_shooter", 
+    ros::init(argc, argv, "torpedo_shooter",
         ros::init_options::NoSigintHandler);
 
     if(!ros::isInitialized())
