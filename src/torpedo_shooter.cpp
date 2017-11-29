@@ -20,8 +20,9 @@ bool TorpedoShooter::shoot(std_srvs::Trigger::Request  &req,
     ROS_INFO("Current Sub Position x: %f, y: %f, z: %f", sub_position.pos.x,
               sub_position.pos.y, sub_position.pos.z);
 
-    ROS_INFO("Current Sub rotation roll: %f, pitch: %f, yaw: %f", sub_position.rot.GetAsEuler().x,
-              sub_position.rot.GetAsEuler().y, sub_position.rot.GetAsEuler().z);
+    ROS_INFO("Current Sub rotation roll: %f, pitch: %f, yaw: %f",
+        sub_position.rot.GetAsEuler().x, sub_position.rot.GetAsEuler().y,
+        sub_position.rot.GetAsEuler().z);
 
     //This sets the torpedo spawn position relative to the sub
     sub_position.pos.z -= 0.4;
@@ -30,11 +31,12 @@ bool TorpedoShooter::shoot(std_srvs::Trigger::Request  &req,
     // torpedo->SetLinearAccel(math::Vector3(0.0,0.0,.001));
 
 
-    // This is for calculating the direction of the initial velocity of the torpedo
+    // This is for calculating the direction of the initial velocity of
+    // the torpedo
     // Using just trig
-    math::Vector3 magnitude = math::Vector3(cos(sub_position.rot.GetAsEuler().z),
-                                            sin(sub_position.rot.GetAsEuler().z),
-                                            0.0);
+    math::Vector3 magnitude = \
+                  math::Vector3(cos(sub_position.rot.GetAsEuler().z), \
+                      sin(sub_position.rot.GetAsEuler().z), 0.0);
 
     torpedo->SetLinearVel(magnitude);
     torpedo->SetWorldPose(sub_position);
@@ -52,7 +54,8 @@ void TorpedoShooter::Load(physics::ModelPtr _parent, sdf::ElementPtr)
 
     int argc = 0;
     char **argv = NULL;
-    ros::init(argc, argv, "torpedo_shooter", ros::init_options::NoSigintHandler);
+    ros::init(argc, argv, "torpedo_shooter", \
+        ros::init_options::NoSigintHandler);
 
     if(!ros::isInitialized())
     {
