@@ -16,8 +16,8 @@
         </geometry>
         <material>
           <script>
-            <uri>model://dice/materials/scripts</uri>
-            <uri>model://dice/materials/textures</uri>
+            <uri>model://2018/dice/materials/scripts</uri>
+            <uri>model://2018/dice/materials/textures</uri>
             <name>OneFace</name>
           </script>
         </material>
@@ -58,8 +58,8 @@
         </geometry>
         <material>
           <script>
-            <uri>model://dice/materials/scripts</uri>
-            <uri>model://dice/materials/textures</uri>
+            <uri>model://2018/dice/materials/scripts</uri>
+            <uri>model://2018/dice/materials/textures</uri>
             <name>TwoFace</name>
           </script>
         </material>
@@ -100,8 +100,8 @@
         </geometry>
         <material>
           <script>
-            <uri>model://dice/materials/scripts</uri>
-            <uri>model://dice/materials/textures</uri>
+            <uri>model://2018/dice/materials/scripts</uri>
+            <uri>model://2018/dice/materials/textures</uri>
             <name>ThreeFace</name>
           </script>
         </material>
@@ -142,8 +142,8 @@
         </geometry>
         <material>
           <script>
-            <uri>model://dice/materials/scripts</uri>
-            <uri>model://dice/materials/textures</uri>
+            <uri>model://2018/dice/materials/scripts</uri>
+            <uri>model://2018/dice/materials/textures</uri>
             <name>FourFace</name>
           </script>
         </material>
@@ -184,8 +184,8 @@
         </geometry>
         <material>
           <script>
-            <uri>model://dice/materials/scripts</uri>
-            <uri>model://dice/materials/textures</uri>
+            <uri>model://2018/dice/materials/scripts</uri>
+            <uri>model://2018/dice/materials/textures</uri>
             <name>FiveFace</name>
           </script>
         </material>
@@ -226,8 +226,8 @@
         </geometry>
         <material>
           <script>
-            <uri>model://dice/materials/scripts</uri>
-            <uri>model://dice/materials/textures</uri>
+            <uri>model://2018/dice/materials/scripts</uri>
+            <uri>model://2018/dice/materials/textures</uri>
             <name>SixFace</name>
           </script>
         </material>
