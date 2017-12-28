@@ -82,7 +82,7 @@
 
     <model name="ceiling_plane">
       <static>true</static>
-      <pose>0 0 4.49 0 0 0</pose>
+      <pose>0 0 0 0 0 0</pose>
       <link name="link">
         <!-- <collision name="collision"> -->
         <!--   <geometry> -->
@@ -110,7 +110,7 @@
     </model>
 
     <include>
-      <pose> 0 0 0 1.5707 0 0 </pose>
+        <pose>0 0 -4.5 1.5707 0 0</pose>
       <uri>model://gibb</uri>
     </include>
 
@@ -139,19 +139,19 @@
 
     <include>
       <name>gate_side_a</name>
-      <pose>19.8 -25.7 4.5 0 0 1.575</pose>
-      <uri>model://gate</uri>
+      <pose>2 -22.5 -1.0 0 0 0</pose>
+      <uri>model://2018/prequal-gate</uri>
     </include>
 
     <include>
-      <name>buoys</name>
-      <pose>16.1 -25.5 1.55 0 0 1.575</pose>
-      <uri>model://buoys</uri>
+      <name>post</name>
+      <pose>2 -12.5 -1.5 0 0 0 </pose>
+      <uri>model://2018/prequal-pole</uri>
     </include>
 
     <include>
         <name>robosub</name>
-        <pose>21 -25 3 0 0 3</pose>
+        <pose>2 -26 -0.5 0 0 1.5707</pose>
         <uri>model://cobalt</uri>
     </include>
 
