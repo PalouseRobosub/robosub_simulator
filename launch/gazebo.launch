@@ -4,7 +4,7 @@
 <rosparam command="load" file="$(find robosub_simulator)/param/cobalt_sim.yaml"/>
 <rosparam command="load" file="$(find robosub_simulator)/param/obstacles.yaml"/>
 <rosparam command="load" file="$(find robosub_simulator)/param/simulator.yaml"/>
-<arg name="world"  default="transdec"/>
+<arg name="world"  default="transdec-2018"/>
 <arg name="gui"  default="true"/>
 <arg name="minimal"  default="false"/>
 <arg name="fake_net" default="true"/>
