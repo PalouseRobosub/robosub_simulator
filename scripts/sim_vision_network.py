@@ -1,3 +1,14 @@
+"""
+Author: Ryan Summers (summers.ryan.m@gmail.com)
+Date: 12-29-2017
+
+Description:
+    Provides object detection in place of the Darknet YOLO vision network for
+    simulation runs. Gazebo link_state messages are used to determine object
+    locations and bounding boxes are draw around objects after
+    undistortion effects are applied.
+"""
+
 import cv2
 import cv_bridge
 import math
