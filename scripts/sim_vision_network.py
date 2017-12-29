@@ -1,13 +1,15 @@
 import cv2
-import rospy
-import numpy as np
-import math
-from rs_yolo.msg import DetectionArray
-from gazebo_msgs.msg import LinkStates
-from sensor_msgs.msg import Image
-import tf
 import cv_bridge
+import math
+import numpy as np
+import rospy
+import tf
+
+from gazebo_msgs.msg import LinkStates
 from operator import add, sub
+from rs_yolo.msg import DetectionArray, Detection
+from sensor_msgs.msg import Image
+
 
 class FisheyeLens:
     def __init__(self, c1, c2, c3, f, max_fov=np.pi):
@@ -21,6 +23,10 @@ class FisheyeLens:
 links = {}
 lens_parameters = FisheyeLens(c1=685.4, c2=525.2, c3=0, f=307.53251966606937)
 boxes = []
+max_distance = 7
+
+detection_pub = rospy.Publisher('fake_net', DetectionArray, queue_size=10)
+
 
 class Point:
     def __init__(self, pts):
@@ -29,7 +35,16 @@ class Point:
         self.z = pts[2]
 
 
-def point_to_pixel(point_array, lens_params):
+class LinkDescriptor:
+    def __init__(self, label, width, height, depth, label_id):
+        self.label = label
+        self.label_id = label_id
+        self.width = width
+        self.height = height
+        self.depth = depth
+
+
+def point_to_pixel(point_array, lens_params=lens_parameters):
     point = Point(point_array)
     x = point.x / -point.z
     y = point.y / -point.z
@@ -50,58 +65,12 @@ def point_to_pixel(point_array, lens_params):
     return [math.cos(phi) * r / r_max, math.sin(phi) * r / r_max]
 
 
-class LinkDescriptor:
-    def __init__(self, label, width, height, depth):
-        self.label = label
-        self.width = width
-        self.height = height
-        self.depth = depth
-
-
 def rotate_point(point, quaternion):
     q2 = point
     q2.append(0.0)
-
     return tf.transformations.quaternion_multiply(
             tf.transformations.quaternion_multiply(quaternion, q2),
             tf.transformations.quaternion_conjugate(quaternion))[:3]
-
-
-class BoundingBox:
-    def __init__(self, origin, descriptor, orientation):
-        offset_static = [-descriptor.width / 2, 0, descriptor.height / 2]
-        offset = rotate_point(offset_static, orientation).tolist()
-
-        self.origin = origin
-        self.label = descriptor.label
-
-        self.pts = []
-        offset = rotate_point([ descriptor.width / 2, descriptor.depth / 2, descriptor.height / 2], orientation).tolist()
-        self.pts.append(map(add, origin, offset))
-        offset = rotate_point([ -descriptor.width / 2, descriptor.depth / 2, descriptor.height / 2], orientation).tolist()
-        self.pts.append(map(add, origin, offset))
-        offset = rotate_point([ descriptor.width / 2, -descriptor.depth / 2, descriptor.height / 2], orientation).tolist()
-        self.pts.append(map(add, origin, offset))
-        offset = rotate_point([ -descriptor.width / 2, -descriptor.depth / 2, descriptor.height / 2], orientation).tolist()
-        self.pts.append(map(add, origin, offset))
-
-        offset = rotate_point([ descriptor.width / 2, descriptor.depth / 2, -descriptor.height / 2], orientation).tolist()
-        self.pts.append(map(add, origin, offset))
-        offset = rotate_point([ -descriptor.width / 2, descriptor.depth / 2, -descriptor.height / 2], orientation).tolist()
-        self.pts.append(map(add, origin, offset))
-        offset = rotate_point([ descriptor.width / 2, -descriptor.depth / 2, -descriptor.height / 2], orientation).tolist()
-        self.pts.append(map(add, origin, offset))
-        offset = rotate_point([ -descriptor.width / 2, -descriptor.depth / 2, -descriptor.height / 2], orientation).tolist()
-        self.pts.append(map(add, origin, offset))
-
-
-    def change_reference(self, rot, origin):
-        updated_pts = []
-        for pt in self.pts:
-            updated_pts.append(change_reference_frame(pt, rot, origin))
-
-        self.origin = change_reference_frame(self.origin, rot, origin)
-        self.pts = updated_pts
 
 
 def change_reference_frame(point, rot_quat, origin):
@@ -121,6 +90,46 @@ def change_reference_frame(point, rot_quat, origin):
     return [-1 * p[1], -1 * p[0], -1 * p[2]]
 
 
+class BoundingBox:
+    def __init__(self, origin, descriptor, orientation):
+        self.origin = origin
+        self.label = descriptor.label
+        self.label_id = descriptor.label_id
+
+        self.pts = []
+        for i in range(0, 2):
+            x = descriptor.width / 2 - i * descriptor.width
+            for j in range(0, 2):
+                y = descriptor.depth / 2 - j * descriptor.depth
+                for k in range(0, 2):
+                    z = descriptor.height / 2 - k * descriptor.height
+                    offset = rotate_point([x, y, z], orientation).tolist()
+                    self.pts.append(map(add, origin, offset))
+
+
+    def change_reference(self, rot, origin):
+        updated_pts = []
+        for pt in self.pts:
+            updated_pts.append(change_reference_frame(pt, rot, origin))
+
+        self.origin = change_reference_frame(self.origin, rot, origin)
+        self.pts = updated_pts
+
+
+    def calculate_pixels(self):
+        pixels = []
+        pixel_origin = point_to_pixel(self.origin)
+        for pt in self.pts:
+            pixels.append(point_to_pixel(pt))
+
+        return pixel_origin, pixels
+
+
+    def distance(self):
+        np_array = np.array(self.origin)
+        return np.sqrt(np_array.dot(np_array))
+
+
 def callback(link_states):
     links_local = set(list(links.keys())).intersection(link_states.name)
 
@@ -129,8 +138,8 @@ def callback(link_states):
     p = link_states.pose[camera_index].position
     camera_orientation = [q.x, q.y, q.z, q.w]
 
-    sensor_offset = rotate_point([0, 0, 0.14], camera_orientation)
-    camera_position = [p.x, p.y, p.z] + sensor_offset
+    sensor_offset = rotate_point([0, 0, 0.14], camera_orientation).tolist()
+    camera_position = map(add, [p.x, p.y, p.z], sensor_offset)
 
     if len(boxes) == 0:
         for link in links_local:
@@ -143,52 +152,64 @@ def callback(link_states):
             box = BoundingBox(link_position, links[link], link_orientation)
             box.change_reference(camera_orientation, camera_position)
 
-            if box.origin[2] < 0:
-                pixels = []
-                pixels.append(point_to_pixel(box.origin, lens_parameters))
-                for point in box.pts:
-                    pixels.append(point_to_pixel(point, lens_parameters))
-
-                boxes.append(pixels)
+            if box.origin[2] < 0 and box.distance() < max_distance:
+                boxes.append(box)
 
 
 def camera_callback(image):
     global boxes
-    cv_image = cv_bridge.CvBridge().imgmsg_to_cv2(image, "bgr8")
 
+    cv_image = cv_bridge.CvBridge().imgmsg_to_cv2(image, "bgr8")
 #    undistorted = cv_image.copy()
     undistorted = cv2.remap(cv_image, map1, map2, cv2.INTER_LINEAR)
 
+    detections_msg = DetectionArray()
+
     rows = cv_image.shape[0]
     cols = cv_image.shape[1]
-    points = []
+    ratio_scale_y = float(rows) / cols
     for box in boxes:
-        for location in box:
+        origin, pixels = box.calculate_pixels()
+        points = []
+        origin[1] /= ratio_scale_y
+        points.append([int((origin[0] + 1) / 2 * cols), int((1 - (origin[1] + 1) / 2) * rows)])
+        for location in pixels:
+            location[1] /= ratio_scale_y
             points.append([int((location[0] + 1)/2 * cols), int((1 - (location[1] + 1) / 2) * rows)])
-    boxes = []
 
-    np_array = np.ndarray(shape=(len(points),1,2))
-    for i in range(0, len(points)):
-        np_array[i] = points[i]
+        np_array = np.ndarray(shape=(len(points),1,2))
+        for i in range(0, len(points)):
+            np_array[i] = points[i]
 
-    new_locations = cv2.fisheye.undistortPoints(np_array, K1, D2, R=R1, P=P1).reshape(-1,2)
-#    new_locations = points
+#        new_locations = np_array.reshape(-1, 2)
+        new_locations = cv2.fisheye.undistortPoints(np_array, K1, D2, R=R1, P=P1).reshape(-1,2)
 
-    for i in range(0, len(new_locations), 9):
-        point = new_locations[i].flatten()
+        original_x = points[0][0] - undistorted.shape[1] / 2
+        new_x = new_locations[0][0] - undistorted.shape[1] / 2
+        if (original_x > 0 and new_x < 0) or (original_x < 0 and new_x > 0):
+            continue
+
+        point = new_locations[0].flatten()
         cv2.circle(undistorted, (int(point[0]), int(point[1])), 5, (0, 0, 255), 2)
 
-    for i in range(0, len(new_locations), 9):
-        origin = new_locations[i]
-        locs = new_locations[i+1:i+9]
-        max_x = locs[0][0]
-        min_x = locs[0][0]
-        max_y = locs[0][1]
-        min_y = locs[0][1]
-        box = True
+        locs = new_locations[1:]
+        max_x = min(locs[0][0], undistorted.shape[1])
+        min_x = max(locs[0][0], 0)
+        max_y = min(locs[0][1], undistorted.shape[0])
+        min_y = max(locs[0][1], 0)
+        draw_box = True
+        index = 1
         for p in locs:
-            if abs(origin[0] - p[0]) >= undistorted.shape[1]:
-                box = False
+            original_x = points[index][0] - undistorted.shape[1] / 2
+            new_x = p[0] - undistorted.shape[1] / 2
+            index = index + 1
+            if (original_x > 0 and new_x < 0) or (original_x < 0 and new_x > 0):
+                draw_box = False
+
+            if abs(locs[0][0] - p[0]) >= undistorted.shape[1] or \
+               abs(locs[0][1] - p[1]) >= undistorted.shape[0]:
+                print 'Bad'
+                draw_box = False
 
             p[0] = min(undistorted.shape[1], p[0])
             p[0] = max(0, p[0])
@@ -203,8 +224,25 @@ def camera_callback(image):
             if p[1] > max_y:
                 max_y = p[1]
 
-        if box and min_x != max_x and min_y != max_y:
+            cv2.circle(undistorted, (int(p[0]), int(p[1])), 5, (255, 0, 0), 2)
+
+        if draw_box and min_x != max_x and min_y != max_y:
+            detection = Detection()
+            detection.label = box.label
+            detection.label_id = box.label_id
+            detection.probability = 1
+            detection.x = min_x
+            detection.y = min_y
+            detection.width = max_x - min_x
+            detection.height = max_y - min_y
+            detections_msg.detections.append(detection)
+
             cv2.rectangle(undistorted, (int(min_x), int(min_y)), (int(max_x), int(max_y)), (0,255,0), 2)
+
+    boxes = []
+
+    detection_pub.publish(detections_msg)
+
 
     img_small = cv2.resize(undistorted, (0,0), fx=0.5, fy=0.5)
     cv2.imshow("Image", img_small)
@@ -223,11 +261,11 @@ if __name__ == '__main__':
 
     all_links = rospy.get_param('/simulator/significant_links')
     for link in all_links:
-        links[link['name']] = LinkDescriptor(link['label'], link['width'], link['height'], link['depth'])
+        links[link['name']] = LinkDescriptor(link['label'], link['width'], link['height'], link['depth'], link['label_id'])
 
-    pub = rospy.Publisher('fake_net', DetectionArray, queue_size=10)
+    rospy.init_node('fake_network')
+    detection_pub = rospy.Publisher('fake_net', DetectionArray, queue_size=10)
     rospy.Subscriber('gazebo/link_states', LinkStates, callback)
     rospy.Subscriber('/camera/left/image_raw', Image, camera_callback)
-    rospy.init_node('fake_network')
 
     rospy.spin()
