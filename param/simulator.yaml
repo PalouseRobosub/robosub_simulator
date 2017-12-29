@@ -18,3 +18,12 @@ simulator:
     ports:
         simulated_thruster: "/dev/null"
         simulated_sensor: "/dev/null"
+    significant_links:
+        -   name: "gate_side_a::gate_right"
+            label: "start_gate_post"
+            height: 1.5
+            width: 0.1
+        -   name: "gate_side_a::gate_left"
+            label: "state_gate_post"
+            height: 1.5
+            width: 0.1
