@@ -294,6 +294,10 @@ def callback(link_states):
     Returns:
         None.
     """
+    global boxes
+    if len(boxes) != 0:
+        return
+
     links_local = set(list(links.keys())).intersection(link_states.name)
 
     # Calculate the camera's position and orientation for frame of reference
@@ -311,28 +315,27 @@ def callback(link_states):
 
     # Only perform this update loop if the previous iteration has sent off a
     # DetectionArray message. It will clear the boxes array when it is done.
-    if len(boxes) == 0:
-        for link in links_local:
-            index = link_states.name.index(link)
-            p = link_states.pose[index].position
-            q = link_states.pose[index].orientation
+    for link in links_local:
+        index = link_states.name.index(link)
+        p = link_states.pose[index].position
+        q = link_states.pose[index].orientation
 
-            # Determine the current position and orientation of the link.
-            link_orientation = [q.x, q.y, q.z, q.w]
-            link_position = [p.x, p.y, p.z]
+        # Determine the current position and orientation of the link.
+        link_orientation = [q.x, q.y, q.z, q.w]
+        link_position = [p.x, p.y, p.z]
 
-            # Construct a bounding box (3D) for the link and convert it's frame
-            # of reference to that of the camera's. The box must be constructed
-            # before the frame of reference is changed so that the vertices of
-            # the box are properly transformed.
-            box = BoundingBox(link_position, links[link], link_orientation)
-            box.change_reference(camera_orientation, camera_position)
+        # Construct a bounding box (3D) for the link and convert it's frame
+        # of reference to that of the camera's. The box must be constructed
+        # before the frame of reference is changed so that the vertices of
+        # the box are properly transformed.
+        box = BoundingBox(link_position, links[link], link_orientation)
+        box.change_reference(camera_orientation, camera_position)
 
-            # Only add the box to the display list if its within the maximum
-            # distance from the camera and is infront of the camera (negative
-            # Z).
-            if box.origin[2] < 0 and box.distance() < max_distance:
-                boxes.append(box)
+        # Only add the box to the display list if its within the maximum
+        # distance from the camera and is infront of the camera (negative
+        # Z).
+        if box.origin[2] < 0 and box.distance() < max_distance:
+            boxes.append(box)
 
 
 def camera_callback(image):
