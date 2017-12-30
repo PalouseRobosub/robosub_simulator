@@ -335,7 +335,24 @@ def callback(link_states):
         # distance from the camera and is infront of the camera (negative
         # Z).
         if box.origin[2] < 0 and box.distance() < max_distance:
-            boxes.append(box)
+
+            # Angles between the point and the focal axis must be less than 45
+            # degrees. If they are above, the fisheye undistortion can cause
+            # the points to appear at seemingly random locations within the
+            # image. Do not add boxes that have points that are outside of the
+            # angle range.
+            max_angle = 45
+            append = True
+            for pt in box.pts:
+                theta_h = np.arctan2(pt[0], -pt[2])
+                theta_v = np.arctan2(pt[1], -pt[2])
+                if abs(theta_h) > np.pi / 180 * max_angle or \
+                   abs(theta_v) > np.pi / 180 * max_angle:
+                    append = False
+                    break
+
+            if append:
+                boxes.append(box)
 
 
 def camera_callback(image):
@@ -349,13 +366,14 @@ def camera_callback(image):
     # Convert the Image message into an open CV message and apply a filter to
     # remove fisheye distortions.
     cv_image = cv_bridge.CvBridge().imgmsg_to_cv2(image, "bgr8")
+
+    height = cv_image.shape[0]
+    width = cv_image.shape[1]
+
     if debug:
         undistorted = cv2.remap(cv_image, map1, map2, cv2.INTER_LINEAR)
 
     detections_msg = DetectionArray()
-
-    height = cv_image.shape[0]
-    width = cv_image.shape[1]
 
     # Note that the calculated normalized pixel coordinates rely on a square
     # image. The image output by Gazebo is scaled to fir the HFOV, which crops
@@ -383,17 +401,7 @@ def camera_callback(image):
 
         # Apply fisheye undistortion to the list of points to locate them within
         # the undistorted image.
-        new_locations = cv2.fisheye.undistortPoints(np_array, K1, D2, R=R1, P=P1).reshape(-1,2)
-
-        # There appears to be some form of bug that causes errant
-        # transformations from the fisheye'd pixel to undistorted coordinates.
-        # Fisheye undistortion should never cause the new location to cross
-        # into a new cartesian quadrant. If this happens, ignore this box as it
-        # must not be visible in the frame.
-        original_x = points[0][0] - width / 2
-        new_x = new_locations[0][0] - width / 2
-        if (original_x > 0 and new_x < 0) or (original_x < 0 and new_x > 0):
-            continue
+        new_locations = cv2.fisheye.undistortPoints(np_array, K1, D2, R=R1, P=P1).reshape(-1, 2)
 
         point = new_locations[0].flatten()
         if debug:
@@ -407,19 +415,6 @@ def camera_callback(image):
         draw_box = True
         index = 1
         for p in locs:
-            # Verify that the point has not changed quadrants. If it has, there
-            # was an errant transformation and the bounding box should not be
-            # drawn.
-            original_x = points[index][0] - width / 2
-            new_x = p[0] - width / 2
-            index = index + 1
-            if (original_x > 0 and new_x < 0) or (original_x < 0 and new_x > 0):
-                draw_box = False
-
-            if abs(locs[0][0] - p[0]) >= width or \
-               abs(locs[0][1] - p[1]) >= height:
-                draw_box = False
-
             # Calculate the min and max X,Y coordinates to draw a box that
             # encapsulates the link.
             p[0] = min(width, p[0])
@@ -441,7 +436,7 @@ def camera_callback(image):
 
         # If the box was not marked as errant, mark a successful detection and
         # draw the box onto a CV image for debugging.
-        if draw_box and min_x != max_x and min_y != max_y:
+        if min_x != max_x and min_y != max_y:
             detection = Detection()
             detection.label = box.label
             detection.label_id = box.label_id
@@ -459,7 +454,6 @@ def camera_callback(image):
     boxes = []
 
     detection_pub.publish(detections_msg)
-
 
     # Display the un-fisheye'd image with bounding points, link origins, and
     # bounding boxes for debugging purposes.
