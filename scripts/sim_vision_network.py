@@ -1,3 +1,4 @@
+#!/usr/bin/python
 """
 Author: Ryan Summers (summers.ryan.m@gmail.com)
 Date: 12-29-2017
@@ -25,6 +26,7 @@ from sensor_msgs.msg import Image
 links = {}
 boxes = []
 max_distance = 7
+debug = False
 
 detection_pub = rospy.Publisher('fake_net', DetectionArray, queue_size=10)
 
@@ -344,19 +346,20 @@ def camera_callback(image):
     # Convert the Image message into an open CV message and apply a filter to
     # remove fisheye distortions.
     cv_image = cv_bridge.CvBridge().imgmsg_to_cv2(image, "bgr8")
-    undistorted = cv2.remap(cv_image, map1, map2, cv2.INTER_LINEAR)
+    if debug:
+        undistorted = cv2.remap(cv_image, map1, map2, cv2.INTER_LINEAR)
 
     detections_msg = DetectionArray()
 
-    rows = cv_image.shape[0]
-    cols = cv_image.shape[1]
+    height = cv_image.shape[0]
+    width = cv_image.shape[1]
 
     # Note that the calculated normalized pixel coordinates rely on a square
     # image. The image output by Gazebo is scaled to fir the HFOV, which crops
     # the Y dimension. Scale the Y dimensions appropriate so they aren't offset
     # when plotting the detection windows. This can be done by dividing all of
     # the Y measurements by the calculated scaling factor.
-    ratio_scale_y = float(rows) / cols
+    ratio_scale_y = float(height) / width
 
     for box in boxes:
         origin, pixels = box.calculate_pixels()
@@ -366,10 +369,10 @@ def camera_callback(image):
         # of the image into real coordinates starting at the top left with
         # positive Y down and positive X right.
         origin[1] /= ratio_scale_y
-        points.append([int((origin[0] + 1) / 2 * cols), int((1 - (origin[1] + 1) / 2) * rows)])
+        points.append([int((origin[0] + 1) / 2 * width), int((1 - (origin[1] + 1) / 2) * height)])
         for location in pixels:
             location[1] /= ratio_scale_y
-            points.append([int((location[0] + 1)/2 * cols), int((1 - (location[1] + 1) / 2) * rows)])
+            points.append([int((location[0] + 1)/2 * width), int((1 - (location[1] + 1) / 2) * height)])
 
         np_array = np.ndarray(shape=(len(points),1,2))
         for i in range(0, len(points)):
@@ -384,18 +387,19 @@ def camera_callback(image):
         # Fisheye undistortion should never cause the new location to cross
         # into a new cartesian quadrant. If this happens, ignore this box as it
         # must not be visible in the frame.
-        original_x = points[0][0] - undistorted.shape[1] / 2
-        new_x = new_locations[0][0] - undistorted.shape[1] / 2
+        original_x = points[0][0] - width / 2
+        new_x = new_locations[0][0] - width / 2
         if (original_x > 0 and new_x < 0) or (original_x < 0 and new_x > 0):
             continue
 
         point = new_locations[0].flatten()
-        cv2.circle(undistorted, (int(point[0]), int(point[1])), 5, (0, 0, 255), 2)
+        if debug:
+            cv2.circle(undistorted, (int(point[0]), int(point[1])), 5, (0, 0, 255), 2)
 
         locs = new_locations[1:]
-        max_x = min(locs[0][0], undistorted.shape[1])
+        max_x = min(locs[0][0], width)
         min_x = max(locs[0][0], 0)
-        max_y = min(locs[0][1], undistorted.shape[0])
+        max_y = min(locs[0][1], height)
         min_y = max(locs[0][1], 0)
         draw_box = True
         index = 1
@@ -403,21 +407,21 @@ def camera_callback(image):
             # Verify that the point has not changed quadrants. If it has, there
             # was an errant transformation and the bounding box should not be
             # drawn.
-            original_x = points[index][0] - undistorted.shape[1] / 2
-            new_x = p[0] - undistorted.shape[1] / 2
+            original_x = points[index][0] - width / 2
+            new_x = p[0] - width / 2
             index = index + 1
             if (original_x > 0 and new_x < 0) or (original_x < 0 and new_x > 0):
                 draw_box = False
 
-            if abs(locs[0][0] - p[0]) >= undistorted.shape[1] or \
-               abs(locs[0][1] - p[1]) >= undistorted.shape[0]:
+            if abs(locs[0][0] - p[0]) >= width or \
+               abs(locs[0][1] - p[1]) >= height:
                 draw_box = False
 
             # Calculate the min and max X,Y coordinates to draw a box that
             # encapsulates the link.
-            p[0] = min(undistorted.shape[1], p[0])
+            p[0] = min(width, p[0])
             p[0] = max(0, p[0])
-            p[1] = min(undistorted.shape[0], p[1])
+            p[1] = min(height, p[1])
             p[1] = max(0, p[1])
             if p[0] < min_x:
                 min_x = p[0]
@@ -429,7 +433,8 @@ def camera_callback(image):
                 max_y = p[1]
 
             # For debug purposes, draw the points onto the undistorted CV image.
-            cv2.circle(undistorted, (int(p[0]), int(p[1])), 5, (255, 0, 0), 2)
+            if debug:
+                cv2.circle(undistorted, (int(p[0]), int(p[1])), 5, (255, 0, 0), 2)
 
         # If the box was not marked as errant, mark a successful detection and
         # draw the box onto a CV image for debugging.
@@ -444,7 +449,8 @@ def camera_callback(image):
             detection.height = max_y - min_y
             detections_msg.detections.append(detection)
 
-            cv2.rectangle(undistorted, (int(min_x), int(min_y)), (int(max_x), int(max_y)), (0,255,0), 2)
+            if debug:
+                cv2.rectangle(undistorted, (int(min_x), int(min_y)), (int(max_x), int(max_y)), (0,255,0), 2)
 
     # Clear the boxes list to indicate the message has been sent.
     boxes = []
@@ -454,13 +460,17 @@ def camera_callback(image):
 
     # Display the un-fisheye'd image with bounding points, link origins, and
     # bounding boxes for debugging purposes.
-    img_small = cv2.resize(undistorted, (0,0), fx=0.5, fy=0.5)
-    cv2.imshow("Image", img_small)
-    cv2.waitKey(1)
+    if debug:
+        img_small = cv2.resize(undistorted, (0,0), fx=0.5, fy=0.5)
+        cv2.imshow("Image", img_small)
+        cv2.waitKey(1)
 
 
 if __name__ == '__main__':
+    rospy.init_node('fake_network')
+
     filename = rospy.get_param('~fisheye_camera_file')
+    debug = rospy.get_param('~debug', default=False)
     data = cv2.FileStorage(filename, cv2.FILE_STORAGE_READ)
     K1 = data.getNode('K1').mat()
     D2 = data.getNode('D2').mat()
@@ -480,9 +490,8 @@ if __name__ == '__main__':
         links[link['name']] = LinkDescriptor(link['label'], link['width'], link['height'], link['depth'], link['label_id'])
 
     # Start subscribes and publishers for the ROS framework.
-    rospy.init_node('fake_network')
-    detection_pub = rospy.Publisher('vision', DetectionArray, queue_size=10)
-    rospy.Subscriber('gazebo/link_states', LinkStates, callback)
-    rospy.Subscriber('camera/left/image_raw', Image, camera_callback)
+    detection_pub = rospy.Publisher('vision', DetectionArray, queue_size=1)
+    rospy.Subscriber('gazebo/link_states', LinkStates, callback, queue_size=1)
+    rospy.Subscriber('camera/left/image_raw', Image, camera_callback, queue_size=1)
 
     rospy.spin()
