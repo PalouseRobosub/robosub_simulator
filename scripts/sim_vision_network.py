@@ -28,7 +28,7 @@ boxes = []
 max_distance = 7
 debug = False
 
-detection_pub = rospy.Publisher('fake_net', DetectionArray, queue_size=10)
+detection_pub = rospy.Publisher('vision', DetectionArray, queue_size=10)
 
 
 class FisheyeLens:
@@ -441,14 +441,15 @@ def camera_callback(image):
             detection.label = box.label
             detection.label_id = box.label_id
             detection.probability = 1
-            detection.x = min_x
-            detection.y = min_y
-            detection.width = max_x - min_x
-            detection.height = max_y - min_y
+            detection.x = ((min_x + max_x) / 2) / width
+            detection.y = ((min_y + max_y) / 2) / height
+            detection.width = float(max_x - min_x) / width
+            detection.height = float(max_y - min_y) / height
             detections_msg.detections.append(detection)
 
             if debug:
-                cv2.rectangle(undistorted, (int(min_x), int(min_y)), (int(max_x), int(max_y)), (0,255,0), 2)
+                cv2.rectangle(undistorted, (int(min_x), int(min_y)), \
+                        (int(max_x), int(max_y)), (0,255,0), 2)
 
     # Clear the boxes list to indicate the message has been sent.
     boxes = []
@@ -468,6 +469,7 @@ if __name__ == '__main__':
 
     filename = rospy.get_param('~fisheye_camera_file')
     debug = rospy.get_param('~debug', default=False)
+    rospy.loginfo('Opening {}'.format(filename))
     data = cv2.FileStorage(filename, cv2.FILE_STORAGE_READ)
     K1 = data.getNode('K1').mat()
     D2 = data.getNode('D2').mat()
