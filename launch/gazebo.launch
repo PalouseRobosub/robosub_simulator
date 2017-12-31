@@ -7,6 +7,7 @@
 <arg name="world"  default="transdec"/>
 <arg name="gui"  default="true"/>
 <arg name="minimal"  default="false"/>
+<arg name="fake_net" default="true"/>
 <include file="$(find gazebo_ros)/launch/empty_world.launch">
    <arg name="use_sim_time" value="true"/>
    <arg name="debug" value="false"/>
@@ -29,6 +30,12 @@
   <node name="thruster" pkg="robosub" type="thruster_maestro" launch-prefix="$(find robosub)/scripts/sleepme.sh 3"/>
   <node name="bno055_left" pkg="robosub" type="bno055_sensor" launch-prefix="$(find robosub)/scripts/sleepme.sh 3"/>
   <node name="pinger_bearing" pkg="robosub" type="pinger_bearing" launch-prefix="$(find robosub)/scripts/sleepme.sh 3"/>
+</group>
+
+<group if="$(arg fake_net)">
+    <node name="sim_network" type="sim_vision_network.py" pkg="robosub_simulator" required="true" output="screen">
+        <param name="fisheye_camera_file" value="$(find robosub)/src/vision/calib/stereo_out_camera_data.xml" />
+    </node>
 </group>
 
 </launch>
