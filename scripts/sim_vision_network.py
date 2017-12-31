@@ -25,7 +25,7 @@ from sensor_msgs.msg import Image
 
 links = {}
 boxes = []
-max_distance = 7
+max_distance = 10
 debug = False
 
 detection_pub = rospy.Publisher('vision', DetectionArray, queue_size=10)
@@ -469,6 +469,7 @@ if __name__ == '__main__':
 
     filename = rospy.get_param('~fisheye_camera_file')
     debug = rospy.get_param('~debug', default=False)
+    max_distance = rospy.get_param('~max_disatance', default=10)
     rospy.loginfo('Opening {}'.format(filename))
     data = cv2.FileStorage(filename, cv2.FILE_STORAGE_READ)
     K1 = data.getNode('K1').mat()
