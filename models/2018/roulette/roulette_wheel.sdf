@@ -65,5 +65,9 @@
       </collision>
     </link>
 
+    <plugin name="roulette_spinner" filename="libroulette_spinner.so">
+        <rate> 1.0 </rate>
+    </plugin>
+
   </model>
 </sdf>
