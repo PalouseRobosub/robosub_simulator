@@ -19,7 +19,8 @@ void RouletteSpinner::Load(physics::ModelPtr _parent, sdf::ElementPtr sdf)
         rpm = 1;
     }
 
-    ROS_INFO_STREAM("RouletteSpinner plugin loaded. Spinning at " << rpm << " RPM");
+    ROS_INFO_STREAM("RouletteSpinner plugin loaded. Spinning at " << rpm <<
+            " RPM");
 }
 
 void RouletteSpinner::Update()
