@@ -1,5 +1,5 @@
-#ifndef MARKER_DROPPER_H
-#define MARKER_DROPPER_H
+#ifndef ROULETTE_SPINNER_H
+#define ROULETTE_SPINNER_H
 
 #include <ignition/math/Pose3.hh>
 
@@ -28,4 +28,4 @@ class RouletteSpinner: public ModelPlugin
     void Update();
 };
 }
-#endif // MARKER_DROPPER_H
+#endif // ROULETTE_SPINNER_H
