@@ -11,6 +11,11 @@ add_library(markerdrop SHARED marker_dropper.cpp)
 add_dependencies(markerdrop ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(markerdrop ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
 
+# Plugin for continually spinning the roulette wheel
+add_library(roulette_spinner SHARED roulette_spinner.cpp)
+add_dependencies(roulette_spinner ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(roulette_spinner ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
+
 # Plugin for the Torpedo Shooter
 add_library(torpedoshoot SHARED torpedo_shooter.cpp)
 add_dependencies(torpedoshoot ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
