@@ -17,8 +17,8 @@ control:
         x: 0.0
         y: 0.0
         z: 0.0
-        psi: 0.35
-        phi: 0.35
+        psi: 0.37
+        phi: 0.33
         theta: 0.0
     derivative:
         x: 0.0
