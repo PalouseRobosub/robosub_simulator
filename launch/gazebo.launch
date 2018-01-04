@@ -15,7 +15,6 @@
    <arg name="world_name" value="$(find robosub_simulator)/worlds/$(arg world).world"/>
 </include>
 
-<node name="virtual_serial_port_sensor" pkg="robosub_simulator" type="create_sensor_vsp.sh" />
 <node name="virtual_serial_port_thruster" pkg="robosub_simulator" type="create_thruster_vsp.sh" />
 <node name="simulator_bridge" pkg="robosub_simulator" type="simulator_bridge" required="true" />
 
@@ -24,10 +23,9 @@
   <node name="localization_harness" pkg="robosub_simulator" type="localization_harness" output="screen" />
   <node name="control" pkg="robosub" type="control" />
   <node name="imu" pkg="robosub" type="imu">
-    <param name="active_imu" value="bno055_left"/>
+    <param name="active_imu" value="real"/>
   </node>
   <node name="thruster" pkg="robosub" type="thruster_maestro" launch-prefix="$(find robosub)/scripts/sleepme.sh 3"/>
-  <node name="bno055_left" pkg="robosub" type="bno055_sensor" launch-prefix="$(find robosub)/scripts/sleepme.sh 3"/>
   <node name="pinger_bearing" pkg="robosub" type="pinger_bearing" launch-prefix="$(find robosub)/scripts/sleepme.sh 3"/>
 </group>
 

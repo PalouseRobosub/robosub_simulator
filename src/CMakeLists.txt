@@ -6,10 +6,6 @@ add_library(buoyancy_improved SHARED buoyancy_improved.cpp)
 add_dependencies(buoyancy_improved  ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(buoyancy_improved   ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
 
-add_library(sensor SHARED bno055_emulator.cpp)
-add_dependencies(sensor ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(sensor ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} serial)
-
 # Plugin for the Marker Dropper
 add_library(markerdrop SHARED marker_dropper.cpp)
 add_dependencies(markerdrop ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
@@ -24,7 +20,7 @@ target_link_libraries(torpedoshoot ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boo
 add_executable(simulator_bridge simulator_bridge.cpp)
 add_dependencies(simulator_bridge ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-target_link_libraries(simulator_bridge sensor ${catkin_LIBRARIES})
+target_link_libraries(simulator_bridge ${catkin_LIBRARIES})
 
 # Localization engine diag harness/error calculator
 add_executable(localization_harness localization_harness.cpp)

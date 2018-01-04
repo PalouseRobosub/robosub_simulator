@@ -21,15 +21,12 @@
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Geometry>
 
-#include "bno055_emulator.h"
-
 using std::vector;
+using std::string;
 using namespace Eigen;
 using namespace rs;
 
 static constexpr double _180_OVER_PI = 180.0 / 3.14159;
-
-Bno055Emulator bno_emulator;
 
 ThrottledPublisher<geometry_msgs::PointStamped> position_pub;
 ThrottledPublisher<geometry_msgs::QuaternionStamped> orientation_pub;
@@ -239,12 +236,6 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
     euler_msg.pitch *= _180_OVER_PI;
     euler_msg.yaw *= _180_OVER_PI;
 
-
-    if (bno_emulator.setOrientation(q.x(), q.y(), q.z(), q.w()))
-    {
-        ROS_ERROR("Failed to update the BNO emulator orientation.");
-    }
-
     // Publish sub position and orientation
 
     geometry_msgs::Pose subTFPose;
@@ -300,41 +291,11 @@ void imuCallback(const sensor_msgs::Imu::ConstPtr& msg)
 
     lin_accel.header.stamp = ros::Time::now();
     lin_accel_pub.publish(lin_accel);
-
-    bno_emulator.setLinearAcceleration(msg->linear_acceleration.x,
-                                       msg->linear_acceleration.y,
-                                       msg->linear_acceleration.z);
 }
 
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "simulator_bridge");
-
-    /*
-     * Initialize the IMU emulator.
-     */
-    bno_emulator.init();
-
-    /*
-     * Sleep to allow time for overriding the simulated port.
-     */
-    sleep(2);
-    string sensor_port;
-    if (ros::param::get("simulator/ports/simulated_sensor", sensor_port) ==
-            false)
-    {
-        ROS_ERROR("Failed to load emulated sensor port parameter.");
-        return -1;
-    }
-
-    /*
-     * Open and initialize the emulated serial port for the BNO.
-     */
-    if (bno_emulator.setPort(sensor_port))
-    {
-        ROS_ERROR("Failed to set emulated BNO port.");
-        return -1;
-    }
 
     ros::NodeHandle nh;
 
@@ -382,11 +343,6 @@ int main(int argc, char **argv)
     // require extra packages or anything like that.
     while(ros::ok())
     {
-        if (bno_emulator.update())
-        {
-            ROS_ERROR("BNO emulator failed to update.");
-            return -1;
-        }
         ros::spinOnce();
         r.sleep();
     }

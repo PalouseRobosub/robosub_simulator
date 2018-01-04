@@ -17,4 +17,3 @@ simulator:
     visualizer_update_rate: 10
     ports:
         simulated_thruster: "/dev/null"
-        simulated_sensor: "/dev/null"
