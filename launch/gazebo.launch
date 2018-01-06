@@ -31,8 +31,13 @@
 </group>
 
 <group if="$(arg fake_net)">
-    <node name="sim_network" type="sim_vision_network.py" pkg="robosub_simulator">
-        <param name="fisheye_camera_file" value="$(find robosub)/src/vision/calib/stereo_out_camera_data.xml" />
+    <node name="sim_network_left" type="sim_vision_network.py" pkg="robosub_simulator">
+        <param name="fisheye_camera_file" value="$(find robosub_simulator)/param/left_calibration.json" />
+        <param name="camera" value="left"/>
+    </node>
+    <node name="sim_network_right" type="sim_vision_network.py" pkg="robosub_simulator">
+        <param name="fisheye_camera_file" value="$(find robosub_simulator)/param/right_calibration.json" />
+        <param name="camera" value="right"/>
     </node>
 </group>
 

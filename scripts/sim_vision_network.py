@@ -13,6 +13,7 @@ Description:
 import cv2
 import cv_bridge
 import math
+import json
 import numpy as np
 import rospy
 import tf
@@ -302,7 +303,7 @@ def callback(link_states):
 
     # Calculate the camera's position and orientation for frame of reference
     # conversions.
-    camera_index = link_states.name.index('robosub::left_camera')
+    camera_index = link_states.name.index('robosub::{}_camera'.format(camera))
     q = link_states.pose[camera_index].orientation
     p = link_states.pose[camera_index].position
     camera_orientation = [q.x, q.y, q.z, q.w]
@@ -341,7 +342,7 @@ def callback(link_states):
             # the points to appear at seemingly random locations within the
             # image. Do not add boxes that have points that are outside of the
             # angle range.
-            max_angle = 45
+            max_angle = 75
             append = True
             for pt in box.pts:
                 theta_h = np.arctan2(pt[0], -pt[2])
@@ -371,7 +372,7 @@ def camera_callback(image):
     width = cv_image.shape[1]
 
     if debug:
-        undistorted = cv2.remap(cv_image, map1, map2, cv2.INTER_LINEAR)
+        undistorted = cv2.remap(cv_image, map1, map2, cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
 
     detections_msg = DetectionArray()
 
@@ -401,7 +402,7 @@ def camera_callback(image):
 
         # Apply fisheye undistortion to the list of points to locate them within
         # the undistorted image.
-        new_locations = cv2.fisheye.undistortPoints(np_array, K1, D2, R=R1, P=P1).reshape(-1, 2)
+        new_locations = cv2.fisheye.undistortPoints(np_array, K, D, np.eye(3), K).reshape(-1, 2)
 
         point = new_locations[0].flatten()
         if debug:
@@ -465,24 +466,22 @@ def camera_callback(image):
 
 
 if __name__ == '__main__':
-    rospy.init_node('fake_network')
+    rospy.init_node('fake_network', anonymous=True)
 
     filename = rospy.get_param('~fisheye_camera_file')
+    camera = rospy.get_param('~camera')
+
     debug = rospy.get_param('~debug', default=False)
     max_distance = rospy.get_param('~max_disatance', default=10)
     rospy.loginfo('Opening {}'.format(filename))
-    data = cv2.FileStorage(filename, cv2.FILE_STORAGE_READ)
-    K1 = data.getNode('K1').mat()
-    D2 = data.getNode('D2').mat()
-    R1 = data.getNode('R1').mat()
-    P1 = data.getNode('P1').mat()
-
-    # Python cv2.FileStorage appears to be unable to parse image_size from the
-    # XML (which also appears to be a known bug). It is hardcoded here instead.
-    image_size = (1384, 1032)
+    with open(filename, 'r') as f:
+        data = json.load(f)
+        K = np.array(data['K'])
+        D = np.array(data['D'])
+        image_size = (data['DIM'][0], data['DIM'][1])
 
     # Create a rectification map to correct fisheye distortions.
-    map1, map2 = cv2.fisheye.initUndistortRectifyMap(K1, D2, R1, P1, image_size, cv2.CV_16SC2)
+    map1, map2 = cv2.fisheye.initUndistortRectifyMap(K, D, np.eye(3), K, image_size, cv2.CV_16SC2)
 
     # Load a list of important links that need to be detected.
     all_links = rospy.get_param('/simulator/significant_links')
@@ -490,8 +489,8 @@ if __name__ == '__main__':
         links[link['name']] = LinkDescriptor(link['label'], link['width'], link['height'], link['depth'], link['label_id'])
 
     # Start subscribes and publishers for the ROS framework.
-    detection_pub = rospy.Publisher('vision', DetectionArray, queue_size=1)
+    detection_pub = rospy.Publisher('vision/{}'.format(camera), DetectionArray, queue_size=1)
     rospy.Subscriber('gazebo/link_states', LinkStates, callback, queue_size=1)
-    rospy.Subscriber('camera/left/image_raw', Image, camera_callback, queue_size=1)
+    rospy.Subscriber('camera/{}/image_raw'.format(camera), Image, camera_callback, queue_size=1)
 
     rospy.spin()
