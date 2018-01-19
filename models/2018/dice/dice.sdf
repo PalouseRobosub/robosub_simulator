@@ -11,7 +11,7 @@
       <visual name='one_dice_vis'>
         <geometry>
           <box>
-            <size>0.3 0.3 0.3</size>
+            <size>0.23 0.23 0.23</size>
           </box>
         </geometry>
         <material>
@@ -42,7 +42,7 @@
       <collision name='one_dice_collide'>
         <geometry>
           <box>
-            <size>0.3 0.3 0.3</size>
+            <size>0.23 0.23 0.23</size>
           </box>
         </geometry>
       </collision>
@@ -53,7 +53,7 @@
       <visual name='two_dice_vis'>
         <geometry>
           <box>
-            <size>0.3 0.3 0.3</size>
+            <size>0.23 0.23 0.23</size>
           </box>
         </geometry>
         <material>
@@ -84,7 +84,7 @@
       <collision name='two_dice_collide'>
         <geometry>
           <box>
-            <size>0.3 0.3 0.3</size>
+            <size>0.23 0.23 0.23</size>
           </box>
         </geometry>
       </collision>
@@ -95,7 +95,7 @@
       <visual name='three_dice_vis'>
         <geometry>
           <box>
-            <size>0.3 0.3 0.3</size>
+            <size>0.23 0.23 0.23</size>
           </box>
         </geometry>
         <material>
@@ -126,7 +126,7 @@
       <collision name='three_dice_collide'>
         <geometry>
           <box>
-            <size>0.3 0.3 0.3</size>
+            <size>0.23 0.23 0.23</size>
           </box>
         </geometry>
       </collision>
@@ -137,7 +137,7 @@
       <visual name='four_dice_vis'>
         <geometry>
           <box>
-            <size>0.3 0.3 0.3</size>
+            <size>0.23 0.23 0.23</size>
           </box>
         </geometry>
         <material>
@@ -168,7 +168,7 @@
       <collision name='four_dice_collide'>
         <geometry>
           <box>
-            <size>0.3 0.3 0.3</size>
+            <size>0.23 0.23 0.23</size>
           </box>
         </geometry>
       </collision>
@@ -179,7 +179,7 @@
       <visual name='five_dice_vis'>
         <geometry>
           <box>
-            <size>0.3 0.3 0.3</size>
+            <size>0.23 0.23 0.23</size>
           </box>
         </geometry>
         <material>
@@ -210,7 +210,7 @@
       <collision name='five_dice_collide'>
         <geometry>
           <box>
-            <size>0.3 0.3 0.3</size>
+            <size>0.23 0.23 0.23</size>
           </box>
         </geometry>
       </collision>
@@ -221,7 +221,7 @@
       <visual name='six_dice_vis'>
         <geometry>
           <box>
-            <size>0.3 0.3 0.3</size>
+            <size>0.23 0.23 0.23</size>
           </box>
         </geometry>
         <material>
@@ -252,7 +252,7 @@
       <collision name='six_dice_collide'>
         <geometry>
           <box>
-            <size>0.3 0.3 0.3</size>
+            <size>0.23 0.23 0.23</size>
           </box>
         </geometry>
       </collision>
