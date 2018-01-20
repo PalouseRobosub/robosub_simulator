@@ -5,7 +5,7 @@ rate:
         #  than any rates used for topics published by the simulator
         #  such as control, depth, sensor in cobalt_sim.yaml and
         #  any rate parameters below
-        simulator_bridge: 150
+        simulator_bridge: 30
         position: 10
         euler: 20
         obstacle_pos: 1
