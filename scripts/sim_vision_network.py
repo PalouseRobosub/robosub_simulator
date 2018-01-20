@@ -29,8 +29,6 @@ boxes = []
 max_distance = 10
 debug = False
 
-detection_pub = rospy.Publisher('vision', DetectionArray, queue_size=10)
-
 
 class FisheyeLens:
     """Describes a Fisheye Lens.
