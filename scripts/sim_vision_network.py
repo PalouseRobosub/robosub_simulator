@@ -58,6 +58,7 @@ class FisheyeLens:
         self.max_fov = max_fov
 
 
+""" Parameters taken from the Cobalt SDF camera model. """
 lens_parameters = FisheyeLens(c1=685.4, c2=525.2, c3=0, f=307.53251966606937)
 
 
