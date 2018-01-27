@@ -470,7 +470,7 @@ if __name__ == '__main__':
     camera = rospy.get_param('~camera')
 
     debug = rospy.get_param('~debug', default=False)
-    max_distance = rospy.get_param('~max_distance', default=10)
+    max_distance = rospy.get_param('~max_distance', default=5)
     rospy.loginfo('Opening {}'.format(filename))
     with open(filename, 'r') as f:
         data = json.load(f)
