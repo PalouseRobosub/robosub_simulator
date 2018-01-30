@@ -22,59 +22,54 @@ simulator:
             label: "start_gate_post"
             label_id: 1
             height: 1.5
-            width: 0.1
-            depth: 0.1
+            width: 0.08
+            depth: 0.08
+
         -   name: "gate_side_a::gate_left"
             label: "start_gate_post"
             label_id: 1
             height: 1.5
-            width: 0.1
-            depth: 0.1
-        -   name: "buoys_side_a::red_buoy"
-            label: "red_buoy"
+            width: 0.08
+            depth: 0.08
+
+        -   name: "dice_side_a::one_dice"
+            label: "one_dice"
             label_id: 2
-            height: 0.2
-            width: 0.2
-            depth: 0.2
-        -   name: "buoys_side_a::green_buoy"
-            label: "green_buoy"
+            height: 0.23
+            width: 0.23
+            depth: 0.23
+
+        -   name: "dice_side_a::two_dice"
+            label: "two_dice"
             label_id: 3
-            height: 0.2
-            width: 0.2
-            depth: 0.2
-        -   name: "buoys_side_a::yellow_buoy"
-            label: "yellow_buoy"
+            height: 0.23
+            width: 0.23
+            depth: 0.23
+
+        -   name: "dice_side_a::three_dice"
+            label: "three_dice"
             label_id: 4
-            height: 0.2
-            width: 0.2
-            depth: 0.2
-        -   name: "channel_side_a::bottom"
-            label: "nav_channel_bar"
+            height: 0.23
+            width: 0.23
+            depth: 0.23
+
+        -   name: "dice_side_a::four_dice"
+            label: "four_dice"
             label_id: 5
-            height: 2.0
-            width: 0.1
-            depth: 0.1
-        -   name: "channel_side_a::left"
-            label: "nav_channel_post"
+            height: 0.23
+            width: 0.23
+            depth: 0.23
+
+        -   name: "dice_side_a::five_dice"
+            label: "five_dice"
             label_id: 6
-            height: 1.0
-            width: 0.1
-            depth: 0.1
-        -   name: "channel_side_a::right"
-            label: "nav_channel_post"
-            label_id: 6
-            height: 1.0
-            width: 0.1
-            depth: 0.1
-        -   name: "path_marker2_side_a::top"
-            label: "path_marker"
+            height: 0.23
+            width: 0.23
+            depth: 0.23
+
+        -   name: "dice_side_a::six_dice"
+            label: "six_dice"
             label_id: 7
-            height: 0.1
-            width: 0.15
-            depth: 1.2
-        -   name: "path_marker1_side_a::top"
-            label: "path_marker"
-            label_id: 7
-            height: 0.1
-            width: 0.15
-            depth: 1.2
+            height: 0.23
+            width: 0.23
+            depth: 0.23
