@@ -28,6 +28,11 @@
   </node>
   <node name="thruster" pkg="robosub" type="thruster_maestro" launch-prefix="$(find robosub)/scripts/sleepme.sh 3"/>
   <node name="pinger_bearing" pkg="robosub" type="pinger_bearing" launch-prefix="$(find robosub)/scripts/sleepme.sh 3"/>
+
+  <node name="bottom_undistortion" pkg="robosub" type="undistortion" launch-prefix="$(find robosub)/scripts/sleepme.sh 3">
+    <param name="camera" value="bottom"/>
+    <rosparam command="load" file="$(find robosub_simulator)/param/bottom_camera.yaml" />
+  </node>
 </group>
 
 <group if="$(arg fake_net)">
