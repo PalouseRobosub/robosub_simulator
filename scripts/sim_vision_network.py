@@ -467,23 +467,23 @@ def camera_callback(image):
 if __name__ == '__main__':
     rospy.init_node('fake_network', anonymous=True)
 
-    filename = rospy.get_param('~fisheye_camera_file')
     camera = rospy.get_param('~camera')
+    K = np.array(rospy.get_param('~camera_matrix'))
+    D = np.array(rospy.get_param('~distortion_coefficients'))
+    image_size = (rospy.get_param('~size/rows'), rospy.get_param('~size/cols'))
+
+    print K
+    print D
+    print image_size
 
     debug = rospy.get_param('~debug', default=False)
     max_distance = rospy.get_param('~max_distance', default=5)
-    rospy.loginfo('Opening {}'.format(filename))
-    with open(filename, 'r') as f:
-        data = json.load(f)
-        K = np.array(data['K'])
-        D = np.array(data['D'])
-        image_size = (data['DIM'][0], data['DIM'][1])
 
     # Create a rectification map to correct fisheye distortions.
     map1, map2 = cv2.fisheye.initUndistortRectifyMap(K, D, np.eye(3), K, image_size, cv2.CV_16SC2)
 
     # Load a list of important links that need to be detected.
-    all_links = rospy.get_param('/simulator/significant_links')
+    all_links = rospy.get_param('simulator/significant_links')
     for link in all_links:
         links[link['name']] = LinkDescriptor(link['label'], link['width'], link['height'], link['depth'], link['label_id'])
 
