@@ -472,10 +472,6 @@ if __name__ == '__main__':
     D = np.array(rospy.get_param('~distortion_coefficients'))
     image_size = (rospy.get_param('~size/rows'), rospy.get_param('~size/cols'))
 
-    print K
-    print D
-    print image_size
-
     debug = rospy.get_param('~debug', default=False)
     max_distance = rospy.get_param('~max_distance', default=5)
 
