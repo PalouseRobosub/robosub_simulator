@@ -33,43 +33,64 @@ simulator:
             depth: 0.08
 
         -   name: "dice_side_a::one_dice"
-            label: "die_one"
+            label: "die_1"
             label_id: 2
             height: 0.23
             width: 0.23
             depth: 0.23
 
         -   name: "dice_side_a::two_dice"
-            label: "die_two"
+            label: "die_2"
             label_id: 3
             height: 0.23
             width: 0.23
             depth: 0.23
 
         -   name: "dice_side_a::three_dice"
-            label: "die_three"
+            label: "die_3"
             label_id: 4
             height: 0.23
             width: 0.23
             depth: 0.23
 
         -   name: "dice_side_a::four_dice"
-            label: "die_four"
+            label: "die_4"
             label_id: 5
             height: 0.23
             width: 0.23
             depth: 0.23
 
         -   name: "dice_side_a::five_dice"
-            label: "die_five"
+            label: "die_5"
             label_id: 6
             height: 0.23
             width: 0.23
             depth: 0.23
 
         -   name: "dice_side_a::six_dice"
-            label: "die_six"
+            label: "die_6"
             label_id: 7
             height: 0.23
             width: 0.23
             depth: 0.23
+
+        -   name: "path_marker1_side_a::link_0"
+            label: "path_marker"
+            label_id: 8
+            height: 0.03
+            width: 0.275
+            depth: 1.0
+
+        -   name: "path_marker2_side_a::link_0"
+            label: "path_marker"
+            label_id: 8
+            height: 0.03
+            width: 0.275
+            depth: 1.0
+
+        -   name: "roulette::roulette_wheel"
+            label: "roulette_wheel"
+            label_id: 9
+            height: 0.001
+            width: 1.0
+            depth: 1.0

@@ -29,7 +29,7 @@
   <node name="thruster" pkg="robosub" type="thruster_maestro" launch-prefix="$(find robosub)/scripts/sleepme.sh 3"/>
   <node name="pinger_bearing" pkg="robosub" type="pinger_bearing" launch-prefix="$(find robosub)/scripts/sleepme.sh 3"/>
 
-  <node name="bottom_undistortion" pkg="robosub" type="undistortion" launch-prefix="$(find robosub)/scripts/sleepme.sh 3">
+  <node name="bottom_undistortion" pkg="robosub" type="undistortion">
     <param name="camera" value="bottom"/>
     <rosparam command="load" file="$(find robosub_simulator)/param/bottom_camera.yaml" />
   </node>
@@ -45,6 +45,12 @@
         <rosparam command="load" file="$(find robosub_simulator)/param/right_camera.yaml" />
         <param name="camera" value="right"/>
         <param name="max_distance" value="7"/>
+    </node>
+    <node name="sim_network_bottom" type="sim_vision_network.py" pkg="robosub_simulator">
+        <rosparam command="load" file="$(find robosub_simulator)/param/bottom_camera.yaml" />
+        <param name="camera" value="bottom"/>
+        <param name="max_distance" value="7"/>
+        <param name="debug" value="true"/>
     </node>
 </group>
 
