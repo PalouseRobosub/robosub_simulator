@@ -50,7 +50,6 @@
         <rosparam command="load" file="$(find robosub_simulator)/param/bottom_camera.yaml" />
         <param name="camera" value="bottom"/>
         <param name="max_distance" value="7"/>
-        <param name="debug" value="true"/>
     </node>
 </group>
 
