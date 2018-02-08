@@ -7,9 +7,9 @@ notifications:
   email: false
   slack:
     rooms:
-      - palouserobosub:C883XOLXAI646jXLW8zENsVE#software
-    on_success: never
-    on_failure: never
+      - secure: "1X6t6P/RL97qAXY+nx9JHovMOcgTmvIwRRWOAJqL44Z4ypWtp8XJnU/pHjFYCW7JYe5TFpobEWrrnjORasrVH8rGU/n1pqHxFwJiAsmlDej1fqWcC0A8P1cj6OtbfEWw/az2FaFoP3G7+DejeFWVWWjgpUCpeFfw06fzSHAv6wdoISSSaFmWhgNHctaZuZJsTRrn1B9CMSEGGTV0RTnKSCo76cDd8XgG5bGBqbzOg8rK4jFtnb9VEObxHCK6zdx92vflZB25OC3QkJOE/86xhEQhmuyI3g7vUGd20Ioln93haeG2742/akhyfMXY0n8VPPTJwOeHUAzSKvHw0InTro0mtFP6I+YylgF/F58H3KD1j4G7/Sbe4WRA4tWUSv2FKVxhnHn5fp3DUKnBxiZ3pSGC5tW3cYduo+OVxcPO+Bxqx1CcnWEYTHsSU+5SoqPqyPAEf7w9QufBOPwXAlZ3if94eUBfpP17yaohlLpyPfLuKjSOkwbG3Gq0NRs2EYHSFB2qnPJap5ekATVRbtJnkFoI3dtvRIo5HuL670Y8pYUwAjADXpPmuWM0nxUh3arIOgr7o1dhQfkD5GJR48Ai27+Q6FuFto3+zqeIByWXeuUHbzXrAC++8whqLATTXIk3ONgfDrmo+M6jsihGb0E/NjjRnT3Az4w0nSGx3xPPHuw="
+    on_success: always
+    on_failure: always
 
 #whitelist for branches to build
 branches:
