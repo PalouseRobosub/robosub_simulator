@@ -454,6 +454,7 @@ def camera_callback(image):
     # Clear the boxes list to indicate the message has been sent.
     boxes = []
 
+    detections_msg.header.stamp = rospy.Time.now()
     detection_pub.publish(detections_msg)
 
     # Display the un-fisheye'd image with bounding points, link origins, and
