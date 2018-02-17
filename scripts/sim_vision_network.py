@@ -20,7 +20,7 @@ import tf
 
 from gazebo_msgs.msg import LinkStates
 from operator import add, sub
-from rs_yolo.msg import DetectionArray, Detection
+from robosub_msgs.msg import DetectionArray, Detection
 from sensor_msgs.msg import Image
 
 

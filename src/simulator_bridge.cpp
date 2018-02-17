@@ -1,6 +1,6 @@
 #include "ros/ros.h"
-#include "robosub/Float32Stamped.h"
-#include "robosub/Euler.h"
+#include "robosub_msgs/Float32Stamped.h"
+#include "robosub_msgs/Euler.h"
 #include "geometry_msgs/Vector3Stamped.h"
 #include "geometry_msgs/PointStamped.h"
 #include "geometry_msgs/Pose.h"
@@ -8,9 +8,9 @@
 #include "gazebo_msgs/ModelStates.h"
 #include "gazebo_msgs/LinkStates.h"
 #include "sensor_msgs/Imu.h"
-#include "robosub/ObstaclePosArray.h"
+#include "robosub_msgs/ObstaclePosArray.h"
 #include "geometry_msgs/QuaternionStamped.h"
-#include "robosub/HydrophoneDeltas.h"
+#include "robosub_msgs/HydrophoneDeltas.h"
 #include "tf/transform_datatypes.h"
 #include "tf/transform_broadcaster.h"
 #include "utility/ThrottledPublisher.hpp"
@@ -30,10 +30,10 @@ static constexpr double _180_OVER_PI = 180.0 / 3.14159;
 
 ThrottledPublisher<geometry_msgs::PointStamped> position_pub;
 ThrottledPublisher<geometry_msgs::QuaternionStamped> orientation_pub;
-ThrottledPublisher<robosub::Euler> euler_pub;
-ThrottledPublisher<robosub::Float32Stamped> depth_pub;
-ThrottledPublisher<robosub::ObstaclePosArray> obstacle_pos_pub;
-ThrottledPublisher<robosub::HydrophoneDeltas> hydrophone_deltas_pub;
+ThrottledPublisher<robosub_msgs::Euler> euler_pub;
+ThrottledPublisher<robosub_msgs::Float32Stamped> depth_pub;
+ThrottledPublisher<robosub_msgs::ObstaclePosArray> obstacle_pos_pub;
+ThrottledPublisher<robosub_msgs::HydrophoneDeltas> hydrophone_deltas_pub;
 ThrottledPublisher<geometry_msgs::Vector3Stamped> lin_accel_pub;
 
 // List of names of objects to publish the position and name of. This will be
@@ -127,7 +127,7 @@ void linkStatesCallback(const gazebo_msgs::LinkStates &msg)
             hydrophone_time_delays[i];
     }
 
-    robosub::HydrophoneDeltas deltas;
+    robosub_msgs::HydrophoneDeltas deltas;
     deltas.header.stamp = ros::Time::now();
     deltas.xDelta = ros::Duration(hydrophone_time_delays[1]);
     deltas.yDelta = ros::Duration(hydrophone_time_delays[2]);
@@ -144,8 +144,8 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
 {
     geometry_msgs::PointStamped position_msg;
     geometry_msgs::QuaternionStamped orientation_msg;
-    robosub::Float32Stamped depth_msg;
-    robosub::Euler euler_msg;
+    robosub_msgs::Float32Stamped depth_msg;
+    robosub_msgs::Euler euler_msg;
 
     // Find top of water and subs indices in modelstates lists
     int sub_index = -1, pinger_index = -1, ceiling_index = -1;
@@ -254,7 +254,7 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
     // object_name[i]. std::distance is used to find the index of that object
     // wthin the msg.name (and therefore msg.pose array since they contain the
     // same objects in the same order).
-    robosub::ObstaclePosArray object_array;
+    robosub_msgs::ObstaclePosArray object_array;
     for(int i = 0; i < object_names.size(); i++)
     {
         auto it = std::find(msg.name.begin(), msg.name.end(), object_names[i]);
@@ -266,7 +266,7 @@ void modelStatesCallback(const gazebo_msgs::ModelStates& msg)
             int idx = std::distance(msg.name.begin(), it);
 
             // Extract necessary data from modelstates.
-            robosub::ObstaclePos pos;
+            robosub_msgs::ObstaclePos pos;
             pos.x = msg.pose[idx].position.x - pinger_position[0];
             pos.y = msg.pose[idx].position.y - pinger_position[1];
             pos.z = -(msg.pose[ceiling_index].position.z -
@@ -303,13 +303,13 @@ int main(int argc, char **argv)
         ("simulator/cobalt/position", 1, 0, "rate/simulator/position");
     orientation_pub = ThrottledPublisher<geometry_msgs::QuaternionStamped>
         ("real/orientation", 1, 0, "rate/imu");
-    euler_pub = ThrottledPublisher<robosub::Euler>
+    euler_pub = ThrottledPublisher<robosub_msgs::Euler>
         ("real/pretty/orientation", 1, 0, "rate/simulator/euler");
-    depth_pub = ThrottledPublisher<robosub::Float32Stamped>
+    depth_pub = ThrottledPublisher<robosub_msgs::Float32Stamped>
         ("depth", 1, 0, "rate/depth");
-    obstacle_pos_pub = ThrottledPublisher<robosub::ObstaclePosArray>
+    obstacle_pos_pub = ThrottledPublisher<robosub_msgs::ObstaclePosArray>
         ("obstacles/positions", 1, 0, "rate/simulator/obstacle_pos");
-    hydrophone_deltas_pub = ThrottledPublisher<robosub::HydrophoneDeltas>
+    hydrophone_deltas_pub = ThrottledPublisher<robosub_msgs::HydrophoneDeltas>
         ("hydrophones/30khz/delta", 1, 0, "rate/simulator/hydrophone_deltas");
     lin_accel_pub = ThrottledPublisher<geometry_msgs::Vector3Stamped>
         ("real/acceleration/linear", 1, 0, "rate/simulator/lin_accel");

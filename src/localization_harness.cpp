@@ -1,5 +1,5 @@
 #include "ros/ros.h"
-#include "robosub/Float32Stamped.h"
+#include "robosub_msgs/Float32Stamped.h"
 #include "tf2_ros/transform_listener.h"
 #include "tf2/exceptions.h"
 #include "tf/transform_datatypes.h"
@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 
     geometry_msgs::TransformStamped resultantTransform;
 
-    ros::Publisher linear_error_pub = nh.advertise<robosub::Float32Stamped>(
+    ros::Publisher linear_error_pub = nh.advertise<robosub_msgs::Float32Stamped>(
         "localization/error/linear", 1);
 
     ros::Publisher vector_error_pub =
@@ -43,7 +43,7 @@ int main(int argc, char **argv)
                                                       ros::Time(0),
                                                       ros::Duration(300.0));
 
-            robosub::Float32Stamped linear_error_msg;
+            robosub_msgs::Float32Stamped linear_error_msg;
             geometry_msgs::Vector3Stamped vector_error_msg;
 
             linear_error_msg.header.stamp = vector_error_msg.header.stamp =
