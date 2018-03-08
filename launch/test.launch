@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<launch>
+<rosparam command="load" file="$(find robosub)/param/cobalt.yaml"/>
+<rosparam command="load" file="$(find robosub_simulator)/param/cobalt_sim.yaml"/>
+<rosparam command="load" file="$(find robosub_simulator)/param/obstacles.yaml"/>
+<rosparam command="load" file="$(find robosub_simulator)/param/simulator.yaml"/>
+<arg name="world"  default="test"/>
+<arg name="gui"  default="true"/>
+<arg name="minimal"  default="false"/>
+<arg name="fake_net" default="true"/>
+<include file="$(find gazebo_ros)/launch/empty_world.launch">
+   <arg name="use_sim_time" value="true"/>
+   <arg name="debug" value="false"/>
+   <arg name="gui" value="$(arg gui)" />
+   <arg name="verbose" value="true"/>
+   <arg name="world_name" value="$(find robosub_simulator)/worlds/$(arg world).world"/>
+</include>
+
+<node name="virtual_serial_port_thruster" pkg="robosub_simulator" type="create_thruster_vsp.sh" />
+<node name="simulator_bridge" pkg="robosub_simulator" type="simulator_bridge" required="true" />
+
+<!-- launch basic sub software, unless we are just running the minimal simulator-->
+<group unless="$(arg minimal)">
+  <node name="localization_harness" pkg="robosub_simulator" type="localization_harness" output="screen" />
+  <node name="control" pkg="robosub" type="control" />
+  <node name="imu" pkg="robosub" type="imu">
+    <param name="active_imu" value="real"/>
+  </node>
+  <node name="thruster" pkg="robosub" type="thruster_maestro" launch-prefix="$(find robosub)/scripts/sleepme.sh 3"/>
+  <node name="pinger_bearing" pkg="robosub" type="pinger_bearing" launch-prefix="$(find robosub)/scripts/sleepme.sh 3"/>
+
+  <node name="bottom_undistortion" pkg="robosub" type="undistortion">
+    <param name="camera" value="bottom"/>
+    <rosparam command="load" file="$(find robosub_simulator)/param/bottom_camera.yaml" />
+  </node>
+</group>
+
+<group if="$(arg fake_net)">
+    <node name="sim_network_left" type="sim_vision_network.py" pkg="robosub_simulator">
+        <rosparam command="load" file="$(find robosub_simulator)/param/left_camera.yaml" />
+        <param name="camera" value="left"/>
+        <param name="max_distance" value="7"/>
+    </node>
+    <node name="sim_network_right" type="sim_vision_network.py" pkg="robosub_simulator">
+        <rosparam command="load" file="$(find robosub_simulator)/param/right_camera.yaml" />
+        <param name="camera" value="right"/>
+        <param name="max_distance" value="7"/>
+    </node>
+    <node name="sim_network_bottom" type="sim_vision_network.py" pkg="robosub_simulator">
+        <rosparam command="load" file="$(find robosub_simulator)/param/bottom_camera.yaml" />
+        <param name="camera" value="bottom"/>
+        <param name="max_distance" value="7"/>
+    </node>
+</group>
+
+<node name="stereo_vision" type="stereo_node.py" pkg="robosub">
+    <param name="camera_separation" value="0.40"/>
+    <param name="focal_distance" value="442"/>
+</node>
+
+</launch>

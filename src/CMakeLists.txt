@@ -31,3 +31,8 @@ target_link_libraries(simulator_bridge ${catkin_LIBRARIES})
 add_executable(localization_harness localization_harness.cpp)
 add_dependencies(localization_harness ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(localization_harness ${catkin_LIBRARIES})
+
+# Plugin for Bumper
+add_library(gazebo_ros_bumper bumper.cpp)
+add_dependencies(gazebo_ros_bumper ${catkin_EXPORTED_TARGETS})
+target_link_libraries(gazebo_ros_bumper ${Boost_LIBRARIES} ContactPlugin ${catkin_LIBRARIES})
