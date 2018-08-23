@@ -31,6 +31,14 @@ addons:
     - robosub-kinetic
     - robosub-simulator-kinetic
 
+before_install:
+  - |
+     sudo systemctl stop apt-daily.service &&
+     sudo systemctl kill --kill-who=all apt-daily.service &&
+     while ! (systemctl list-units --all apt-daily.service | fgrep -q dead) ; do
+       sleep 1
+     done
+
 #build the project
 before_script:
   - source /opt/ros/kinetic/setup.bash
