@@ -132,7 +132,7 @@ void linkStatesCallback(const gazebo_msgs::LinkStates &msg)
     deltas.xDelta = ros::Duration(hydrophone_time_delays[1]);
     deltas.yDelta = ros::Duration(hydrophone_time_delays[2]);
     deltas.zDelta = ros::Duration(hydrophone_time_delays[3]);
-    
+
     /*
      * deltas need to be made negative to match what the sub receives from the
      * actual hydrophones
